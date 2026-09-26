@@ -1,0 +1,49 @@
+\begin{tikzpicture}[>=Latex,thick,font=\small,
+  spring/.style={decorate,decoration={zigzag,segment length=3.6pt,amplitude=3pt}}]
+  \foreach \offset/\labeltext in {0/{(a) Absorvedor: coordenadas independentes},8/{(b) Massa de ponta e apoio ao solo}} {
+    \begin{scope}[xshift=\offset cm]
+      \node[anchor=west,font=\small\bfseries] at (-.3,1.1) {\labeltext};
+      \fill[pattern=north east lines] (-.4,-.45) rectangle (0,.45);
+      \draw[very thick] (0,-.45)--(0,.45);
+      \fill[blue!15] (0,-.09) rectangle (4.4,.09);
+      \draw (0,-.09)--(4.4,-.09) (0,.09)--(4.4,.09);
+      \node at (2.1,.43) {$EI,\ \rho A,\ L$};
+      \draw[->,thin] (.25,-.55)--(1.8,-.55) node[right] {$x$};
+      \draw[->,blue!70!black] (2.5,-.1)--(2.5,-1.05) node[below] {$w(x,t)$};
+    \end{scope}
+  }
+  % Independent oscillator linked to a massless tip crossbar.
+  \fill (4.4,0) circle (2pt);
+  \draw (4.4,0)--(4.4,-.4) (3.75,-.4)--(5.05,-.4);
+  \draw[spring] (3.75,-.4)--(3.75,-1.75);
+  \node[left] at (3.5,-1.05) {$k$};
+  \draw (5.05,-.4)--(5.05,-.8);
+  \draw (4.81,-1.25)--(4.81,-.8)--(5.29,-.8)--(5.29,-1.25);
+  \draw (4.84,-1.02)--(5.26,-1.02) (5.05,-1.02)--(5.05,-1.75);
+  \node[right] at (5.35,-1.05) {$c$};
+  \draw (3.75,-1.75)--(5.05,-1.75) (4.4,-1.75)--(4.4,-1.98);
+  \draw[fill=orange!20] (3.65,-1.98) rectangle (5.15,-2.65);
+  \node at (4.4,-2.3) {$m,\ z(t)$};
+  \draw[->,blue!70!black] (5.8,.1)--(5.8,-.5) node[right] {$y=w(L,t)$};
+  \draw[->,orange!80!black] (5.65,-2.0)--(5.65,-2.85) node[right] {$z$};
+  \draw[->,red!70!black] (4.4,.85)--(4.4,.15) node[midway,right] {$f$};
+  \node[align=center,font=\footnotesize] at (3,-3.3)
+    {Mola e amortecedor medem $z-y$.\\A massa não está ligada ao solo.};
+  % Rigidly attached point mass, spring and damper connected to ground.
+  \begin{scope}[xshift=8cm]
+    \draw[fill=orange!20] (3.8,-.3) rectangle (5,.3);
+    \node at (4.4,0) {$m$};
+    \draw (4.4,-.3)--(4.4,-.55) (3.75,-.55)--(5.05,-.55);
+    \draw[spring] (3.75,-.55)--(3.75,-1.9);
+    \node[left] at (3.5,-1.2) {$k$};
+    \draw (5.05,-.55)--(5.05,-.95);
+    \draw (4.81,-1.4)--(4.81,-.95)--(5.29,-.95)--(5.29,-1.4);
+    \draw (4.84,-1.17)--(5.26,-1.17) (5.05,-1.17)--(5.05,-1.9);
+    \node[right] at (5.35,-1.2) {$c$};
+    \draw (3.2,-1.9)--(5.6,-1.9);
+    \fill[pattern=north east lines] (3.2,-2.13) rectangle (5.6,-1.9);
+    \draw[->,blue!70!black] (5.8,.1)--(5.8,-.65) node[right] {$y=z$};
+    \node[align=center,font=\footnotesize] at (3,-3.3)
+      {Mola e amortecedor medem $y$.\\A massa acompanha rigidamente a ponta.};
+  \end{scope}
+\end{tikzpicture}

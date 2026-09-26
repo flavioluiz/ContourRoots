@@ -1,0 +1,26 @@
+# Generated study results and release builds
+output/
+dist/
+tmp/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.lof
+*.lot
+
+# MATLAB
+*.asv
+*.mex*
+buildtool.log
+.buildtool/
+
+# OS / editor
+.DS_Store
