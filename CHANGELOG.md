@@ -3,7 +3,7 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.3.0] — 2026-09-26
 
 ### Added
 - Aeroelasticity example: flutter of a two-degree-of-freedom wing section
