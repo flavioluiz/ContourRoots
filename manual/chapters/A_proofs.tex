@@ -1,0 +1,54 @@
+\chapter{Proofs}\label{ap:proofs}
+
+\paragraph{Proposition~\ref{prop:bound}.} Let $\Real s\ge0$ and $F(s,T)=0$.
+Then $|D(s)|=|N(s)|e^{-T\Real s}\le|N(s)|$. With $r=|s|$, the triangle
+inequality gives $|D(s)|\ge r^m-\sum_{k<m}|d_k|r^k$ and
+$|N(s)|\le\sum_{k\le p}|n_k|r^k$, hence
+$h(r)=r^m-\sum_{k<m}|d_k|r^k-\sum_{k\le p}|n_k|r^k\le0$. Since $p<m$, the
+coefficients of $h$ have exactly one sign change, so by Descartes' rule of
+signs $h$ has exactly one positive root $R$ (if some coefficient other than
+the leading one is nonzero), and $h(r)>0$ for $r>R$. Therefore $r\le R$.
+Nothing depends on $T$. \hfill$\square$
+
+\paragraph{Proposition~\ref{prop:direction}.} The signs of $\Real(ds/dT)$ and
+of $\Real[(ds/dT)^{-1}]$ coincide. From~\eqref{eq:speed}, using
+$e^{-sT}N(s)=-D(s)$ at a root,
+\[
+  \Bigl(\frac{ds}{dT}\Bigr)^{-1}=\frac{D'(s)+e^{-sT}N'(s)}{s\,e^{-sT}N(s)}-\frac Ts
+  =\frac1s\Bigl[\frac{N'(s)}{N(s)}-\frac{D'(s)}{D(s)}\Bigr]-\frac Ts .
+\]
+At $s=\ii\omega$, $-T/(\ii\omega)$ is purely imaginary and
+$\Real[\zeta/(\ii\omega)]=\Imag(\zeta)/\omega$. For a real polynomial $P$,
+$\frac{d}{d\omega}\ln|P(\ii\omega)|^2=2\Real[\ii P'(\ii\omega)/P(\ii\omega)]
+=-2\Imag[P'(\ii\omega)/P(\ii\omega)]$. Hence
+\[
+  \Real\Bigl(\frac{ds}{dT}\Bigr)^{-1}
+  =\frac{1}{2\omega}\frac{d}{d\omega}\bigl[\ln|D(\ii\omega)|^2-\ln|N(\ii\omega)|^2\bigr]
+  =\frac{G'(\omega)}{2\omega|D(\ii\omega)|^2},
+\]
+using $|D|=|N|$ at the crossing. Since $\omega>0$ the claim follows.
+\hfill$\square$
+
+\paragraph{Proposition~\ref{prop:padedir}.} (a) On the imaginary axis
+$|P_n/Q_n|=1$ by~\eqref{eq:allpass}, so $D+NP_n/Q_n=0$ requires
+$|D(\ii\omega)|=|N(\ii\omega)|$. (b) The phase condition is
+$\phi_n(\omega T)=-\theta_i-2\pi k$; since $\phi_n$ decreases monotonically
+from $0$ to $-n\pi$, it has a solution, which is unique, if and only if
+$\theta_i+2\pi k<n\pi$. (c) With $R(z)=P_n(z)/Q_n(z)$ in place of $e^{-z}$,
+$F=D+R(sT)N$, $F_s=D'+RN'+TR'N$ and $F_T=sR'N$. Using $RN=-D$ and
+$\rho=R'/R$,
+\[
+  \Bigl(\frac{ds}{dT}\Bigr)^{-1}=-\frac{F_s}{F_T}
+  =\frac{1}{s\,[-\rho(sT)]}\Bigl[\frac{N'}{N}-\frac{D'}{D}\Bigr]-\frac Ts .
+\]
+On the imaginary axis $R(\ii y)=e^{\ii\phi_n(y)}$ gives
+$\rho(\ii y)=\phi_n'(y)$, real and negative; for the exact delay
+$\rho\equiv-1$. The positive factor $-1/\phi_n'$ does not change the sign of
+the real part, which is therefore $\operatorname{sign}G'(\omega_i)$ as in
+Proposition~\ref{prop:direction}. \hfill$\square$
+
+\paragraph{Error of the derivative formula of Section~\ref{sec:newton}.}
+For analytic $f$, $\frac{f(z+h)-f(z-h)}{2h}=f'+\frac{h^2}{6}f'''+O(h^4)$ and
+$\frac{f(z+\ii h)-f(z-\ii h)}{2\ii h}=f'-\frac{h^2}{6}f'''+O(h^4)$. Their mean
+is the formula of Section~\ref{sec:newton}, with error $O(h^4)$.
+\hfill$\square$

@@ -1,0 +1,52 @@
+\chapter{Validation and limitations}\label{ch:validation}
+
+\section{Test suite}
+
+The test suite (\code{buildtool test} and \code{buildtool docs}) has four
+layers.
+\begin{description}
+  \item[Unit tests] of the public interface: agreement of \code{croots},
+    \code{cpoles}, \code{czeros} and \code{cpzmap} with the core solver;
+    polynomial input against \code{roots}; cancellations; warnings for
+    exploratory and incomplete searches; input errors.
+  \item[Regression tests] of the numerical behavior: a triple root; three
+    roots under scalings of $10^{\pm100}$; a function without zeros;
+    boundary roots and exhausted budgets that must not be reported as
+    complete; heat, string and duct poles against closed forms; total and
+    partial cancellation; an opaque handle with $Z-P=0$; symbolic and LTI
+    input; the delay tools (closed-form critical delay, delay-independent
+    stability, Padé predictions, bound-based counts); the coupled beam
+    (static compliance, limits, scaling, finite-element convergence).
+  \item[Baseline] results of the research code from which the toolbox was
+    extracted must be reproduced within a relative tolerance of $10^{-9}$.
+  \item[Documentation tests] execute every MATLAB block of the README and
+    of the Markdown documentation, the quick-start scripts, and check that
+    code shown in tutorials is identical to the example files.
+\end{description}
+
+\section{Independent references in the studies}
+
+The studies of Chapters~\ref{ch:delay}--\ref{ch:beam} compare the solver
+with closed forms (critical delay of P1; heat, string and duct spectra),
+modal formulas (Kelvin--Voigt beam), the direct critical-delay method and
+bound-based counts (stability maps), time-domain integration with
+\code{dde23}, and a finite-element model (coupled beam). The references are
+never used as Newton seeds.
+
+\section{Limitations}
+
+\begin{itemize}
+  \item Scalar functions only; matrix and MIMO problems are not treated.
+  \item Rectangular regions only; roots outside the rectangle are not
+        considered, and infinite spectra are not enumerated.
+  \item Completeness is a numerical check under the analyticity assumption
+        (Section~\ref{sec:contract}), not an interval-arithmetic proof.
+  \item Analyticity of function handles, and the location of branch and
+        accumulation points, must be established by the user.
+  \item Roots closer than the confirmation resolution are reported as
+        clusters; near pole-zero pairs may be reported as cancelled.
+  \item The time-delay tools assume one constant delay, real coefficients
+        and (for the bound) a retarded system.
+  \item Tested with MATLAB R2023b; other releases and Octave have not been
+        tested.
+\end{itemize}

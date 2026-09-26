@@ -37,9 +37,10 @@ and, with proofs, in the [manual](../ContourRoots_manual.pdf).
 | `Singularities` | `[]` | known branch or accumulation points; region containing one is rejected |
 | `Plot`, `Display` | `false` | plot or print the result |
 
-A contour count is accepted when two successive doublings give the same
-integer, the computed winding number is within `1e-7` of it, and all
-sampled increments of $\arg F$ are below $\pi/3$ and of $\log|F|$ below 2.
+A contour count is accepted when three consecutive sampling levels (each
+doubling the number of points) give the same integer and, at the last two
+levels, the computed winding number is within `1e-7` of it and all sampled
+increments of $\arg F$ are below $\pi/3$ and of $\log|F|$ below 2.
 
 ## Example
 

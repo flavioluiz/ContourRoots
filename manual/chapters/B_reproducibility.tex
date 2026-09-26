@@ -1,0 +1,31 @@
+\chapter{Reproducibility}\label{ap:repro}
+
+All numbers, tables and figures of this manual are produced by the code
+distributed with ContourRoots. From the repository folder:
+\begin{lstlisting}
+buildtool examples   % time-delay, distributed and coupled-beam studies
+buildtool manual     % documentation figures and this PDF
+buildtool test       % unit and regression tests
+buildtool docs       % documentation tests
+\end{lstlisting}
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{>{\ttfamily\raggedright}p{6.2cm}X}
+\toprule
+\normalfont File & Content\\\midrule
+matlab/\allowbreak complex\_spectrum.m & core solver (Chapter~\ref{ch:algorithm})\\
+matlab/\allowbreak private/\allowbreak spectrum\_*.m & counts, Newton, subdivision, input adapters\\
+matlab/\allowbreak croots.m, cpoles.m, czeros.m, cpzmap.m, ndpair.m & public interface\\
+matlab/\allowbreak delay/\allowbreak *.m & time-delay and Padé tools (Chapter~\ref{ch:delay})\\
+examples/\allowbreak time\_delay/\allowbreak run\_delay\_study.m & Chapter~\ref{ch:delay}; calls \code{run\_pade\_critical\_study} and \code{run\_pade\_pitfalls}\\
+examples/\allowbreak distributed\_systems/\allowbreak run\_nonrational\_examples.m & Chapter~\ref{ch:distributed}\\
+examples/\allowbreak coupled\_beam/\allowbreak run\_coupled\_beam\_study.m & Chapter~\ref{ch:beam}\\
+examples/\allowbreak models/\allowbreak *.m & distributed and coupled-beam models, finite elements\\
+tools/\allowbreak make\_doc\_figures.m & figures of the Markdown documentation\\
+manual/\allowbreak  & this manual (\LaTeX{} sources and TikZ figures)\\
+\bottomrule
+\end{tabularx}\end{center}
+
+The results in this version were computed with MATLAB R2023b. Generated
+data are written to \code{output/}, which is not versioned; the studies take
+a few minutes.

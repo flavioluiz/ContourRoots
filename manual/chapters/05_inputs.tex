@@ -1,0 +1,70 @@
+\chapter{Model input and the analyticity contract}\label{ch:inputs}
+
+The algorithm of Chapter~\ref{ch:algorithm} is only as good as its
+assumption that the searched factor is analytic on a neighborhood of the
+closed rectangle. This chapter lists the accepted input forms and states,
+for each, how that assumption is established.
+
+\section{Input forms}
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{>{\raggedright}p{3.1cm}X}
+\toprule
+Input & Treatment\\\midrule
+Coefficient vector & Polynomial in descending powers, exact derivative; analytic by construction. \code{croots(c,region)} behaves like \code{roots(c)} restricted to the rectangle.\\
+Function handle & Evaluated as given. Analytic only if the user passes \code{AssumeAnalytic}; otherwise exploratory. Vectorized handles are evaluated on whole contours; scalar-only handles are evaluated point by point.\\
+\code{ndpair(N,D)} & Each factor is a handle, a coefficient vector or a symbolic expression. Polynomial and checked symbolic factors are analytic automatically; handles need \code{AssumeAnalytic}, which then applies to \emph{both} factors.\\
+Symbolic (\code{sym}, \code{symfun}) & Split with \code{numden}; each factor is checked by a conservative grammar (below) and differentiated exactly.\\
+\code{tf}, \code{zpk}, \code{ss} & Continuous-time SISO only. Rational models and \code{tf} models with input, output or transport delays become an analytic pair (delay in the numerator). Models with internal delays are evaluated with \code{evalfr} in exploratory mode.\\
+\bottomrule
+\end{tabularx}\end{center}
+
+\section{The symbolic analyticity check}
+
+A symbolic factor is accepted as entire if it is a number, the variable, or
+is built from entire factors by sums, products, $\exp$, $\sin$, $\cos$,
+$\sinh$, $\cosh$ and powers with constant nonnegative integer exponents.
+The check is \emph{sufficient, not necessary}: $\cosh\sqrt s$ is entire but
+is rejected, with the error \code{complex\_spectrum:AnalyticContract}. The
+remedy is to provide the factor as a handle that evaluates the entire
+function directly (with a series near removable points,
+Chapter~\ref{ch:distributed}) and to declare \code{AssumeAnalytic}. All
+parameters other than the complex variable must be substituted numerically
+before the call.
+
+\section{What a declaration of analyticity means}
+
+\code{'AssumeAnalytic',true} asserts that the searched factor(s) are
+analytic on an open set containing the closed rectangle. It is a statement
+about mathematics, not about the code, and must be checked by the user:
+\begin{itemize}
+  \item removable singularities (e.g.\ $\sinh(s)/s$ at $0$) must be removed
+        in the implementation, otherwise the evaluation returns \code{NaN};
+  \item roots such as $\sqrt s$ or $s^{1/4}$ are acceptable only inside
+        combinations invariant under the change of branch;
+  \item for a \emph{single} handle in pole mode, the declaration concerns
+        $1/G$: it asserts that $G$ has no zeros in the rectangle. For
+        transfer functions with zeros, use \code{ndpair}.
+\end{itemize}
+A false declaration makes the counts meaningless and can produce wrong
+results without any warning.
+
+\section{Singular points}
+
+Some models have points where the function is not meromorphic: branch
+points of genuinely multivalued functions, or accumulation points of poles
+(Section~\ref{sec:kelvinvoigt}). No finite contour computation can resolve
+a neighborhood of such a point. The option \code{Singularities} declares
+them; a rectangle that contains one is rejected with the error
+\code{complex\_spectrum:SingularityInRegion}. The solver does not discover
+such points in opaque handles.
+
+\section{Scaling}
+
+The argument principle is invariant under multiplication of $f$ by a
+nonzero constant, and the regression tests check that roots do not change
+when $f$ is scaled by $10^{\pm100}$. Overflow is a different matter: a
+term such as $e^{-sT}$ grows like $e^{T|\Real s|}$ in the left half-plane,
+and samples that overflow make a count fail. Rectangles extending far to
+the left may need to be split, or the function rescaled by an analytic
+nonvanishing factor.

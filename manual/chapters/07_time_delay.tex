@@ -1,0 +1,486 @@
+\chapter{Time-delay systems and the limits of Padé approximations}\label{ch:delay}
+
+This chapter studies the scalar characteristic equation
+\begin{equation}
+  F(s,T)=D(s)+N(s)\,e^{-sT}=0,\qquad T\ge0,
+  \label{eq:qp}
+\end{equation}
+with real polynomials $D$ of degree $m$ and $N$ of degree $p$. It shows
+that the stability of such systems can be decided for every delay without
+approximating the delay, and then examines precisely what a Padé
+approximation of $e^{-sT}$ preserves and what it loses.
+
+\section{Formulation}
+
+The simplest example is the delay-differential equation
+\begin{equation}
+  \dot x(t)=-a\,x(t)-b\,x(t-T).
+  \label{eq:dde}
+\end{equation}
+Its solution from $t=0$ is determined only by a whole \emph{history}
+$x(\theta)=\varphi(\theta)$, $\theta\in[-T,0]$: on $[0,T]$ the delayed term is
+known and \eqref{eq:dde} is an ordinary differential equation; its solution
+determines the delayed term on $[T,2T]$, and so on (the \emph{method of
+steps} \citep{bellman1963}). The state is a function, and the system is
+infinite-dimensional. Exponential solutions $e^{st}$ exist when
+$s+a+be^{-sT}=0$. More generally, the loop of Figure~\ref{fig:loop}, a
+rational plant $N/D$ with delayed unit feedback, has the characteristic
+equation~\eqref{eq:qp}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  blk/.style={draw=ink,thick,minimum width=22mm,minimum height=10mm,align=center,fill=soft},
+  sum/.style={draw=ink,thick,circle,minimum size=6mm,inner sep=0},
+  arr/.style={-{Stealth[length=2.2mm]},thick}]
+  \node (in) at (0,0) {$r$};
+  \node[sum,right=12mm of in] (s) {};
+  \node[blk,right=14mm of s] (G) {$\dfrac{N(s)}{D(s)}$};
+  \coordinate[right=16mm of G] (out);
+  \node[right=4mm of out] (y) {$y$};
+  \node[blk,below=10mm of G,fill=softred,draw=rust] (d) {$e^{-sT}$};
+  \draw[arr] (in) -- (s);
+  \draw[arr] (s) -- node[above]{$e$} (G);
+  \draw[arr] (G) -- (out) -- (y);
+  \draw[arr] (out) |- (d);
+  \draw[arr] (d) -| node[pos=0.95,right]{$-$} (s);
+\end{tikzpicture}
+\caption{Loop with a delay in the feedback path. The loop transfer function
+is $L(s)=\frac{N(s)}{D(s)}e^{-sT}$; $1+L=0$ is equivalent to~\eqref{eq:qp}.
+The delay has unit gain at every frequency and unbounded phase $-\omega T$.}
+\label{fig:loop}
+\end{figure}
+
+\begin{definition}
+The system is \emph{retarded} if $p<m$ and \emph{neutral} if $p=m$.
+\end{definition}
+Throughout this chapter $p<m$. Three cases illustrate the typical
+behaviors (Table~\ref{tab:cases}).
+
+\begin{table}[H]\centering\small
+\caption{Case studies; all are stable at $T=0$.}\label{tab:cases}
+\begin{tabular}{llll}\toprule
+Case & Equation & Model & Behavior as $T$ grows\\\midrule
+P1 & $s+1+2e^{-sT}=0$ & $\dot x=-x(t)-2x(t-T)$ & loses stability at $T\approx1.209$\\
+P2 & $s+2+e^{-sT}=0$ & $\dot x=-2x(t)-x(t-T)$ & stable for every $T\ge0$\\
+P3 & $s^2+0.8s+4+3e^{-sT}=0$ & $\ddot x+0.8\dot x+4x=-3x(t-T)$ & stability switches\\
+\bottomrule\end{tabular}
+\end{table}
+
+\section{Structure of the spectrum}
+
+$F(\cdot,T)$ is entire and, for $T>0$, has infinitely many roots. For
+retarded systems they form chains that move to the left: balancing
+$|D(s)|\sim|s|^m$ with $|N(s)e^{-sT}|\sim|s|^pe^{-T\Real s}$ gives
+\[
+  \Real s\approx-\frac{m-p}{T}\ln|s|,\qquad |s|\to\infty .
+\]
+Hence every half-plane $\Real s>c$ contains finitely many roots, the
+\emph{spectral abscissa} $\alpha(T)=\max\{\Real s:F(s,T)=0\}$ is well
+defined, and the zero solution of a linear retarded system is exponentially
+stable if and only if $\alpha(T)<0$ \citep{hale1993,michiels2014}.
+Figure~\ref{fig:polemaps} shows the spectra of the three cases together
+with the poles of Padé models (Section~\ref{sec:pade}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pole_maps.pdf}
+\caption{Roots of~\eqref{eq:qp} ($\times$) and poles of diagonal Padé
+models ($\circ$) at $T=1$ (P1, P2) and $T=0.8$ (P3). The exact chains
+continue to the left; the rational spectra are finite.}
+\label{fig:polemaps}
+\end{figure}
+
+\begin{proposition}[A region containing all unstable roots]\label{prop:bound}
+Let $p<m$, $D$ monic, $D(s)=s^m+\sum_{k<m}d_ks^k$, $N(s)=\sum_{k\le p}n_ks^k$,
+and let $R>0$ be the positive root of
+\[
+  r^m-\sum_{k<m}|d_k|r^k-\sum_{k\le p}|n_k|r^k=0 .
+\]
+Then for every $T\ge0$, every root of~\eqref{eq:qp} with $\Real s\ge0$
+satisfies $|s|\le R$.
+\end{proposition}
+The proof is in Appendix~\ref{ap:proofs}. For P1, $|s+1|\le2$ gives $R=3$;
+for P3, $R\approx3.076$. The function \code{rhp\_root\_bound} computes $R$,
+and \code{unstable\_root\_count} applies the argument principle to the
+rectangle $[0,R+1]\times[-(R+1),R+1]$: the number $Z(T)$ of unstable roots
+is obtained without guessing a search window and without approximation
+(the count itself is a floating-point computation, reliable away from
+critical delays).
+
+\section{Roots for a given delay}
+
+The study of this chapter locates roots with the delay-specific solver
+\code{delay\_roots} (damped Newton from a grid, audited by an
+argument-principle count); \code{croots} gives the same roots with the
+subdivision algorithm of Chapter~\ref{ch:algorithm}. Table~\ref{tab:solver}
+shows that the number of roots found agrees with the independent count and
+that the residuals are near machine precision.
+
+\input{../output/time_delay/data/table_solver.tex}
+
+\section{Critical delays}
+
+As $T$ varies the roots move continuously, and new roots appear only from
+$\Real s=-\infty$. Stability can therefore change only when a root crosses
+the imaginary axis. At a crossing $s=\ii\omega$, $\omega>0$,
+\begin{equation}
+  e^{-\ii\omega T}=-\frac{D(\ii\omega)}{N(\ii\omega)} .
+  \label{eq:crossing}
+\end{equation}
+This complex equation splits into two real equations with very different
+roles.
+
+\paragraph{Modulus: where.} The left side has unit modulus for every $T$,
+so the crossing frequencies do not depend on the delay and solve
+\begin{equation}
+  G(\omega)=|D(\ii\omega)|^2-|N(\ii\omega)|^2=0 ,
+  \label{eq:G}
+\end{equation}
+an even polynomial in $\omega$, i.e.\ a polynomial of degree $m$ in
+$x=\omega^2$. Its positive roots give a \emph{finite} set of frequencies.
+
+\paragraph{Phase: when.} For each frequency $\omega_i$, with
+$\theta_i=\operatorname{mod}(-\arg[-D(\ii\omega_i)/N(\ii\omega_i)],2\pi)$, the
+phase condition gives \emph{infinitely many} critical delays
+\begin{equation}
+  T_{i,k}=\frac{\theta_i+2\pi k}{\omega_i},\qquad k=0,1,2,\ldots
+  \label{eq:Tk}
+\end{equation}
+This elimination is the scalar form of the direct method
+\citep{walton1987,olgac2002,michiels2014}. \code{critical\_delays} computes
+all $T_{i,k}$ in an interval and refines each pair $(\omega,T)$ by a
+two-variable Newton correction.
+
+\begin{example}[P1]
+$G(\omega)=1+\omega^2-4$ gives $\omega_c=\sqrt3$. Since
+$-D(\ii\sqrt3)/N=e^{-2\pi\ii/3}$, $\theta=2\pi/3$ and
+$T_k=(2\pi/3+2\pi k)/\sqrt3$: $T_0=2\pi/(3\sqrt3)\approx1.2092$,
+$T_1\approx4.8368$, $T_2\approx8.4644$.
+\end{example}
+\begin{example}[P3]
+$G(\omega)=\omega^4-7.36\,\omega^2+7$ has the roots $\omega_1\approx2.4976$ and
+$\omega_2\approx1.0593$; each generates its own sequence of critical delays,
+and the two sequences interleave.
+\end{example}
+For P2, $G(\omega)=\omega^2+3>0$: there is no crossing, and since P2 is
+stable at $T=0$ it is stable for every delay.
+
+\section{Direction of the crossings}
+
+Differentiating $F(s(T),T)=0$ gives
+\begin{equation}
+  \frac{ds}{dT}=-\frac{F_T}{F_s}
+  =\frac{s\,e^{-sT}N(s)}{D'(s)+e^{-sT}[N'(s)-TN(s)]} .
+  \label{eq:speed}
+\end{equation}
+The crossing is destabilizing if $\Real(ds/dT)>0$ at $s=\ii\omega$. The
+following classical result \citep{cooke1986} makes the direction a property
+of the frequency alone.
+
+\begin{proposition}[Direction depends only on the frequency]\label{prop:direction}
+At a simple crossing $s=\ii\omega$, $\omega>0$,
+$\operatorname{sign}\Real\dfrac{ds}{dT}=\operatorname{sign}G'(\omega)$.
+\end{proposition}
+
+All branches $k$ of a frequency therefore cross in the same direction. In
+P1, $G'(\sqrt3)>0$: every $T_k$ adds an unstable pair. In P3, crossings at
+$\omega_1$ always destabilize and crossings at $\omega_2$ always stabilize
+(Table~\ref{tab:critical}, Figure~\ref{fig:critical}).
+
+\input{../output/time_delay/data/table_critical.tex}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{critical_delays.pdf}
+\caption{Frequencies and directions of the exact crossings (up: into the
+right half-plane; down: back to the left half-plane).}
+\label{fig:critical}
+\end{figure}
+
+\section{Stability map}
+
+Each simple crossing moves one conjugate pair, so the number of roots in
+the right half-plane is the step function
+\begin{equation}
+  Z(T)=Z(0)+2\sum_{T_{i,k}<T}\operatorname{sign}G'(\omega_i),
+  \label{eq:Z}
+\end{equation}
+where $Z(0)$ is the number of unstable roots of $D+N$ (the roots created
+when $T$ becomes positive come from $\Real s=-\infty$). For P3 on
+$[0,10]$:
+\[
+  Z(T)=\begin{cases}
+   0, & 0\le T<0.2918,\\
+   2, & 0.2918<T<2.6953,\\
+   0, & 2.6953<T<2.8076\quad\text{(stability window)},\\
+   2,4,6,4, & \text{after }2.8076,\ 5.3233,\ 7.8390,\ 8.6265.
+  \end{cases}
+\]
+The window has width $0.112$ and could easily be missed by a sweep in $T$.
+Formula~\eqref{eq:Z} was checked independently with
+\code{unstable\_root\_count} at 80 delays, with full agreement (black curve
+and circles in Figure~\ref{fig:Zp3}). Figure~\ref{fig:alpha} shows the
+spectral abscissa computed by a sweep, refined near the window.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{spectral_abscissa.pdf}
+\caption{Spectral abscissa versus delay, exact and with Padé models of
+orders 1, 4 and 8; diamonds are the exact critical delays of~\eqref{eq:Tk}.
+In P3 the exact curve touches zero at $T\approx2.695$ and crosses again at
+$T\approx2.808$; the \pade{1} model misses the window and the \pade{4}
+model widens it.}
+\label{fig:alpha}
+\end{figure}
+
+\section{The Padé approximation}\label{sec:pade}
+
+The diagonal Padé approximation of $e^{-z}$ of order $n$ is the rational
+function $P_n(z)/Q_n(z)$ whose Taylor series agrees with that of $e^{-z}$
+up to $z^{2n}$ \citep{baker1996}:
+\begin{equation}
+  e^{-z}-\frac{P_n(z)}{Q_n(z)}=O(z^{2n+1}),\quad
+  Q_n(z)=\sum_{k=0}^n\frac{(2n-k)!\,n!}{(2n)!\,k!\,(n-k)!}z^k,\quad
+  P_n(z)=Q_n(-z).
+  \label{eq:pade}
+\end{equation}
+With $z=sT$ the characteristic equation becomes the polynomial
+$D(s)Q_n(sT)+N(s)P_n(sT)$ of degree $m+n$. Three structural properties
+determine its behavior.
+
+\paragraph{(i) Exact gain.} Since $P_n(\ii y)=\overline{Q_n(\ii y)}$,
+\begin{equation}
+  \left|\frac{P_n(\ii y)}{Q_n(\ii y)}\right|=1\ \ (y\in\mathbb R),\qquad
+  \left|\frac{P_n(z)}{Q_n(z)}\right|\le1\ \ (\Real z\ge0),
+  \label{eq:allpass}
+\end{equation}
+the second by the maximum principle, as all roots of $Q_n$ lie in the left
+half-plane. The error of the approximation is entirely in the phase.
+
+\paragraph{(ii) Bounded phase.} Writing $P_n(\ii y)/Q_n(\ii y)=e^{\ii\phi_n(y)}$,
+$\phi_n=-2\arg Q_n(\ii y)$ decreases monotonically and
+\begin{equation}
+  \phi_n(y)=-y+O(y^{2n+1})\ (y\to0),\qquad \phi_n(y)\searrow-n\pi\ (y\to\infty),
+  \label{eq:phase}
+\end{equation}
+whereas the exact phase $-y$ is unbounded (Figure~\ref{fig:phaseuniv}).
+This behavior depends only on $y=\omega T$.
+
+\paragraph{(iii) Right-half-plane zeros.} The $n$ zeros of $P_n(sT)$ have
+positive real part. The step response of the approximation jumps to
+$(-1)^n$ at $t=0^+$ and oscillates before $t=T$, while the true delay stays
+at zero (Figure~\ref{fig:step}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pade_phase_universal.pdf}
+\caption{(a) Unwrapped phase of $e^{-\ii y}$ and of $\pade{n}$
+approximations; dotted lines mark $-n\pi$. (b) Phase error; the dashed line
+marks $10^{-2}$ rad.}
+\label{fig:phaseuniv}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{pade_step_response.pdf}
+\caption{Step response of $e^{-s}$ and of its Padé approximations.}
+\label{fig:step}
+\end{figure}
+
+Table~\ref{tab:validity} quantifies property (ii): the largest $y$ for
+which the phase error is below a tolerance. For $0.01$ rad and $n\ge4$,
+$y_{0.01}\approx1.6n-2$.
+
+\begin{table}[H]\centering\small
+\caption{Largest $y=\omega T$ with Padé phase error below $0.1$, $0.01$ and
+$10^{-6}$ rad, and asymptotic phase.}\label{tab:validity}
+\input{../output/time_delay/data/pade_validity_table.tex}
+\end{table}
+
+\section{What Padé preserves}
+
+\begin{proposition}[Frequencies and directions are inherited]\label{prop:padedir}
+For the rational equation $D+NP_n/Q_n=0$:
+\begin{enumerate}[label=(\alph*)]
+  \item imaginary roots occur exactly at the frequencies $\omega_i$
+        of~\eqref{eq:G};
+  \item at $\omega_i$, the critical delays solve
+        $\phi_n(\omega_iT)=-(\theta_i+2\pi k)$, which has a (unique)
+        solution if and only if $\theta_i+2\pi k<n\pi$;
+  \item every crossing has the direction $\operatorname{sign}G'(\omega_i)$.
+\end{enumerate}
+\end{proposition}
+Diagonal Padé never invents crossing frequencies nor reverses a direction;
+but a model of order $n$ has at most $\lceil(n\pi-\theta_i)/(2\pi)\rceil$
+crossings per frequency for \emph{all} $T\ge0$, about $n/2$, where the true
+system has infinitely many. Conclusions that depend only on the modulus are
+preserved: for P2, $|s+2|\ge2>1\ge|P_n/Q_n|$ in the right half-plane, and every
+Padé model is stable for every delay, as the true system.
+
+In a fixed condition the dominant roots converge very fast with $n$
+(Table~\ref{tab:pade}, Figure~\ref{fig:conv}): faster than geometrically,
+consistent with the $O(y^{2n+1})$ error, until round-off. Far from the
+origin, however, rational poles appear that have no exact counterpart (two
+for $n=4$, four for $n=8$, six for $n=12$ in the window of
+Figure~\ref{fig:polemaps}).
+
+\input{../output/time_delay/data/table_pade_rms.tex}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{pade_convergence.pdf}
+\caption{RMS error of the dominant pair versus Padé order.}
+\label{fig:conv}
+\end{figure}
+
+\section{What Padé loses}
+
+\subsection{A non-conservative delay margin}
+
+For P1, the \pade{1} phase is $-2\arctan(\omega T/2)$; equating it to
+$-2\pi/3$ at $\omega_c=\sqrt3$ gives $T_c^{\pade{1}}=2$, against the exact
+$1.2092$: a 65\,\% error (Table~\ref{tab:padeTc}). The rational polynomial
+$\tfrac T2s^2+(1-\tfrac T2)s+3$ is Hurwitz if and only if $T<2$. The error
+\emph{overestimates} the tolerable delay: at $T=1.5$, the \pade{1} model is
+stable (abscissa $-1/6$) while the true system is unstable (abscissa
+$+0.0656$). Figure~\ref{fig:sim} confirms it in the time domain, with the
+delay equation integrated directly by \code{dde23} \citep{shampine2001}.
+The first crossing occurs at $y=2\pi/3\approx2.09$, beyond the useful range
+of orders 1 and 2 and within that of order 4 (Table~\ref{tab:validity}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{p1_time_simulation.pdf}
+\caption{P1 at $T=1.5$, above the exact critical delay $1.209$: the delay
+equation diverges; the \pade{1} model decays; \pade{4} coincides with the
+exact solution.}
+\label{fig:sim}
+\end{figure}
+
+\begin{remark}
+The rational model also needs an initial state for the Padé filter. The
+true initial condition is a function on $[-T,0]$; a model of order $n$ holds
+only $n$ numbers. The constant history of Figure~\ref{fig:sim} can be
+represented consistently; general histories cannot.
+\end{remark}
+
+\subsection{Shifted and missing branches}
+
+For larger delays the branches $k\ge1$ of~\eqref{eq:Tk} matter, with larger
+values of $y$. Figure~\ref{fig:padephase} shows the mechanism for P1: every
+intersection of a phase curve with a horizontal line $-(\theta+2\pi k)$ is a
+critical delay; the Padé phases saturate and reach only the first lines,
+later and later. Table~\ref{tab:padeCoverage} and
+Figures~\ref{fig:padeacc}--\ref{fig:padeevents} separate two notions of
+quality: \emph{local accuracy} of the first critical delay converges fast
+with $n$; \emph{global coverage} of the events grows slowly. In P1 there are
+three events up to $T=10$; \pade{1} and \pade{2} represent one, \pade{4}
+two and \pade{8} three. Even when an event is represented, its position may
+be far off: \pade{4} places the second crossing of P1 at $5.71$ instead of
+$4.84$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{pade_critical_phase.pdf}
+\caption{P1: exact and Padé phases versus delay; intersections with the
+branch lines are critical delays.}
+\label{fig:padephase}
+\end{figure}
+
+\input{../output/time_delay/data/pade_critical_tables.tex}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pade_critical_accuracy.pdf}
+\caption{Left: relative error in the first critical delay. Right: fraction
+of the exact crossings in $[0,10]$ represented by each order.}
+\label{fig:padeacc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pade_critical_events.pdf}
+\caption{Critical delays predicted by each order (dots) and exact
+(vertical lines and crosses).}
+\label{fig:padeevents}
+\end{figure}
+
+\subsection{Stability windows erased, shifted and invented}
+
+In P3 stability depends on the order of events at two frequencies, so a
+shifted event changes the qualitative conclusion. Figure~\ref{fig:Zp3}
+compares $Z(T)$ from~\eqref{eq:Z} with the rational models (their counts
+computed with Proposition~\ref{prop:padedir} and checked by eigenvalues of
+a balanced state-space realization), and Table~\ref{tab:intervals} lists
+the predicted stable intervals.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{p3_unstable_count.pdf}
+\caption{P3: number of right-half-plane roots. Black: exact~\eqref{eq:Z};
+circles: independent bound-based count (Proposition~\ref{prop:bound}); red:
+Padé model. Shaded: the rational model reaches the wrong stability
+conclusion.}
+\label{fig:Zp3}
+\end{figure}
+
+\begin{table}[H]\centering\small
+\caption{P3: delay intervals in $[0,10]$ where each model predicts stability,
+and the number of unstable roots at $T=10$.}\label{tab:intervals}
+\input{../output/time_delay/data/p3_stability_intervals.tex}
+\end{table}
+
+Four kinds of error appear:
+\begin{itemize}
+  \item \textbf{Erased window.} \pade{1} has no stabilizing event of
+        $\omega_2$ in $[0,10]$ and misses the window.
+  \item \textbf{Unbounded fictitious stability.} \pade{2} has the
+        stabilizing event at $T=2.887$ but not the second branch of
+        $\omega_1$ (which needs $y\approx7.0>2\pi$); it predicts stability
+        for \emph{every} $T>2.887$, whereas the system is unstable for every
+        $T>2.808$.
+  \item \textbf{Shifted and widened window.} \pade{3} and \pade{4} predict
+        windows 12 and 2.5 times wider than the true one.
+  \item \textbf{Invented stable region.} \pade{5} reproduces the window but,
+        lacking the branches $k=2,3$ of $\omega_1$, turns the stabilizing
+        event at $T=9.13$ into a stable region $(9.13,10]$ that does not exist.
+\end{itemize}
+Only from order 10 on is the stability map in $[0,10]$ correct, and any fixed
+order fails again on a long enough interval. High orders are also
+numerically fragile: the roots of the expanded polynomial
+$DQ_n+NP_n$ gave a wrong unstable-root count for 24 of 99 small delays with
+$n=10$, and 64 of 99 with $n=12$; a balanced realization avoids this.
+
+\section{Guidelines}
+
+\begin{keybox}{Using Padé safely}
+\begin{enumerate}[leftmargin=1.5em]
+  \item Decide stability on the original equation: frequencies from
+        \eqref{eq:G}, delays from \eqref{eq:Tk}, the map \eqref{eq:Z}, and a
+        bound-based count as a check.
+  \item Use Padé as a local tool: design near an operating point, low-order
+        simulation models, or Newton seeds.
+  \item Choose the order from the largest relevant $\omega T$ with
+        Table~\ref{tab:validity}; an order $n$ represents no phase beyond
+        $n\pi$.
+  \item Distrust stability windows and ``stable for all larger delays''
+        predicted by rational models.
+  \item Validate in the time domain near critical delays.
+  \item Avoid high orders through expanded polynomials; for larger problems
+        use methods designed for delay equations
+        \citep{breda2005,breda2015,vyhlidal2009}.
+\end{enumerate}
+\end{keybox}
+
+\section{Limitations}
+
+The direct method above assumes a single constant delay, real
+coefficients, simple crossings and a retarded system. Tangential or
+multiple crossings require higher-order analysis \citep{cooke1986,michiels2014}.
+For neutral systems ($p=m$) Proposition~\ref{prop:bound} fails, the root
+chains approach vertical lines, and stability can be sensitive to
+infinitesimal changes of the delay \citep{hale1993,michiels2014}. With
+several delays, crossings form curves and surfaces
+\citep{olgac2002,michiels2007}; matrix systems lead to nonlinear eigenvalue
+problems \citep{breda2015,michiels2014}.

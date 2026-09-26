@@ -1,0 +1,167 @@
+\chapter{Algorithm and numerical safeguards}\label{ch:algorithm}
+
+The solver, \code{complex\_spectrum}, isolates the zeros of an analytic
+function $f$ in a rectangle $\Omega=[x_0,x_1]\times[y_0,y_1]$. In zero mode
+$f=N$ (or the given function); in pole mode $f=D$. This chapter describes
+each component and the conditions under which a result is declared
+complete.
+
+\section{Contour counts}\label{sec:count}
+
+The boundary of a rectangle $B$ is sampled at $n$ equally spaced points per
+edge, $4n$ points in total, traversed counterclockwise. With
+$v_j=f(z_j)$, the phase and log-modulus increments are
+\[
+  \delta_j=\operatorname{Arg}\frac{v_{j+1}}{v_j}\in(-\pi,\pi],\qquad
+  \mu_j=\log|v_{j+1}|-\log|v_j| ,
+\]
+and the discrete winding number is $w=\frac{1}{2\pi}\sum_j\delta_j$. The
+number of samples starts at $n=n_0$ (\code{ContourPoints}, default 32) and
+is doubled up to \code{ContourRefinements} times (default 7, i.e.\ up to
+4096 points per edge). A count is \emph{accepted} when
+\begin{enumerate}
+  \item the rounded winding number $\operatorname{round}(w)$ is the same at
+        three consecutive sampling levels,
+  \item at the last two levels $|w-\operatorname{round}(w)|<10^{-7}$, and
+  \item at the last two levels every increment satisfies $|\delta_j|<\pi/3$
+        and $|\mu_j|<2$.
+\end{enumerate}
+Condition 3 is the practical form of the requirement that the argument of
+$f$ vary slowly between samples; without it, a fast phase rotation could be
+aliased and a whole turn lost. If any sample is zero, infinite or
+\code{NaN} (a zero on the boundary, or overflow), or if the conditions are
+not met at the finest level, the count fails and the rectangle is
+\emph{unresolved}.
+
+The same samples give the first-moment estimate~\eqref{eq:moment}, computed
+as $\sum_j \tfrac{z_j+z_{j+1}}{2}(\mu_j+\ii\delta_j)/(2\pi\ii\,Z)$, used as a
+Newton starting point.
+
+\section{Newton's method}\label{sec:newton}
+
+From a starting point $z$ inside a cell $B$ with count $m$, the solver
+applies the modified Newton iteration
+\[
+  z\leftarrow z-\alpha\, m\,\frac{f(z)}{f'(z)} ,
+\]
+which converges quadratically to a zero of multiplicity $m$. Safeguards:
+\begin{itemize}
+  \item the step is limited to half the larger side of $B$;
+  \item the damping factor $\alpha$ is halved (at most 12 times) until
+        $|f|$ does not increase; if it cannot be decreased, the start is
+        abandoned;
+  \item the iteration stops if it leaves $B$, and converges when the step is
+        below \code{RootTolerance}$\cdot(1+|z|)$.
+\end{itemize}
+The derivative is the user-supplied \code{Derivative}, the exact derivative
+for symbolic input and coefficient vectors, or otherwise the four-point
+complex difference
+\[
+  f'(z)\approx\frac{f(z+h)-f(z-h)-\ii\,[f(z+\ii h)-f(z-\ii h)]}{4h},
+  \qquad h=10^{-4}\max(1,|z|),
+\]
+whose error is $O(h^4)$ for analytic $f$ (the $h^2$ terms of the real and
+imaginary central differences cancel).
+
+\section{Local confirmation}\label{sec:confirm}
+
+A Newton limit $z^\ast$ is accepted only if a contour count on the small
+square of half-width $\rho=\code{RootTolerance}\cdot(1+|z^\ast|)$ centered
+at $z^\ast$ equals the count $m$ of the cell. This confirms both that
+$z^\ast$ is a zero and that no other zero of the cell was missed; $m$ becomes
+the multiplicity of $z^\ast$, and $\sqrt2\rho$ is reported as
+\code{locationRadius}. Consequently, zeros closer than about $\rho$ are
+reported as one location whose multiplicity is the size of the cluster.
+
+\section{Recursive subdivision}\label{sec:subdivision}
+
+\begin{algobox}{Algorithm 1 — recursive isolation of the zeros of $f$ in a cell $B$ with count $m$}
+\begin{enumerate}[leftmargin=1.7em]
+  \item If $m=0$, return.
+  \item For each start in (first-moment center of $B$, geometric center of
+        $B$, user seeds inside $B$): run Newton (Section~\ref{sec:newton});
+        if the limit is confirmed with count $m$ (Section~\ref{sec:confirm}),
+        record it and return.
+  \item If the depth exceeds \code{MaxDepth} or the number of visited cells
+        exceeds \code{MaxCells}, mark $B$ unresolved and return.
+  \item Split $B$ across its longer side at the fraction $0.5$ of the side.
+        Count the two halves. If both counts are accepted and add up to $m$,
+        recurse into both halves and return.
+  \item Otherwise retry with the split fractions $0.438\ldots$ and
+        $0.573\ldots$, then with the other side. If no split conserves the
+        count, mark $B$ unresolved.
+\end{enumerate}
+\end{algobox}
+
+The \emph{conservation check} of step 4 detects zeros lying on the split
+line (the counts of the halves then fail or do not add up) and moves the
+line. The irrational-looking fractions make it unlikely that a second
+attempt hits a zero again. Unresolved cells are never discarded: they are
+returned in \code{info.unresolvedBoxes}.
+
+\section{Cancellation}\label{sec:cancel}
+
+In pole mode with a pair $N/D$, the zeros of $D$ are isolated with
+Algorithm~1. For each location $z^\ast$ with multiplicity $m_D$, the zeros of
+$N$ are counted on the same small square, giving $m_N$. The reported
+multiplicity is $\max(m_D-m_N,0)$; if it is zero, $z^\ast$ is moved to
+\code{cancelledLocations}, and the removed order $\min(m_D,m_N)$ is recorded.
+Zero mode is symmetric. If the count of the other factor fails, the location
+is kept and flagged in \code{cancellationUncertain}, and the result is not
+complete. The test has the resolution of the small square: a pole and a zero
+closer than $\rho$ are indistinguishable from an exact cancellation.
+
+\section{Exploratory mode}\label{sec:exploratory}
+
+When the function is not known to be analytic (an opaque handle without
+\code{AssumeAnalytic}, or a single quotient handle), contour counts may
+measure $Z-P$ instead of $Z$ and cannot be trusted. The solver then starts
+Newton from a \code{GridSize} grid of points and from the seeds, and keeps
+the limits confirmed by a positive local count. The result has status
+\code{exploratory} and is never declared complete.
+
+\section{The completeness contract}\label{sec:contract}
+
+A search is \code{numerically\_complete} when (i) the count on
+$\partial\Omega$ was accepted, (ii) every cell was resolved, (iii) the
+multiplicities of the located zeros add up to that count, and (iv) every
+cancellation test was resolved. Under the analyticity assumption, and if
+the accepted counts are correct, all zeros in $\Omega$ are then reported,
+each within its \code{locationRadius} as a cluster of the stated
+multiplicity.
+
+\begin{keybox}{What this is not}
+It is not a proof. The counts are computed from finitely many floating-point
+samples; a function that oscillates between samples faster than the
+safeguards of Section~\ref{sec:count} can detect could in principle fool
+them. Analyticity of a handle is the user's declaration. Residuals depend on
+the scaling of the searched factor and are not bounds on the location
+error. \code{info.certified} is always false. Rigorous enclosures would
+require interval arithmetic, which is outside the scope of this version.
+\end{keybox}
+
+\section{Cost}
+
+The cost is dominated by function evaluations on contours: $4n$ per count,
+with $n$ doubling until acceptance, for the outer rectangle, for every
+cell of the subdivision and for every local confirmation. Vectorized
+handles are evaluated on all samples of a contour at once. Tall rectangles
+over oscillatory functions (e.g.\ $e^{-sT}$ with large $T|\Imag s|$) need
+more samples per edge; smaller rectangles or larger
+\code{ContourRefinements} help. Seeds from a previous parameter value
+reduce the number of subdivisions in parameter sweeps.
+
+\section{Related methods and software}\label{sec:related}
+
+Contour-integral root finders go back to \citet{delves1967}; see
+\citet{kravanja2000} for a thorough treatment including moment-based
+eigenvalue formulations. \code{cxroots} \citep{cxroots} implements such a
+method in Python with subdivision. GRPF \citep{grpf} analyzes the phase of a
+single meromorphic function on an adaptive triangulation and locates both
+zeros and poles. For quasi-polynomials and time-delay systems, QPmR
+\citep{vyhlidal2009} maps the zero-level curves of the real and imaginary
+parts, and spectral discretization methods \citep{breda2005,breda2015,michiels2014}
+approximate the rightmost roots of matrix delay equations. ContourRoots
+combines well-known ingredients; its emphasis is on a MATLAB-style
+interface, explicit cancellation for $N/D$ pairs, and diagnostics that make
+incomplete searches visible.

@@ -1,0 +1,162 @@
+\chapter{A beam coupled to an oscillator}\label{ch:beam}
+
+This case study couples a partial differential equation (a beam, with
+infinitely many modes) to an ordinary one (a mass-spring-damper), derives an
+entire characteristic function and transfer functions, and computes the
+poles without modal truncation. The results are validated with an
+independent finite-element model.
+
+\begin{figure}[H]
+\centering
+\input{figures/beam_schematic.tikz}
+\caption{The two topologies. The connection transmits transverse force but
+no moment; displacements are positive downwards.}
+\label{fig:schematic}
+\end{figure}
+
+\section{Model}
+
+A uniform Euler--Bernoulli beam of length $L$, bending stiffness $EI$ and
+mass per length $\mu_b=\rho A$ is clamped at $x=0$. In topology (a), a mass
+$m$ with displacement $z(t)$ is connected to the tip displacement
+$y(t)=w(L,t)$ by a spring $k$ and a damper $c$ in parallel; the mass is not
+grounded (a tuned-mass absorber). The beam is elastic; all dissipation is in
+$c$. Shear deformation, rotary inertia and gravity (already balanced) are
+neglected:
+\begin{gather}
+  \mu_bw_{tt}+EIw_{xxxx}=0,\quad 0<x<L,\qquad w(0,t)=w_x(0,t)=0,\\
+  EIw_{xx}(L,t)=0,\qquad -EIw_{xxx}(L,t)=F(t)+f(t),\\
+  f=k(z-y)+c(\dot z-\dot y),\qquad m\ddot z+c(\dot z-\dot y)+k(z-y)=u(t),
+\end{gather}
+where $f$ is the force of the connection on the beam and $F$, $u$ are
+external forces at the tip and on the mass.
+
+\section{The bare-beam receptance}
+
+With $w=W(x)e^{st}$ and $\theta^4=q=-\mu_bL^4s^2/EI$, the clamped solution
+is $W(x)=a[\cosh bx-\cos bx]+d[\sinh bx-\sin bx]$, $b=\theta/L$. The
+zero-moment condition fixes $d/a$, and the shear condition gives the tip
+receptance
+\[
+  H_b(s)=\frac{y}{f}=\frac{L^3}{EI}\frac{A(q)}{B(q)},\quad
+  A(q)=\frac{\cosh\theta\sin\theta-\sinh\theta\cos\theta}{\theta^3},\quad
+  B(q)=1+\cosh\theta\cos\theta .
+\]
+$A$ and $B$ are entire in $q$: they are invariant under $\theta\mapsto\ii\theta$.
+Near $q=0$, $A(q)=\tfrac23-\tfrac q{315}+\tfrac{q^2}{623700}-\tfrac{q^3}{5108103000}+\cdots$
+and $B(0)=2$, so $H_b(0)=L^3/(3EI)$, the static compliance of a cantilever.
+Write $H_b=N_b/D_b$ with $N_b=(L^3/EI)A$, $D_b=B$.
+
+\section{Characteristic function and transfer functions}
+
+With $Z(s)=k+cs$ the Laplace-domain equations are
+\[
+  \begin{bmatrix}D_b+N_bZ & -N_bZ\\ -Z & ms^2+Z\end{bmatrix}
+  \begin{bmatrix}y\\ z\end{bmatrix}=
+  \begin{bmatrix}N_bF\\ u\end{bmatrix},
+\]
+whose determinant is the entire characteristic function
+\begin{equation}
+  \Delta(s)=D_b(s)(ms^2+cs+k)+N_b(s)\,ms^2(cs+k) .
+  \label{eq:beamdelta}
+\end{equation}
+The coupled poles are not the union of the beam and oscillator poles, and
+$1+H_bZ_{\mathrm{eff}}$, with $Z_{\mathrm{eff}}=ms^2(cs+k)/(ms^2+cs+k)$, is
+not entire; clearing its denominators gives~\eqref{eq:beamdelta}. The
+transfer functions are
+\[
+  \frac yF=\frac{N_b(ms^2+Z)}{\Delta},\qquad
+  \frac yu=\frac{N_bZ}{\Delta},\qquad
+  \frac zu=\frac{D_b+N_bZ}{\Delta}.
+\]
+With zero inputs, the energy
+$E=\tfrac12\int_0^L(\mu_bw_t^2+EIw_{xx}^2)\,dx+\tfrac12m\dot z^2+\tfrac12k(z-y)^2$
+satisfies $\dot E=-c(\dot z-\dot y)^2\le0$, which confirms the sign
+conventions and excludes growing modes for positive parameters. In topology
+(b) the mass moves with the tip and $\Delta_{\mathrm{tip}}=D_b+N_b(ms^2+cs+k)$;
+it is a different system, with potential energy $ky^2/2$.
+
+\section{Implementation}
+
+With $\tau=\sqrt{\mu_bL^4/EI}$, $\lambda=\tau s$, $\mu=m/(\mu_bL)$,
+$\kappa=kL^3/EI$ and $\gamma=cL^3/(EI\tau)$, the function evaluated is
+$\Delta=B(-\lambda^2)(\mu\lambda^2+\gamma\lambda+\kappa)+A(-\lambda^2)\mu\lambda^2(\gamma\lambda+\kappa)$,
+equal to~\eqref{eq:beamdelta} times $L^3/EI$. In normalized units the
+complete computation needs only function handles:
+\begin{lstlisting}
+m = 0.1;  k = 1.2362363368;  c = 0.05;      % L = EI = rho*A = 1
+beta = @(s) (-s.^2).^(1/4);
+Nb = @beam_numerator;                        % series near 0, see text
+Db = @(s) 1 + cosh(beta(s)).*cos(beta(s));
+Zc = @(s) k + c*s;
+N = @(s) Nb(s).*(m*s.^2 + Zc(s));
+D = @(s) Db(s).*(m*s.^2 + Zc(s)) + Nb(s).*m.*s.^2.*Zc(s);
+[p, info] = cpoles(ndpair(N, D), [-60 1 -150 150], 'AssumeAnalytic', true);
+\end{lstlisting}
+The full script is \path{examples/coupled_beam/beam_direct_nd.m}; the
+helper \path{examples/models/coupled_beam_model.m} builds the dimensional
+model and the three transfer functions.
+
+\section{Reference case and parameter studies}
+
+The reference case uses $m=0.1$, $k=m\,\omega_{b1}^2=\BaselineStiffness$ with
+the first bare-beam frequency $\omega_{b1}=\FirstBareFrequency$, and $c=0.05$.
+The ten poles in $[-60,1]\times[-150,150]$ are (upper half-plane):
+\begin{center}\small\BaselinePoleTable\end{center}
+For $c=0$ the two lowest frequencies are $2.5703$ and $4.7801$: the coupling
+splits the original resonance; in the first mode the mass follows the tip,
+in the second it moves against it (Figure~\ref{fig:modes}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{coupled_modes.png}
+\caption{Conservative coupled modes from the exact spatial solution,
+normalized by the tip displacement.}
+\label{fig:modes}
+\end{figure}
+
+One parameter at a time was varied: $m\in[0.02,0.5]$ (25 values),
+$k\in[0.05,5]$ (36 values) and $c\in[0,1.5]$ (43 values). Every one of the
+104 cases has ten poles in the window, each found with a fresh contour
+count (previous poles were only seeds).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pole_sweeps.png}
+\caption{Low-frequency poles as the mass, the stiffness and the damping vary.}
+\label{fig:sweeps}
+\end{figure}
+
+\begin{center}\small\DampingPoleTable\end{center}
+
+Increasing $c$ can make the second pair real. Among the sampled values the
+rightmost pole is leftmost at $c=\BestDamping$ (abscissa $\BestAlpha$); at
+$c=1.5$ the dominant pair returns to $-0.0840\pm2.9549\ii$. Damping in the
+connection restrains the very relative motion it dissipates, so more
+damping is not always better. This is a statement about the sampled values
+and the stated window, not a global optimum.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{trends_and_validation.png}
+\caption{Lowest branches versus mass and stiffness, window abscissa versus
+damping, and convergence of the finite-element model.}
+\label{fig:trends}
+\end{figure}
+
+\section{Independent validation}\label{sec:beamvalidation}
+
+A cubic-Hermite finite-element model with consistent mass matrix and an
+extra degree of freedom for the absorber mass (\code{coupled\_beam\_fem.m})
+is solved as a quadratic eigenvalue problem, without using any result of the
+nonrational solver. The largest error among the ten reference poles
+decreases with the mesh:
+\begin{center}\small\FEMTable\end{center}
+Further checks: the static compliance $H_b(0)=1/3$; invariance of the
+dimensionless characteristic function under dimensional rescaling; the
+bare-beam limit; and the decoupled limit $k=c=0$, where the characteristic
+function has a double root at $0$ (the free mass) that is \emph{not} a pole
+of the tip transfer function $y/F$ --- a hidden mode. Enlarging the window
+to $[-90,1]\times[-300,300]$ at three damping values leaves the rightmost
+pole unchanged. The beam is elastic and has no finite accumulation point,
+unlike the Kelvin--Voigt beam of Section~\ref{sec:kelvinvoigt}.

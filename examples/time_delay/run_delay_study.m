@@ -171,9 +171,9 @@ function results = run_delay_study()
         else
             destab = crit.CrossingSpeed>0;
             scatter(ax,crit.Delay(destab),crit.Frequency(destab),75,'^','filled', ...
-                'MarkerFaceColor',[0.83 0.20 0.16],'DisplayName','Desestabilizante');
+                'MarkerFaceColor',[0.83 0.20 0.16],'DisplayName','Destabilizing');
             scatter(ax,crit.Delay(~destab),crit.Frequency(~destab),75,'v','filled', ...
-                'MarkerFaceColor',[0.10 0.55 0.42],'DisplayName','Estabilizante');
+                'MarkerFaceColor',[0.10 0.55 0.42],'DisplayName','Stabilizing');
             xlim(ax,[min(problems(ip).Ts) max(problems(ip).Ts)]);
             ylim(ax,[0 1.18*max(crit.Frequency)]);
         end

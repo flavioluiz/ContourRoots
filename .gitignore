@@ -24,3 +24,6 @@ buildtool.log
 
 # OS / editor
 .DS_Store
+
+# Manual build products (the PDF is copied to docs/)
+manual/*.pdf

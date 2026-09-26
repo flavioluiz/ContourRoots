@@ -1,0 +1,82 @@
+\chapter{Introduction}\label{ch:intro}
+
+\section{The problem}
+
+Many questions about linear dynamical systems reduce to finding the
+values of a complex variable $s$ where a scalar function vanishes. The
+modes of a system are the roots of its characteristic function $\Delta(s)$;
+the poles and zeros of a transfer function $G(s)=N(s)/D(s)$ are the roots
+of $D$ and $N$ that survive cancellation. When $\Delta$, $N$ and $D$ are
+polynomials, the problem is solved by computing matrix eigenvalues, as
+MATLAB's \code{roots}, \code{pole} and \code{zero} do.
+
+Two large classes of models are not rational:
+\begin{itemize}
+  \item systems with \emph{time delays}, whose characteristic functions
+        contain terms such as $e^{-sT}$ \citep{bellman1963,hale1993,gu2003,michiels2014};
+  \item \emph{distributed-parameter} systems, described by partial
+        differential equations, whose transfer functions contain
+        $\sinh$, $\cosh$, $\sqrt s$ and similar functions
+        \citep{curtain2009}.
+\end{itemize}
+Their characteristic functions typically have infinitely many roots, and
+no finite matrix contains all of them. A common practice is to replace the
+nonrational terms by rational approximations, for example Padé
+approximations of $e^{-sT}$ or truncated modal expansions. The
+approximation makes the finite-dimensional toolbox available again, but
+it changes the question: one then computes the roots of a different
+function. Chapter~\ref{ch:delay} shows, on simple examples, that the
+answer can change qualitatively.
+
+ContourRoots answers the original question in a bounded region: \emph{which
+roots does the function have inside this rectangle?} It evaluates the
+function as it is given, and uses the argument principle to count how many
+roots each part of the rectangle contains, which makes it possible to tell
+whether the search was complete.
+
+\section{What the toolbox provides}
+
+\begin{itemize}
+  \item \code{croots}, \code{cpoles}, \code{czeros} and \code{cpzmap}, a
+        MATLAB-style interface for roots, poles, zeros and pole-zero maps
+        of scalar functions given as function handles, coefficient vectors,
+        numerator/denominator pairs (\code{ndpair}), symbolic expressions or
+        SISO LTI models.
+  \item Detection of pole-zero cancellations, including partial ones.
+  \item Diagnostics for every search: a status, the multiplicity and
+        residual of each location, cancelled locations and unresolved
+        regions.
+  \item For scalar retarded time-delay systems $D(s)+N(s)e^{-sT}=0$: all
+        critical delays and crossing directions up to a given delay,
+        without approximation, and a count of unstable roots in a region
+        that provably contains all of them.
+  \item Examples, reproducible studies and tests.
+\end{itemize}
+
+\section{What the toolbox does not claim}
+
+The word \emph{exact} is used in this manual only in one sense: the original
+function is evaluated, without rational approximation or truncation. The
+computed roots are floating-point numbers. A search that ends with the
+status \code{numerically\_complete} has passed careful numerical checks
+under the analyticity assumption, but it is not a proof in the sense of
+interval arithmetic (Section~\ref{sec:contract}). The toolbox does not treat
+matrix-valued characteristic functions, does not enumerate infinite spectra,
+and does not discover singularities hidden inside opaque function handles.
+No claim of superiority over other root finders is made; related methods
+and software are discussed in Section~\ref{sec:related}.
+
+\section{How to read this manual}
+
+Chapter~\ref{ch:quick} is a short tour of the interface.
+Chapters~\ref{ch:background}--\ref{ch:inputs} give the mathematical
+background, the algorithm, and the precise meaning of each input form and
+of the analyticity assumption. Chapter~\ref{ch:api} is a compact reference.
+Chapters~\ref{ch:delay}--\ref{ch:beam} are case studies that can be read
+independently: time-delay systems and the limits of Padé approximations;
+distributed-parameter systems; and a beam coupled to an oscillator.
+Chapter~\ref{ch:validation} summarizes the validation, and the appendices
+contain proofs and reproducibility information.
+
+The Markdown documentation distributed with the toolbox covers the same
+material in a tutorial style, with runnable code for every step.

@@ -1,0 +1,63 @@
+\chapter{Quick start}\label{ch:quick}
+
+\section{Installation}
+
+ContourRoots is plain MATLAB code; the core needs no additional toolbox.
+Download \code{ContourRoots.mltbx} from the release page and open it to
+install it as an Add-On, or download \code{ContourRoots.zip}, unzip it and
+run \code{setup\_contourroots}, which adds the toolbox to the path for the
+current session. From the Command Window:
+\begin{lstlisting}
+url = "https://github.com/flavioluiz/ContourRoots/releases/latest/download/ContourRoots.zip";
+unzip(websave("ContourRoots.zip", url), "ContourRoots");
+run("ContourRoots/setup_contourroots.m")
+\end{lstlisting}
+
+\section{Roots of a characteristic function}
+
+The characteristic function $F(s)=s^2+s+1+(2s+3)e^{-s}$ has infinitely
+many roots. Those in $-8<\Real s<2$, $-20<\Imag s<20$ are obtained with
+\begin{lstlisting}
+F = @(s) s.^2 + s + 1 + (2*s + 3).*exp(-s);
+[r, info] = croots(F, [-8 2 -20 20], 'AssumeAnalytic', true);
+\end{lstlisting}
+The vector \code{r} contains seven roots, ordered by decreasing real part;
+the first two, $0.36201\pm1.8195\ii$, lie in the right half-plane.
+\code{info.status} is \code{'numerically\_complete'}. The option
+\code{'AssumeAnalytic',true} is the user's statement that $F$ is analytic
+on a neighborhood of the closed rectangle; it is justified here because
+$F$ is built from polynomials and the exponential. Without it the search
+is exploratory (Section~\ref{sec:exploratory}).
+
+\section{Poles and zeros}
+
+A transfer function is given as a pair of analytic functions:
+\begin{lstlisting}
+G = ndpair(@(s) sinh(s/2), @(s) sinh(s));
+p = cpoles(G, [-1 1 -10 10], 'AssumeAnalytic', true);   % +-i*pi, +-3i*pi
+z = czeros(G, [-1 1 -10 10], 'AssumeAnalytic', true);   % empty
+cpzmap(G, [-1 1 -10 10], 'AssumeAnalytic', true)
+\end{lstlisting}
+The denominator vanishes at $\ii\pi k$ for every integer $k$; for even $k$
+the numerator vanishes as well and the candidate cancels.
+Figure~\ref{fig:overview} shows both results.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{readme_overview.png}
+\caption{Left: roots of $s^2+s+1+(2s+3)e^{-s}$ in the rectangle
+$[-8,2]\times[-20,20]$ (dashed); the shaded area is the right half-plane.
+Right: \code{cpzmap} of $\sinh(s/2)/\sinh(s)$; grey dots are cancelled
+candidates.}
+\label{fig:overview}
+\end{figure}
+
+\section{Time-delay stability}
+
+For $D(s)+N(s)e^{-sT}=0$ with coefficient vectors \code{N} and \code{D}:
+\begin{lstlisting}
+crit = critical_delays(2, [1 1], 10);         % s + 1 + 2 e^{-sT} = 0
+Z = unstable_root_count(2, [1 1], 1.5);       % 2 unstable roots
+\end{lstlisting}
+The first critical delay is $2\pi/(3\sqrt3)\approx1.2092$
+(Chapter~\ref{ch:delay}).

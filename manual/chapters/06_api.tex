@@ -1,0 +1,76 @@
+\chapter{Interface reference}\label{ch:api}
+
+The complete reference, with examples for every function, is in
+\code{docs/api/} and in the MATLAB help (\code{help croots}). This chapter
+summarizes it.
+
+\section{Functions}
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{>{\ttfamily}p{6.0cm}X}
+\toprule
+\normalfont Syntax & Purpose\\\midrule
+{}[r,info] = croots(F,region,...) & roots of $F$ in the rectangle\\
+{}[p,info] = cpoles(G,region,...) & poles of $G$ after cancellation\\
+{}[z,info] = czeros(G,region,...) & zeros of $G$ after cancellation\\
+cpzmap(G,region,...) & pole-zero map; \code{[p,z,infoP,infoZ]} without plot\\
+G = ndpair(N,D) & transfer function from two analytic factors\\
+{}[x,info] = complex\_spectrum(...) & core solver, \code{'Mode'} \code{'zeros'}/\code{'poles'}\\
+crit = critical\_delays(N,D,Tmax) & crossings of $D+Ne^{-sT}$, $0\le T\le T_{\max}$\\
+Z = unstable\_root\_count(N,D,T) & roots with $\Real s\ge0$ (bound-based count)\\
+R = rhp\_root\_bound(N,D) & radius containing all such roots, all $T$\\
+delay\_roots, delay\_root\_count & grid/Newton solver and count for one delay\\
+pade\_delay, pade\_characteristic & diagonal Padé coefficients and polynomial\\
+pade\_critical\_delays & critical delays predicted by Padé models\\
+setup\_contourroots, contourroots & path setup; overview and version\\
+\bottomrule
+\end{tabularx}\end{center}
+
+The region is always \code{[xmin xmax ymin ymax]}. When \code{info} is not
+requested and a search of \code{croots}, \code{cpoles}, \code{czeros} or
+\code{cpzmap} is not complete, a warning (\code{ContourRoots:Exploratory} or
+\code{ContourRoots:Incomplete}) is issued; \code{'Warn',false} silences it.
+
+\section{Options}
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{>{\ttfamily}p{3.6cm}p{1.6cm}X}
+\toprule
+\normalfont Option & Default & Meaning\\\midrule
+AssumeAnalytic & false & declare the searched factor(s) analytic\\
+SeedPoints & [] & extra Newton starts\\
+Derivative & [] & $F'$ for a single handle\\
+Singularities & [] & points that must not lie in the region\\
+RootTolerance & 1e-7 & relative half-width of confirmation boxes\\
+ContourPoints & 32 & initial samples per edge\\
+ContourRefinements & 7 & maximum doublings of the sampling\\
+MaxDepth & 24 & maximum subdivision depth\\
+MaxCells & 5000 & maximum number of cells\\
+MaxIterations & 80 & Newton iterations per start\\
+GridSize & [25 41] & start grid in exploratory mode\\
+Plot, Display & false & figure or table of results\\
+Warn & true & incompleteness warning (wrappers only)\\
+\bottomrule
+\end{tabularx}\end{center}
+
+\section{Diagnostics}
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{>{\ttfamily\raggedright}p{5.6cm}X}
+\toprule
+\normalfont Field & Meaning\\\midrule
+status & \code{numerically\_complete}, \code{unresolved} or \code{exploratory}\\
+complete & conditions (i)--(iv) of Section~\ref{sec:contract} hold\\
+certified & always false\\
+count & total multiplicity returned, after cancellation\\
+targetCountBeforeCancellations & outer count of the searched factor\\
+multiplicity & multiplicity (cluster size) of each location\\
+locationRadius & resolution of each location (not an error bound)\\
+residuals & $|f|$ of the searched factor at each location\\
+cancelledLocations, cancellationOrders & removed candidates and orders\\
+cancellationUncertain & cancellation test unresolved at a location\\
+unresolvedBoxes & cells that could not be resolved\\
+contourResolved, cellsVisited & outer count accepted; cells used\\
+exploratory, region, mode, analyticSource & context of the search\\
+\bottomrule
+\end{tabularx}\end{center}

@@ -1,0 +1,111 @@
+\chapter{Mathematical background}\label{ch:background}
+
+This chapter collects the facts from complex analysis on which the method
+relies; see \citet{ahlfors1979} for proofs of the classical results.
+
+\section{Analytic and meromorphic functions}
+
+A function $F$ of the complex variable $s=x+\ii y$ is \emph{analytic}
+(holomorphic) on an open set $U$ if it has a complex derivative at every
+point of $U$. It is \emph{entire} if it is analytic on the whole plane.
+Polynomials, $e^{s}$, $\sin s$, $\cos s$, $\sinh s$, $\cosh s$, and all sums,
+products and compositions of entire functions are entire. A function is
+\emph{meromorphic} on $U$ if it is analytic on $U$ except at isolated poles.
+
+Two properties of analytic functions are essential:
+\begin{enumerate}
+  \item The zeros of an analytic function that is not identically zero are
+        isolated, and each has a finite \emph{multiplicity} $m\ge1$:
+        $F(s)=(s-s_0)^m g(s)$ with $g$ analytic and $g(s_0)\neq0$.
+  \item A bounded region contains finitely many zeros.
+\end{enumerate}
+Neither holds for functions that are not analytic: $|s|^2-1$ vanishes on a
+whole circle. Functions with branch points (such as $\sqrt s$ or $\log s$)
+are analytic only on a domain that excludes a cut.
+
+Some expressions that contain square roots are nevertheless entire. For
+instance $\cosh\sqrt q=\sum_k q^k/(2k)!$ and $\sinh(\sqrt q)/\sqrt q=
+\sum_k q^k/(2k+1)!$ contain only integer powers of $q$: the choice of the
+branch of $\sqrt q$ does not change their value. Such \emph{even functions of
+a root} appear in the transfer functions of Chapters~\ref{ch:distributed}
+and~\ref{ch:beam}.
+
+\section{The argument principle}
+
+\begin{theorem}[Argument principle]\label{thm:arg}
+Let $C$ be a simple closed piecewise-smooth curve, oriented
+counterclockwise, and let $F$ be meromorphic on a neighborhood of $C$ and
+its interior, with no zero or pole on $C$. Then
+\begin{equation}
+  \frac{1}{2\pi\ii}\oint_C\frac{F'(s)}{F(s)}\,ds \;=\; Z-P
+  \;=\; \frac{1}{2\pi}\,\Delta_C\arg F(s),
+  \label{eq:argprinciple}
+\end{equation}
+where $Z$ and $P$ are the numbers of zeros and poles inside $C$, counted
+with multiplicity, and $\Delta_C\arg F$ is the total change of a continuous
+branch of $\arg F(s)$ as $s$ travels once around $C$.
+\end{theorem}
+
+The right-hand form is the one used numerically: the change of argument
+is the sum of the phase increments of $F$ between consecutive samples of
+$C$, each taken in $(-\pi,\pi]$. It equals $2\pi$ times the \emph{winding
+number} of the image curve $F(C)$ around the origin
+(Figure~\ref{fig:argprinciple}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{argument_principle.png}
+\caption{The argument principle for $F(s)=s^2+s+1+(2s+3)e^{-s}$ on the
+rectangle $[-2,1]\times[-3,9]$. (a) Four roots lie inside $C$. (b) The image
+curve $F(C)$, drawn with radius $\log(1+|F|)$, winds four times around the
+origin. (c) The unwrapped argument of $F$ along $C$ grows by $4\times2\pi$.}
+\label{fig:argprinciple}
+\end{figure}
+
+Three consequences shape the design of ContourRoots.
+
+\paragraph{Analytic functions.} If $F$ is analytic, $P=0$ and the integral
+counts the zeros. This is the case for characteristic functions such as
+$D(s)+N(s)e^{-sT}$.
+
+\paragraph{Quotients.} For a transfer function $G=N/D$ with $N$ and $D$
+analytic, the integral of $G'/G$ counts $Z_N-Z_D$ \emph{after}
+cancellation. A count of zero does not mean that the region is empty. This
+is why ContourRoots asks for $N$ and $D$ separately (\code{ndpair}) and
+counts the zeros of each.
+
+\paragraph{Multiplicity and the first moment.} If $F$ is analytic with zeros
+$s_1,\dots,s_Z$ (repeated according to multiplicity) inside $C$,
+\begin{equation}
+  \frac{1}{2\pi\ii}\oint_C s\,\frac{F'(s)}{F(s)}\,ds=\sum_{j=1}^{Z}s_j .
+  \label{eq:moment}
+\end{equation}
+Divided by $Z$ it gives the centroid of the zeros; when $Z=1$ it gives the
+zero itself. Higher moments lead to the classical methods of
+\citet{delves1967} and \citet{kravanja2000}, which compute all zeros inside
+$C$ from a small eigenvalue problem. ContourRoots uses only the first
+moment, as a starting point for Newton's method.
+
+\section{Cancellation of poles and zeros}
+
+Let $N$ and $D$ be analytic near $s_0$, with zeros of orders $m_N\ge0$ and
+$m_D\ge0$ at $s_0$. Then $G=N/D$ has at $s_0$
+\begin{itemize}
+  \item a pole of order $m_D-m_N$ if $m_D>m_N$;
+  \item a zero of order $m_N-m_D$ if $m_N>m_D$;
+  \item neither (a removable point, after cancellation) if $m_N=m_D$.
+\end{itemize}
+Counting the zeros of $N$ and of $D$ separately in a small disk around each
+candidate determines $m_N$ and $m_D$, and therefore the type and order of
+the point. This is the cancellation test of Section~\ref{sec:cancel}.
+
+\section{Modes and transfer poles}
+
+For a linear system, the roots of the characteristic function are the
+\emph{modes}; they decide internal stability. A transfer function from one
+input to one output may not contain every mode: a mode that the input
+cannot excite, or that the output cannot observe, appears as a common zero
+of $N$ and $D$ and cancels. Both computations are available: \code{croots}
+on the characteristic function returns the modes, and \code{cpoles} on
+$N/D$ returns the transfer poles. Examples of hidden modes appear in
+Sections~\ref{sec:heat} and~\ref{sec:beamvalidation}.

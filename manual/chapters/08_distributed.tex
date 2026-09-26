@@ -1,0 +1,131 @@
+\chapter{Distributed-parameter systems}\label{ch:distributed}
+
+Transfer functions of systems governed by partial differential equations
+are ratios of entire functions that often look multivalued. This chapter
+shows how to write them as analytic pairs and computes their poles for the
+heat, string, duct and beam examples of \citet{curtain2009}. The models are
+implemented in \code{examples/models/distributed\_model.m}; the study is
+\code{examples/distributed\_systems/run\_nonrational\_examples.m}.
+
+\section{Removing apparent branch points}
+
+For the heat equation the natural expressions contain $\sqrt s$. Define
+\[
+  C(q)=\cosh\sqrt q=\sum_{k\ge0}\frac{q^k}{(2k)!},\qquad
+  H(q)=\frac{\sinh\sqrt q}{\sqrt q}=\sum_{k\ge0}\frac{q^k}{(2k+1)!},\qquad
+  H(0)=1 .
+\]
+Both are entire: only integer powers of $q$ appear. The implementation
+evaluates $H$ by its series for $|q|<10^{-4}$ and by the closed form
+elsewhere, which avoids the $0/0$ at $q=0$ and does not introduce an
+artificial pole. The same idea applies to every model below: each factor is
+an entire function evaluated through a regularized formula, and
+\code{AssumeAnalytic} is justified for both factors.
+
+\section{Heat equation: the sensor position}\label{sec:heat}
+
+With the normalizations $L=\alpha=K_0=1$ of the paper, boundary control and
+a point sensor at $x_0$, the Neumann, Dirichlet and mixed problems give
+\[
+  G_N=\frac{C(x_0^2s)}{s\,H(s)},\qquad
+  G_D=\frac{x_0H(x_0^2s)}{H(s)},\qquad
+  G_M=\frac{x_0H(x_0^2s)}{C(s)} .
+\]
+With $x_0=1/2$ and $-100<\Real s<2$, the Neumann model keeps only $0$ and
+$-4\pi^2$: the candidates $-\pi^2$ and $-9\pi^2$ cancel. The Dirichlet
+model keeps $-\pi^2$ and $-9\pi^2$ and cancels $-4\pi^2$. The mixed model
+keeps $-\pi^2/4$, $-9\pi^2/4$ and $-25\pi^2/4$. With the Dirichlet model and
+$x_0=1$, $G\equiv1$ and every candidate cancels. These are modes of the PDE
+that the sensor cannot see (Figure~\ref{fig:heat}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{heat_and_characteristic.png}
+\caption{Poles retained for four sensor positions and three boundary
+conditions (the Dirichlet row $x_0=1$ is empty because $G=1$). The last
+panel shows the characteristic example of Chapter~\ref{ch:quick}.}
+\label{fig:heat}
+\end{figure}
+
+\section{String and duct}
+
+For the string of Section~2 of the paper, with actuator distribution
+$b(x)=1$ on $[0,1/2]$ and $L=c=1$, the modal coefficients are proportional to
+$1-\cos(k\pi/2)$, which vanishes for $k$ multiple of 4; those modes are not
+poles. The damped model is the output feedback $G/(1+\varepsilon G)$ of the
+paper, with $\varepsilon=0.5$, and the removable factor at $s=0$ is
+regularized by a series.
+
+For the acoustic duct with constant reflectance $a=0.5$ and $L=c=1$, the
+poles lie on the vertical line $\ln(a)/2+\ii k\pi$. With the radiation
+impedance of Section~3.4 (Fig.~5 parameters of the paper: $L=3.54$\,m,
+$c=341$\,m/s, $\rho=1.20$\,kg/m$^3$, radius $0.101$\,m, sensor at $L/2$), the
+reflectance depends on frequency and the poles bend to the left. Its
+rational denominator is cleared from $N$ and $D$ together, so that no
+artificial poles are introduced (Figure~\ref{fig:waveduct}).
+
+Visible poles of the damped string in the left half-plane do not prove
+internal stability of modes hidden from this input/output pair.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{wave_duct_beam.png}
+\caption{String (undamped, damped, and cancelled modes), duct with
+constant reflectance and with radiation impedance, and beam poles compared
+with an independent modal formula.}
+\label{fig:waveduct}
+\end{figure}
+
+\section{Kelvin--Voigt beam: an accumulation point}\label{sec:kelvinvoigt}
+
+For the shear-force to tip-velocity transfer function of Section~4.2 of the
+paper, with $L=EI=I=1$ and Kelvin--Voigt damping $c_d=0.02$, let
+\[
+  q(s)=\frac{-s^2}{1+c_ds},\qquad m=q^{1/4},\qquad
+  G(s)=\frac{s\,[\cosh m\sin m-\sinh m\cos m]/m^3}{(1+c_ds)[1+\cosh m\cos m]} .
+\]
+The factors containing $m$ are invariant under $m\mapsto\ii m$, so the choice
+of fourth root disappears except at $s=-1/c_d$; the numerator ratio has the
+removable value $2/3$ at $m=0$. With the positive roots $\beta_k$ of
+$1+\cosh\beta\cos\beta=0$, the poles solve $s^2+c_d\beta_k^4s+\beta_k^4=0$, an
+independent reference. In $[-25,2]\times[-160,160]$ the search returns
+$-0.12362363\pm3.51384128\ii$ and $-4.85518819\pm21.49292828\ii$, within
+$10^{-14}$ of the reference.
+
+As $\beta_k\to\infty$, one branch of these poles converges to $-1/c_d=-50$
+(Figure~\ref{fig:accumulation}). Every neighborhood of $-50$ contains
+infinitely many poles: $G$ is not meromorphic there, and no finite contour
+computation can resolve a region containing that point. The model reports
+it in \code{meta.singularities}, and the option \code{Singularities}
+rejects any region that contains it.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{beam_accumulation.png}
+\caption{Modal reference with 80 modes: one branch of poles converges to
+$s=-1/c_d=-50$, the other moves to the left.}
+\label{fig:accumulation}
+\end{figure}
+
+\section{Results}
+
+\begin{table}[H]\centering\small
+\caption{Poles in the stated rectangles; ``cancelled'' counts locations.
+The reference errors compare with closed-form or modal formulas that are
+never used as seeds.}\label{tab:distributed}
+\begin{tabular}{lrrrrr}\toprule
+Model & $[\Real_{\min},\Real_{\max}]$ & $|\Imag|<$ & Poles & Cancelled & Max. error\\\midrule
+Heat, Neumann & $[-100,2]$ & 3 & 2 & 2 & $5\times10^{-14}$\\
+Heat, Dirichlet & $[-100,2]$ & 3 & 2 & 1 & $1\times10^{-14}$\\
+Heat, mixed & $[-100,2]$ & 3 & 3 & 0 & $7\times10^{-15}$\\
+String, undamped & $[-2,1]$ & 30 & 14 & 4 & $3\times10^{-21}$\\
+String, $\varepsilon=0.5$ & $[-2,1]$ & 30 & 14 & 4 & ---\\
+Duct, constant reflectance & $[-2,1]$ & 20 & 13 & 0 & $2\times10^{-12}$\\
+Duct, radiation impedance & $[-400,30]$ & 2500 & 16 & 0 & ---\\
+Beam, Kelvin--Voigt & $[-25,2]$ & 160 & 4 & 0 & $7\times10^{-15}$\\
+\bottomrule\end{tabular}
+\end{table}
+
+For the damped string and the radiating duct there is no independent
+closed form; they are verified by the contour counts and the residuals of
+the original equations.

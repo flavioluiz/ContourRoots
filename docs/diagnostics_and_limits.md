@@ -10,10 +10,11 @@ When `info.status` is `'numerically_complete'`:
 - the function was treated as analytic in a neighborhood of the closed
   rectangle (automatically for polynomials, `ndpair` of polynomials and
   checked symbolic input; by your `AssumeAnalytic` declaration otherwise);
-- the argument-principle count on the outer boundary converged: two
-  consecutive doublings of the sampling gave the same integer, the winding
-  number was within `1e-7` of that integer, and every sampled phase
-  increment was below $\pi/3$;
+- the argument-principle count on the outer boundary converged: three
+  consecutive sampling levels (each doubling the number of points) gave the
+  same integer, and at the last two levels the winding number was within
+  `1e-7` of that integer and every sampled phase increment was below
+  $\pi/3$;
 - every cell of the subdivision was resolved, and the multiplicities of the
   returned roots add up to the outer count.
 
