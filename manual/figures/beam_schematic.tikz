@@ -1,6 +1,6 @@
 \begin{tikzpicture}[>=Latex,thick,font=\small,
   spring/.style={decorate,decoration={zigzag,segment length=3.6pt,amplitude=3pt}}]
-  \foreach \offset/\labeltext in {0/{(a) Absorvedor: coordenadas independentes},8/{(b) Massa de ponta e apoio ao solo}} {
+  \foreach \offset/\labeltext in {0/{(a) Absorber: independent coordinates},8/{(b) Tip mass, grounded spring and damper}} {
     \begin{scope}[xshift=\offset cm]
       \node[anchor=west,font=\small\bfseries] at (-.3,1.1) {\labeltext};
       \fill[pattern=north east lines] (-.4,-.45) rectangle (0,.45);
@@ -28,7 +28,7 @@
   \draw[->,orange!80!black] (5.65,-2.0)--(5.65,-2.85) node[right] {$z$};
   \draw[->,red!70!black] (4.4,.85)--(4.4,.15) node[midway,right] {$f$};
   \node[align=center,font=\footnotesize] at (3,-3.3)
-    {Mola e amortecedor medem $z-y$.\\A massa não está ligada ao solo.};
+    {Spring and damper act on $z-y$.\\The mass is not connected to the ground.};
   % Rigidly attached point mass, spring and damper connected to ground.
   \begin{scope}[xshift=8cm]
     \draw[fill=orange!20] (3.8,-.3) rectangle (5,.3);
@@ -44,6 +44,6 @@
     \fill[pattern=north east lines] (3.2,-2.13) rectangle (5.6,-1.9);
     \draw[->,blue!70!black] (5.8,.1)--(5.8,-.65) node[right] {$y=z$};
     \node[align=center,font=\footnotesize] at (3,-3.3)
-      {Mola e amortecedor medem $y$.\\A massa acompanha rigidamente a ponta.};
+      {Spring and damper act on $y$.\\The mass moves rigidly with the tip.};
   \end{scope}
 \end{tikzpicture}

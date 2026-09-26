@@ -38,6 +38,28 @@ function testQuickstartScripts(tc)
     end
 end
 
+function testCodeBlocksMatchExampleFiles(tc)
+    % A block preceded by <!-- file: path --> must equal that file.
+    repo = tc.TestData.repo;
+    files = markdown_files(fullfile(repo,'docs'));
+    checked = 0;
+    for i = 1:numel(files)
+        lines = splitlines(string(fileread(files{i})));
+        for k = find(startsWith(strtrim(lines),'<!-- file:')).'
+            target = strtrim(extractBetween(lines(k),'<!-- file:','-->'));
+            tc.assertEqual(strtrim(lines(k+1)),"```matlab", ...
+                sprintf('%s: marker not followed by a matlab block',files{i}));
+            stop = k + 1 + find(strtrim(lines(k+2:end)) == "```",1);
+            block = strjoin(lines(k+2:stop-1),newline);
+            source = strip(string(fileread(fullfile(repo,target))),'right');
+            tc.verifyEqual(block,source,sprintf('%s is out of sync with %s', ...
+                files{i},target));
+            checked = checked + 1;
+        end
+    end
+    tc.verifyGreaterThan(checked,0);
+end
+
 function files = markdown_files(folder)
     d = dir(fullfile(folder,'**','*.md'));
     d = d(~contains({d.folder},'development'));   % internal planning notes
