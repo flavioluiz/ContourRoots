@@ -173,7 +173,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the other tasks, and the
 
 ## Authorship and AI assistance
 
-Created and maintained by **Flávio Luiz Cardoso-Ribeiro**.
+Created and maintained by **Flávio Luiz Cardoso-Ribeiro**
+([ORCID 0000-0002-6454-9671](https://orcid.org/0000-0002-6454-9671)).
 
 ContourRoots was developed extensively with AI coding assistance, using
 Claude Code (Anthropic) and Codex (OpenAI), including code generation,

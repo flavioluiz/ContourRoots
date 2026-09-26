@@ -5,6 +5,7 @@ type: software
 authors:
   - family-names: "Cardoso-Ribeiro"
     given-names: "Flávio Luiz"
+    orcid: "https://orcid.org/0000-0002-6454-9671"
 version: "0.2.0"
 date-released: "2026-09-26"
 license: MIT
