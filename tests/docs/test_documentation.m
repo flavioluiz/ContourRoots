@@ -31,10 +31,11 @@ function testQuickstartScripts(tc)
     scripts = [dir(fullfile(repo,'examples','quickstart','*.m')); ...
                dir(fullfile(repo,'examples','coupled_beam','beam_direct_nd.m'))];
     tc.assertNotEmpty(scripts);
+    before = findall(groot,'Type','figure');
     for k = 1:numel(scripts)
         file = fullfile(scripts(k).folder,scripts(k).name);
         run_isolated(file);
-        close(findall(groot,'Type','figure'));
+        close(setdiff(findall(groot,'Type','figure'),before));
     end
 end
 

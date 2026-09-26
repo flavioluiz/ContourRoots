@@ -37,7 +37,8 @@ It does **not** mean:
 | `multiplicity` | multiplicity of each returned location (see *clusters* below) |
 | `locationRadius` | half-diagonal of the small box that isolated each location: a resolution estimate, not an error bound |
 | `residuals` | absolute value of the searched factor at each location ($F$, or $D$ in pole mode); depends on the scaling of that factor, and is not $\lvert G(p)\rvert$ |
-| `cancelledLocations`, `cancellationOrders` | candidates removed by pole-zero cancellation, and how many orders were removed |
+| `cancelledLocations`, `cancellationOrders` | candidates where some order was removed by pole-zero cancellation, and how many orders were removed |
+| `cancellationComplete` | `true` where the candidate was removed entirely; `false` for a partial cancellation, which stays in the result with a reduced multiplicity |
 | `cancellationUncertain` | `true` where the cancellation test itself could not be resolved |
 | `unresolvedBoxes` | rectangles `[xmin xmax ymin ymax]` that could not be resolved |
 | `contourResolved` | whether the outer contour count converged |

@@ -18,7 +18,7 @@ Type `help <name>` in MATLAB for the same information in short form.
 | Function | Purpose |
 |---|---|
 | [`critical_delays`](critical_delays.md) | All imaginary-axis crossings of $D(s)+N(s)e^{-sT}=0$ up to a maximum delay, with directions. |
-| [`unstable_root_count`](unstable_root_count.md) | Number of roots with $\mathrm{Re}\,s \ge 0$ for one delay. |
+| [`unstable_root_count`](unstable_root_count.md) | Number of roots with $\mathrm{Re}\,s > 0$ for one delay (`NaN` if inconclusive). |
 | [`rhp_root_bound`](rhp_root_bound.md) | Radius containing every right-half-plane root, for every delay. |
 | [Other delay and Padé tools](delay_tools.md) | `delay_roots`, `delay_root_count`, `pade_delay`, `pade_characteristic`, `pade_critical_delays`, `match_pade_roots`. |
 
@@ -28,7 +28,7 @@ Type `help <name>` in MATLAB for the same information in short form.
 |---|---|
 | `setup_contourroots` | Add ContourRoots to the path for the current session (`'-quiet'` to suppress output). |
 | `contourroots` | Print the version and an overview. |
-| `contourroots_version` | Version string, e.g. `'0.1.0'`. |
+| `contourroots_version` | Version string, e.g. `'0.2.0'`. |
 | `characteristic_roots`, `transfer_poles` | Earlier names of `croots` and `cpoles`, kept for compatibility. |
 
 ## The `info` structure

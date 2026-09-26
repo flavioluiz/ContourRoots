@@ -4,14 +4,17 @@ function plan = buildfile
 %   buildtool test       unit and regression tests (fast)
 %   buildtool docs       run every MATLAB block of README.md and docs/
 %   buildtool examples   run the full example studies (slow, writes output/)
-%   buildtool manual     compile the PDF manual (needs a LaTeX installation)
-%   buildtool release    tests, docs, manual, then dist/ContourRoots.zip/.mltbx
+%   buildtool manual     run the studies, then compile the PDF manual (LaTeX)
+%   buildtool release    tests, docs, studies, manual, then dist/ContourRoots.zip/.mltbx
 %   buildtool clean      delete dist/ and LaTeX build files
 %
 %   Users of the toolbox do not need any of this: see README.md.
 
     plan = buildplan(localfunctions);
     plan.DefaultTasks = "test";
+    % A release regenerates every study, so that the manual never uses
+    % results computed by an older version of the code.
+    plan("manual").Dependencies = "examples";
     plan("release").Dependencies = ["test" "docs" "manual"];
 end
 

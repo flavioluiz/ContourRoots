@@ -18,9 +18,12 @@ For the heat equation the natural expressions contain $\sqrt s$. Define
 Both are entire: only integer powers of $q$ appear. The implementation
 evaluates $H$ by its series for $|q|<10^{-4}$ and by the closed form
 elsewhere, which avoids the $0/0$ at $q=0$ and does not introduce an
-artificial pole. The same idea applies to every model below: each factor is
-an entire function evaluated through a regularized formula, and
-\code{AssumeAnalytic} is justified for both factors.
+artificial pole. The same idea applies to the models below: each factor is
+evaluated through a regularized formula and is analytic in the search
+regions used here, so \code{AssumeAnalytic} is justified for both factors.
+The heat, string and duct factors are entire; the Kelvin--Voigt beam factors
+are analytic except at $s=-1/c_d$ (Section~\ref{sec:kelvinvoigt}), which the
+regions must exclude.
 
 \section{Heat equation: the sensor position}\label{sec:heat}
 

@@ -16,8 +16,9 @@ function report = check_doc_snippets(files)
     rows = cell(0,4);
     failures = 0;
     oldVisible = get(groot,'defaultFigureVisible');
+    before = findall(groot,'Type','figure');
     set(groot,'defaultFigureVisible','off');
-    restore = onCleanup(@() cleanup(oldVisible));
+    restore = onCleanup(@() cleanup(oldVisible,before));
     for i = 1:numel(files)
         blocks = extract_blocks(files{i});
         [status,messages] = run_blocks(blocks);
@@ -80,7 +81,8 @@ function [cr__status,cr__messages] = run_blocks(cr__blocks)
     end
 end
 
-function cleanup(oldVisible)
-    close(findall(groot,'Type','figure'));
+function cleanup(oldVisible,before)
+    % Close only the figures created by the snippets.
+    close(setdiff(findall(groot,'Type','figure'),before));
     set(groot,'defaultFigureVisible',oldVisible);
 end

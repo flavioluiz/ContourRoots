@@ -39,9 +39,11 @@ and oscillates before $t = T$, while the true delay stays at zero:
 
 ## 6.3 What Padé keeps
 
-Since the gain is exact, **the crossing frequencies are exactly the same**
-as for the true delay: they come from $|D(i\omega)| = |N(i\omega)|$,
-which does not involve the phase. One can also prove (see the
+Since the gain is exact, **a Padé model can cross the imaginary axis only
+at the crossing frequencies of the true equation**: they come from
+$|D(i\omega)| = |N(i\omega)|$, which does not involve the phase. Whether a
+crossing actually occurs at a given frequency, and at which delay, depends
+on the phase condition (next section). One can also prove (see the
 [manual](../ContourRoots_manual.pdf)) that each crossing of the Padé model
 has the **same direction** as the true crossings at that frequency.
 Conclusions that depend only on the gain are preserved: P2, stable for

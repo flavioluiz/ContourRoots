@@ -12,7 +12,9 @@ function [roots_delay, info] = delay_roots(N,D,T,xlimits,ylimits,nx,ny,varargin)
 %     'NewtonTolerance'  relative step tolerance (default 1e-11)
 %     'ResidualTolerance' residual tolerance (default 1e-8)
 %     'ClusterTolerance' relative clustering tolerance (default 2e-6)
-%     'VerifyCount'      estimate root count by the argument principle
+%     'VerifyCount'      check the number of roots with the argument
+%                        principle; INFO.countMatches is false when the
+%                        count is inconclusive (NaN)
 %                        (default true)
 %     'Display'          print a root table (default false)
 %     'Plot'             draw a pole map (default false)
@@ -57,7 +59,7 @@ function [roots_delay, info] = delay_roots(N,D,T,xlimits,ylimits,nx,ny,varargin)
     expected = NaN;
     winding = NaN;
     if opt.VerifyCount
-        [expected,winding] = delay_root_count(N,D,T,xlimits,ylimits,600);
+        [expected,winding] = delay_root_count(N,D,T,xlimits,ylimits);
     end
 
     seedPoints = opt.SeedPoints(:);
@@ -144,7 +146,7 @@ function [roots_delay, info] = delay_roots(N,D,T,xlimits,ylimits,nx,ny,varargin)
     info = struct('residuals',residuals,'seedCount',attempts, ...
         'convergedSeedCount',convergedCount,'refinementsUsed',refinementsUsed, ...
         'argumentPrincipleCount',expected,'windingNumber',winding, ...
-        'countMatches',isnan(expected) || numel(roots_delay)==expected, ...
+        'countMatches',~opt.VerifyCount || (~isnan(expected) && numel(roots_delay)==expected), ...
         'characteristic',F);
 
     if opt.Display

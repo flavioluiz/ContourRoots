@@ -39,8 +39,11 @@ Same as [`croots`](croots.md#name-value-options).
 **`p`** — column vector of poles.
 
 **`info`** — diagnostics; in addition to the fields listed for `croots`:
-`cancelledLocations` (zeros of $D$ removed by cancellation),
-`cancellationOrders` (orders removed at each), `cancellationUncertain`, and
+`cancelledLocations` (zeros of $D$ where some order was removed by
+cancellation), `cancellationOrders` (orders removed at each),
+`cancellationComplete` (true where the candidate disappeared entirely;
+false for a partial cancellation, still listed in `p`),
+`cancellationUncertain`, and
 `targetCountBeforeCancellations`.
 
 ## Examples

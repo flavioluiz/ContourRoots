@@ -93,7 +93,9 @@ N = @(s) Nb(s).*(m*s.^2 + Zc(s));
 D = @(s) Db(s).*(m*s.^2 + Zc(s)) + Nb(s).*m.*s.^2.*Zc(s);
 [p, info] = cpoles(ndpair(N, D), [-60 1 -150 150], 'AssumeAnalytic', true);
 \end{lstlisting}
-The full script is \path{examples/coupled_beam/beam_direct_nd.m}; the
+This excerpt is not self-contained: the local function
+\code{beam\_numerator} (the series-regularized $A(q)$) is defined in the full
+script \path{examples/coupled_beam/beam_direct_nd.m}; the
 helper \path{examples/models/coupled_beam_model.m} builds the dimensional
 model and the three transfer functions.
 

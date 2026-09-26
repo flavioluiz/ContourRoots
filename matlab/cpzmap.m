@@ -2,8 +2,9 @@ function [p,z,infoP,infoZ] = cpzmap(G,region,varargin)
 %CPZMAP Pole-zero map of a nonrational transfer function.
 %   CPZMAP(G,REGION) computes the poles (with CPOLES) and zeros (with
 %   CZEROS) of G inside REGION = [xmin xmax ymin ymax] and plots them in
-%   the complex plane: poles as x, zeros as o, as in PZMAP. Locations
-%   removed by pole-zero cancellation are shown as small grey dots. The
+%   the complex plane: poles as x, zeros as o, as in PZMAP. Candidates
+%   removed entirely by pole-zero cancellation are shown as small grey dots
+%   (partial cancellations remain as poles or zeros). The
 %   search rectangle is drawn as a dashed box; roots outside it are not
 %   searched and not shown.
 %
@@ -46,7 +47,10 @@ function [p,z,infoP,infoZ] = cpzmap(G,region,varargin)
         if isempty(ax), ax = newplot; end
         holdState = ishold(ax); hold(ax,'on');
         restore = onCleanup(@() set_hold(ax,holdState));
-        cancelled = [infoP.cancelledLocations; infoZ.cancelledLocations];
+        % Only candidates removed entirely; partial cancellations remain as
+        % poles or zeros with reduced multiplicity.
+        cancelled = [infoP.cancelledLocations(infoP.cancellationComplete); ...
+                     infoZ.cancelledLocations(infoZ.cancellationComplete)];
         frame = region([1 2 2 1 1]) + 1i*region([3 3 4 4 3]);
         plot(ax,real(frame),imag(frame),'--','Color',[.6 .6 .6],'HandleVisibility','off');
         xline(ax,0,':','Color',[.4 .4 .4],'HandleVisibility','off');

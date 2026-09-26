@@ -2,7 +2,8 @@ function build_release()
 %BUILD_RELEASE Build dist/ContourRoots.zip and dist/ContourRoots.mltbx.
 %   The release contains what users need: the toolbox (matlab/), examples,
 %   documentation (including the PDF manual), setup_contourroots.m, README,
-%   LICENSE, CITATION.cff and CHANGELOG.md. Tests, tools, manual sources and
+%   LICENSE, CITATION.cff, CHANGELOG.md, CONTRIBUTING.md and ROADMAP.md
+%   (all linked from the README). Tests, tools, manual sources and
 %   development notes are not included.
 %
 %   The file names do not contain the version on purpose: the README links
@@ -22,7 +23,7 @@ function build_release()
     mkdir(stage);
     cleaner = onCleanup(@() rmdir(fileparts(stage),'s'));
     items = {'matlab','examples','docs','setup_contourroots.m','README.md', ...
-        'LICENSE','CITATION.cff','CHANGELOG.md'};
+        'LICENSE','CITATION.cff','CHANGELOG.md','CONTRIBUTING.md','ROADMAP.md'};
     for k = 1:numel(items)
         copyfile(fullfile(root,items{k}), fullfile(stage,items{k}));
     end
@@ -46,7 +47,7 @@ function build_release()
     opts = matlab.addons.toolbox.ToolboxOptions(stage, uuid);
     opts.ToolboxName = 'ContourRoots';
     opts.ToolboxVersion = contourroots_version_of(root);
-    opts.AuthorName = 'Flávio Ribeiro';
+    opts.AuthorName = 'Flávio Luiz Cardoso-Ribeiro';
     opts.Summary = 'Poles, zeros and roots of nonrational functions in a rectangle of the complex plane.';
     opts.Description = ['Finds roots of scalar analytic functions and poles and zeros of ' ...
         'nonrational transfer functions (time delays, PDE models) with the argument ' ...

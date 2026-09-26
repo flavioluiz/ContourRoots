@@ -83,7 +83,10 @@ info.residuals       % |F(r)|, tiny
 | `exploratory` | The function was not declared analytic, so completeness cannot be checked. | If it is analytic, add `'AssumeAnalytic',true`; otherwise use `ndpair` (next tutorial). |
 
 If you call `croots` with a single output and the result is not complete,
-it prints a warning, so a missing root never goes unnoticed silently.
+it prints a warning. Keep in mind that "complete" is a numerical check
+that relies on the analyticity you declared and on the contour sampling
+(see [Diagnostics and limits](diagnostics_and_limits.md)); it is not a
+proof.
 
 ## 5. Try it on a polynomial
 

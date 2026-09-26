@@ -115,7 +115,8 @@ hidden mode were unstable, the transfer function would not show it:
 
 - Use `ndpair(N, D)` with separate analytic factors.
 - `cpoles` returns zeros of $D$ not cancelled by $N$; `czeros` the reverse.
-- `info.cancelledLocations` lists the cancelled candidates.
+- `info.cancelledLocations` lists the candidates where cancellation
+  occurred; `info.cancellationComplete` tells full from partial cancellation.
 - `cpzmap` plots everything in one call.
 
 Next: [Tutorial 3 — Describing a model](03_model_inputs.md).

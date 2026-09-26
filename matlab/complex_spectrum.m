@@ -31,6 +31,11 @@ function [locations,info] = complex_spectrum(model,region,varargin)
 %   exploratory Newton + local winding checks and never claim completeness.
 %   For pole-mode handles, AssumeAnalytic asserts analyticity of 1/G (hence
 %   no zeros of G in the rectangle). A numerator/denominator pair is preferred.
+%   INFO.cancelledLocations lists every candidate where some order was
+%   removed by cancellation; INFO.cancellationOrders gives the orders
+%   removed, and INFO.cancellationComplete is true where the candidate was
+%   removed entirely (false for a partial cancellation, which remains in
+%   the result with a reduced multiplicity).
 %   INFO.multiplicity counts roots in a small isolating box; roots closer
 %   than this resolution may be returned as one cluster. Boundary roots are
 %   not silently included: use a slightly larger or shifted rectangle.
@@ -65,7 +70,7 @@ function [locations,info] = complex_spectrum(model,region,varargin)
     end
     [target,dt,other,analytic,source]=spectrum_model(model,opt);
     [locations,m,scan]=spectrum_solve(target,dt,region,opt,~analytic);
-    cancelled=complex(zeros(0,1)); cancellationOrders=zeros(0,1);
+    cancelled=complex(zeros(0,1)); cancellationOrders=zeros(0,1); fullyCancelled=false(0,1);
     uncertain=false(size(locations));
     if ~isempty(other)
         for k=1:numel(locations)
@@ -78,6 +83,7 @@ function [locations,info] = complex_spectrum(model,region,varargin)
                 removed=min(m(k),c.count);
                 if removed>0
                     cancelled(end+1,1)=z; cancellationOrders(end+1,1)=removed; %#ok<AGROW>
+                    fullyCancelled(end+1,1)=m(k)<=c.count; %#ok<AGROW>
                 end
                 m(k)=max(0,m(k)-c.count);
             end
@@ -94,6 +100,7 @@ function [locations,info] = complex_spectrum(model,region,varargin)
     info.count=sum(info.multiplicity);
     info.cancelledLocations=cancelled;
     info.cancellationOrders=cancellationOrders;
+    info.cancellationComplete=fullyCancelled;
     info.cancellationUncertain=uncertain(keep);
     info.region=region; info.mode=lower(char(opt.Mode));
     info.analyticSource=source;

@@ -105,8 +105,12 @@ for P3, $R\approx3.076$. The function \code{rhp\_root\_bound} computes $R$,
 and \code{unstable\_root\_count} applies the argument principle to the
 rectangle $[0,R+1]\times[-(R+1),R+1]$: the number $Z(T)$ of unstable roots
 is obtained without guessing a search window and without approximation
-(the count itself is a floating-point computation, reliable away from
-critical delays).
+(the count itself is a floating-point computation with adaptive sampling;
+since the left edge is the imaginary axis, it is inconclusive, and returns
+\code{NaN}, when roots lie on or extremely close to the axis --- near
+critical delays, for persistent imaginary roots, or for large delays, where
+many roots approach the axis. $Z(T)=0$ means stability only when no root
+lies on the imaginary axis).
 
 \section{Roots for a given delay}
 
@@ -217,7 +221,7 @@ $[0,10]$:
    2,4,6,4, & \text{after }2.8076,\ 5.3233,\ 7.8390,\ 8.6265.
   \end{cases}
 \]
-The window has width $0.112$ and could easily be missed by a sweep in $T$.
+The window has width $0.112$: a sweep with step $0.5$ misses it entirely.
 Formula~\eqref{eq:Z} was checked independently with
 \code{unstable\_root\_count} at 80 delays, with full agreement (black curve
 and circles in Figure~\ref{fig:Zp3}). Figure~\ref{fig:alpha} shows the
@@ -301,10 +305,12 @@ $10^{-6}$ rad, and asymptotic phase.}\label{tab:validity}
 \section{What Padé preserves}
 
 \begin{proposition}[Frequencies and directions are inherited]\label{prop:padedir}
-For the rational equation $D+NP_n/Q_n=0$:
+Assume simple crossings, $G\not\equiv0$ and no common factor of $N$ and $D$ on
+the imaginary axis. For the rational equation $D+NP_n/Q_n=0$:
 \begin{enumerate}[label=(\alph*)]
-  \item imaginary roots occur exactly at the frequencies $\omega_i$
-        of~\eqref{eq:G};
+  \item imaginary roots $\ii\omega$, $\omega>0$, can occur only at the
+        candidate frequencies $\omega_i$ of~\eqref{eq:G} (whether one occurs
+        for a finite delay is decided by (b));
   \item at $\omega_i$, the critical delays solve
         $\phi_n(\omega_iT)=-(\theta_i+2\pi k)$, which has a (unique)
         solution if and only if $\theta_i+2\pi k<n\pi$;

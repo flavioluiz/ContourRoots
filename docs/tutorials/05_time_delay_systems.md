@@ -116,8 +116,9 @@ For P3 this reveals a narrow **stability window**:
 | $7.8390 < T < 8.6265$ | 6 |
 | $8.6265 < T \le 10$ | 4 |
 
-A sweep of $T$ in steps of 0.1 would probably miss the window of width
-0.112. The formula finds it directly.
+The window is only 0.112 wide: a sweep of $T$ in steps of 0.5 (…, 2.5,
+3.0, …) misses it entirely, and even a step of 0.1 puts only one or two
+samples inside it. The formula finds it directly.
 
 ![Spectral abscissa versus delay](../assets/spectral_abscissa.png)
 
@@ -136,8 +137,21 @@ Zcheck = arrayfun(@(t) unstable_root_count(3, [1 0.8 4], t), [1 2.75 3 6 9])
 ```
 
 The bound is a mathematical fact; the count is a floating-point contour
-computation (reliable away from the critical delays, where a root sits on
-the imaginary axis).
+computation with adaptive sampling. The left edge of the rectangle is the
+imaginary axis, so roots on or extremely close to it make the count
+impossible to resolve: at or near a critical delay, for roots that stay on
+the axis for every delay, and for large delays (where many roots approach
+the axis). The function then returns `NaN` with a warning, never a
+misleading number. For instance, for P1 at $T = 1000$ the crossing formula
+gives $Z = 552$, while the contour count is inconclusive:
+
+```matlab
+Zbig = unstable_root_count(2, [1 1], 1000, [], 2^16)   % NaN (inconclusive)
+```
+
+In all cases, $Z(T) = 0$ means stability only if no root lies on the
+imaginary axis (away from critical delays, and with
+`info.persistentFrequencies` of `critical_delays` empty).
 
 ## 5.7 Roots for a particular delay
 

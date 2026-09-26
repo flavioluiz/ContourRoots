@@ -19,8 +19,8 @@ All tasks run from the repository folder with MATLAB's `buildtool`
 | `buildtool test` | unit and regression tests (about a minute) |
 | `buildtool docs` | runs every `matlab` block of the README and `docs/`, the quick-start scripts, and checks that code shown in tutorials matches the example files |
 | `buildtool examples` | runs the full studies in `examples/` (a few minutes); results go to `output/` |
-| `buildtool manual` | runs the studies if needed, regenerates `docs/assets`, and compiles the PDF manual (needs `latexmk`) |
-| `buildtool release` | tests, docs and manual, then builds `dist/ContourRoots.zip` and `dist/ContourRoots.mltbx` |
+| `buildtool manual` | runs the studies (`examples`), regenerates `docs/assets`, and compiles the PDF manual (needs `latexmk`) |
+| `buildtool release` | tests, docs, studies and manual, then builds `dist/ContourRoots.zip` and `dist/ContourRoots.mltbx` |
 | `buildtool clean` | removes `dist/` and the manual build folder |
 
 ## Guidelines

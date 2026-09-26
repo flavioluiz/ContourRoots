@@ -3,9 +3,9 @@ message: "If you use ContourRoots, please cite it using these metadata."
 title: "ContourRoots: A MATLAB Toolbox for Nonrational Poles and Zeros"
 type: software
 authors:
-  - family-names: "Ribeiro"
-    given-names: "Flávio"
-version: "0.1.0"
+  - family-names: "Cardoso-Ribeiro"
+    given-names: "Flávio Luiz"
+version: "0.2.0"
 date-released: "2026-09-26"
 license: MIT
 repository-code: "https://github.com/flavioluiz/ContourRoots"

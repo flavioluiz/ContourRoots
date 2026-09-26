@@ -32,4 +32,5 @@ function contourroots()
     fprintf('  help croots                 function reference\n');
     fprintf('  Tutorials and manual:       %s\n', fullfile(root,'docs'));
     fprintf('  Examples:                   %s\n\n', fullfile(root,'examples'));
+    fprintf('  Created and maintained by Flávio Luiz Cardoso-Ribeiro (MIT License).\n\n');
 end

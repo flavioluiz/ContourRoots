@@ -112,7 +112,7 @@ points as grey dots.
 | `info.complete` | `true` when the contour counts match the roots returned |
 | `info.multiplicity` | Multiplicity of each location |
 | `info.residuals` | $\lvert F\rvert$ (or $\lvert D\rvert$ for poles) at each location |
-| `info.cancelledLocations` | Candidates removed by pole-zero cancellation |
+| `info.cancelledLocations` | Candidates where pole-zero cancellation occurred (`info.cancellationComplete`: removed entirely or not) |
 | `info.unresolvedBoxes` | Parts of the rectangle that could not be resolved |
 
 "Numerically complete" means: if the function is analytic as declared, and
@@ -168,7 +168,21 @@ buildtool test        % unit and regression tests
 buildtool docs        % runs every MATLAB block of this README and of docs/
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the other tasks.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the other tasks, and the
+[roadmap](ROADMAP.md) for planned improvements and known limitations.
+
+## Authorship and AI assistance
+
+Created and maintained by **Flávio Luiz Cardoso-Ribeiro**.
+
+ContourRoots was developed extensively with AI coding assistance, using
+Claude Code (Anthropic) and Codex (OpenAI), including code generation,
+documentation and tests; Codex was also used for an independent review of
+version 0.1.0. Problem formulation, project
+direction and release decisions are led by the maintainer. Numerical
+validation and known limitations are documented separately: see
+[Validation](docs/validation.md), [Diagnostics and limits](docs/diagnostics_and_limits.md)
+and the [roadmap](ROADMAP.md). Please report any problem you find.
 
 ## Citation and license
 
