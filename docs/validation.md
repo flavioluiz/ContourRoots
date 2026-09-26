@@ -39,6 +39,25 @@ searches warn; invalid input gives clear errors.
   stay inside the current cell).
   See [Tutorial 9](tutorials/09_aeroelasticity.md) for the validation scope.
 
+## Zero-state time responses
+
+`test_response_api` and `test_time_response` test shifted FFT, de Hoog and
+direct Bromwich quadrature against analytical first-order, delayed, diffusive,
+fractional, unstable and oscillatory responses. Integrated ZOH/FOH kernels
+are checked against exact recurrences and optional MATLAB `lsim`; tests
+also cover direct Diracs, unknown initial limits, scalar-only evaluators,
+conjugacy, numerical scale, refinement exhaustion and causal input handling.
+The full [time-response study](tutorials/10_time_response.md) adds independent
+method-of-steps, rod modal and beam FEM references plus an aeroelastic
+input/output-channel cross-check. Convergence remains conditional on the
+declared inversion half-plane and finite numerical resolution.
+
+The study's maximum absolute errors are approximately 1.2e-8 (delay
+feedback), 4.6e-8 (diffusion), 1.1e-7 (finite rod), and 2.5e-5 (beam relative
+to the refined FEM reference). NASA pitch-step FFT/quadrature differences
+are 3.0e-11 at 160 ft/s and 6.7e-11 at 180 ft/s. These are observed errors
+for the specified test grids and parameters, not general accuracy promises.
+
 ## Documentation tests (`tests/docs`)
 
 Every `matlab` block of the README and of `docs/` is executed, in order,

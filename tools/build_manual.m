@@ -16,6 +16,12 @@ function build_manual()
         run(fullfile(root,'examples','distributed_systems','run_nonrational_examples.m'));
         run(fullfile(root,'examples','coupled_beam','run_coupled_beam_study.m'));
     end
+    if ~isfile(fullfile(root,'output','aeroelasticity','nasa_study.png'))
+        addpath(fullfile(root,'examples','aeroelasticity')); run_aeroelastic_study;
+    end
+    if ~isfile(fullfile(root,'output','time_response','time_response_results.mat'))
+        addpath(fullfile(root,'examples','time_response')); run_time_response_study;
+    end
     make_doc_figures();
 
     tex = fullfile(root,'manual','ContourRoots_manual.tex');

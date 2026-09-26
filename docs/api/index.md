@@ -13,6 +13,16 @@ Type `help <name>` in MATLAB for the same information in short form.
 | [`ndpair`](ndpair.md) | Transfer function as a numerator/denominator pair. |
 | [`complex_spectrum`](complex_spectrum.md) | Core solver behind all of the above; full option list. |
 
+## Time responses
+
+| Function | Purpose |
+|---|---|
+| [`cimpulse`](cimpulse.md) | Ordinary impulse response and known Dirac metadata. |
+| [`cstep`](cstep.md) | Unit-step response from G(s)/s. |
+| [`clsim`](clsim.md) | Zero-state response to sampled/handle input, ZOH or FOH. |
+| [`cinvlaplace`](cinvlaplace.md) | Inverse Laplace transform of a complete expression. |
+| [Options and diagnostics](time_response_options.md) | Inversion-domain contracts, convergence and limits. |
+
 ## Time-delay systems
 
 | Function | Purpose |
@@ -28,7 +38,7 @@ Type `help <name>` in MATLAB for the same information in short form.
 |---|---|
 | `setup_contourroots` | Add ContourRoots to the path for the current session (`'-quiet'` to suppress output). |
 | `contourroots` | Print the version and an overview. |
-| `contourroots_version` | Version string, e.g. `'0.3.0'`. |
+| `contourroots_version` | Version string, e.g. `'0.4.0'`. |
 | `characteristic_roots`, `transfer_poles` | Earlier names of `croots` and `cpoles`, kept for compatibility. |
 
 ## The `info` structure

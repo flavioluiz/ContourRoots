@@ -3,6 +3,27 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
+## [0.4.0] — 2026-09-26
+
+### Added
+- Time responses computed directly from nonrational transfer functions,
+  without Padé or modal approximation: `cstep`, `cimpulse`, `clsim` (the
+  analogues of `step`, `impulse` and `lsim`) and `cinvlaplace`. Numerical
+  Laplace inversion on a Bromwich line by shifted FFT, with independent
+  de Hoog and adaptive-quadrature methods; separate period, bandwidth and
+  line-shift convergence checks; exact ZOH/FOH input reconstruction through
+  integrated step/ramp kernels; Dirac terms reported as metadata.
+- Tutorial 10, reference pages for the four functions and their options,
+  manual chapter 11, four example scripts and a validation study (delay
+  feedback, diffusion, heated rod, coupled beam and aeroelastic pitch
+  response against independent references).
+- `THIRD_PARTY_NOTICES.md`: BSD notice for the adapted mpmath de Hoog
+  recurrence, included in the release packages.
+
+### Fixed
+- A sample exactly at the transport delay of an LTI model uses the exact
+  right limit instead of a rounding-error positive time.
+
 ## [0.3.0] — 2026-09-26
 
 ### Added

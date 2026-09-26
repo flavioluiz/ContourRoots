@@ -1,0 +1,239 @@
+\chapter[Time responses]{Time responses without rational approximation}\label{ch:response}
+
+The previous chapters located poles and zeros. This chapter computes
+\emph{time responses} --- impulse, step and forced --- of the same
+nonrational transfer functions, with the functions \code{cimpulse},
+\code{cstep}, \code{clsim} and \code{cinvlaplace}.
+
+\section{Motivation}
+
+For a rational model, MATLAB's \code{impulse}, \code{step} and \code{lsim}
+integrate a state-space realization in time. A transfer function with a
+delay, a diffusion term or unsteady aerodynamics has no finite realization,
+and the usual practice simulates a rational approximation instead: a Padé
+model of the delay, a truncated modal expansion of the PDE, or aerodynamic
+lag states. Chapter~\ref{ch:delay} showed that such approximations can
+change stability conclusions; they can change transients as well.
+
+The response of a causal linear system at rest is the inverse Laplace
+transform of $G(s)U(s)$,
+\begin{equation}
+  y(t)=\frac{1}{2\pi\ii}\int_{\sigma-\ii\infty}^{\sigma+\ii\infty}
+        e^{st}\,G(s)U(s)\,ds ,
+  \label{eq:bromwich}
+\end{equation}
+where the Bromwich line $\Real s=\sigma$ lies to the right of every
+singularity of $G(s)U(s)$. Equation~\eqref{eq:bromwich} involves only values
+of $G$: it can be evaluated numerically for any transfer function that can
+be evaluated. What is discretized is this integral, not the physical model,
+and the discretization is refined until it converges.
+
+\section{Problem statement and the domain assumption}
+
+The module computes zero-state responses of real, causal, single-input
+single-output systems: all internal states, including the memory of a
+delay line, of a PDE or of an aerodynamic wake, are zero at $t=0$. A
+transfer function does not describe an arbitrary internal initial state,
+so no analogue of MATLAB's \code{initial} is provided.
+
+The one piece of information that cannot be extracted from a function
+handle is where $G$ is analytic. The user supplies it as
+\code{SingularityBound}~$a$: the assertion that $G$ is analytic for
+$\Real s>a$ (or directly as the line, \code{Abscissa}). For coefficient
+vectors and \code{tf}/\code{zpk}/\code{ss} models it is computed from the
+poles. Table~\ref{tab:bounds} gives typical justifications.
+
+\begin{table}[H]\centering\small
+\caption{Justifying the inversion half-plane.}\label{tab:bounds}
+\begin{tabularx}{\textwidth}{>{\raggedright}p{4.2cm}p{1.1cm}X}
+\toprule
+Transfer function & Bound & Justification\\\midrule
+$1/(s+1+0.5e^{-s})$ & 0 & for $\Real s\ge0$, $|s+1|\ge1>0.5\ge|0.5e^{-s}|$: no zeros of the denominator\\
+$e^{-a\sqrt s}$ (diffusion) & 0 & only singularity: the branch cut $(-\infty,0]$\\
+$e^{-\tau s}/(s+1)$ & $-1$ & pole at $-1$; $e^{-\tau s}$ is entire\\
+unstable system & growth rate & the unstable poles must lie left of the line\\
+aeroelastic section, 180 ft/s & 5 & the right-half-plane count of Chapter~\ref{ch:aero} gives the pair $2.13\pm74.8\ii$\\
+\bottomrule\end{tabularx}
+\end{table}
+
+A bounded root search helps to choose the bound but cannot prove it: a
+singularity outside the searched rectangle would be missed. The bound is
+therefore recorded as an assertion (\code{info.domainSource}). Choosing a
+line to the left of an unstable pole does not fail loudly; it computes a
+different, non-causal function (Figure~\ref{fig:respconv}, right).
+
+\section{Inversion on a Bromwich line}
+
+\paragraph{Discretization.} On $s=\sigma+\ii\omega$, \eqref{eq:bromwich}
+is the Fourier integral of $f_\sigma(t)=e^{-\sigma t}f(t)$, with $F=GU$.
+Sampling $F$ at $\omega_k=2\pi k/P$ and applying the inverse FFT of length
+$N$ gives, at $t_n=nP/N$,
+\begin{equation}
+  \frac{1}{\Delta t}\operatorname{IFFT}\bigl(F(\sigma+\ii\omega_k)\bigr)_n
+  =\sum_{m\ge0} f_\sigma(t_n+mP) + E_{\mathrm{band}},
+  \qquad \Delta t=\frac{P}{N},
+  \label{eq:aliasing}
+\end{equation}
+where the sum is the periodic repetition of $f_\sigma$ (aliasing in time;
+only $m\ge0$ appears because $f$ is causal) and $E_{\mathrm{band}}$ is the
+error of truncating the frequency band at $\pm\pi N/P$. Multiplying by
+$e^{\sigma t_n}$ recovers $f(t_n)$ plus the aliasing terms
+$e^{-m\sigma P}f(t_n+mP)$, $m\ge1$. If $|f(t)|\lesssim Ce^{at}$, the first
+of them is of relative order $e^{-(\sigma-a)P}$. The solver chooses
+\[
+  \sigma=\max(a,0)+\frac{\max\{12,\;-\ln(0.01\,\min(\mathrm{AbsTol},\mathrm{RelTol}))\}}{P},
+\]
+which makes the aliasing contribution smaller than the requested tolerance
+by a factor of about 100. The price is the amplification $e^{\sigma t}$ of
+rounding errors when the weighting is undone, reported in
+\code{info.amplification}; very long horizons for growing responses are
+refused.
+
+\paragraph{Refinement.} Each sample is computed four times: with the
+reference period and resolution, with the period doubled, with the
+bandwidth doubled, and with the line shifted to the right by $0.5/P$. The
+three differences --- period, bandwidth and shift --- estimate the three
+error sources separately. A sample is accepted when they are below
+$\mathrm{AbsTol}+\mathrm{RelTol}\,|y|$ in two successive rounds;
+otherwise period and bandwidth are refined. Figure~\ref{fig:respconv}
+(left) shows the three differences for a delayed first-order system.
+Zero-padding a previously sampled spectrum would add no information; each
+refinement evaluates $G$ at new frequencies.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{time_response_convergence.png}
+\caption{Left: period, bandwidth and shift differences during refinement
+($e^{-0.713s}/(s+1)$). Right: for the unstable $1/(s-0.3)$, inversion on a
+line right of the pole gives the causal response $e^{0.3t}$; an inverse FFT
+on the imaginary axis gives a different function.}
+\label{fig:respconv}
+\end{figure}
+
+\paragraph{Independent methods.} Two further methods accept arbitrary
+positive times and serve as cross-checks. \code{Method='dehoog'} sums the
+Fourier series of \eqref{eq:aliasing} with the continued-fraction
+acceleration of \citet{dehoog1982}; its quotient-difference table is a
+Padé-type device for summing the series, not a rational approximation of
+$G$. It checks the degree, the period and the line shift.
+\code{Method='quadrature'} integrates a truncated Bromwich integral with
+adaptive Gauss--Kronrod quadrature and checks the cutoff, the quadrature
+tolerance and the line; it avoids the conditioning limits of the
+quotient-difference table in double precision for late oscillatory
+responses. There is no automatic switching between methods.
+
+\section{Dirac terms, the origin and jumps}
+
+\paragraph{Direct terms.} If $G=D+G_r$ with a constant $D$, the impulse
+response contains $D\delta(t)$ and, with a transport delay $\tau$ of an LTI
+model, $D\delta(t-\tau)$. A vector of samples cannot represent these; the
+returned impulse response is the ordinary part $g_r$, and the Dirac terms
+are listed in \code{info.singularTerms}. For function handles no hidden
+Dirac term can be excluded from finite samples: \code{cimpulse} requires
+the assertion \code{RegularImpulse=true}, with an optional known
+\code{Feedthrough}.
+
+\paragraph{The origin.} An impulse response with $g(0^+)=h_0\neq0$ jumps at
+$t=0$, which would slow the convergence of the inversion. When $h_0$ is
+known --- exactly for rational models, or through \code{InitialValue} ---
+the solver inverts $G_r(s)-h_0/(s+\beta)$, whose inverse is continuous at
+zero, and adds $h_0e^{-\beta t}$ back exactly; $\beta>0$ is chosen so that
+the auxiliary pole lies left of the line. When $h_0$ is unknown, the value
+at $t=0$ is returned as \code{NaN} and marked unresolved; positive times are
+unaffected. Kernels that are infinite at zero, such as $1/\sqrt{\pi t}$ for
+$G=s^{-1/2}$, are computed at positive times.
+
+\paragraph{Jumps.} At a jump of $f$ the inversion integral converges to the
+midpoint of the jump. Known jumps --- the direct term of a step, the delay
+of an LTI model --- are placed exactly with the right-continuous
+convention. A jump unknown to the solver, such as a delay inside a function
+handle, leaves the single sample at that time unresolved, while the other
+samples converge.
+
+\section{Forced response and input reconstruction}
+
+\code{clsim} computes the response to an input given by samples $u_j$ at
+uniform times $t_j$ (or a handle sampled there). The sampled input must be
+completed between samples; the user chooses a zero-order hold (ZOH) or a
+first-order hold (FOH), and the response is computed exactly for that
+reconstructed input. Convolving sampled impulse responses would require
+$g(0)$, which may be infinite; instead the solver uses integrated kernels.
+With $G=D+G_r$, define the step and ramp responses
+$S_r=\mathcal L^{-1}\{G_r/s\}$ and $R_r=\mathcal L^{-1}\{G_r/s^2\}$, both
+zero before $t=0$. A held input is a sum of delayed steps, one per jump
+$u_j-u_{j-1}$ (with $u_{-1}=0$):
+\begin{equation}
+  y(t)=Du(t)+\sum_{t_j\le t}(u_j-u_{j-1})\,S_r(t-t_j).
+\end{equation}
+A piecewise-linear input with slopes $m_j=(u_{j+1}-u_j)/(t_{j+1}-t_j)$ is a
+step $u_0$ plus delayed ramps, one per change of slope:
+\begin{equation}
+  y(t)=Du(t)+u_0S_r(t)+m_0R_r(t)+\sum_{j\ge1,\,t_j\le t}(m_j-m_{j-1})\,R_r(t-t_j).
+\end{equation}
+On a uniform grid these sums are discrete linear convolutions. They are
+computed with zero-padded FFTs (length at least $2n-1$, so that the
+convolution is linear, not circular), after the exact rescaling
+$\sum_j w_jK(t_n-t_j)=e^{\sigma t_n}\sum_j (w_je^{-\sigma t_j})
+(K(t_n-t_j)e^{-\sigma(t_n-t_j)})$, which limits the dynamic range for
+growing kernels. The kernel error estimates are propagated through the same
+sums. For rational models the result agrees with MATLAB's \code{lsim} with
+the same hold to about $10^{-10}$ (ZOH) and $10^{-9}$ (FOH).
+
+\section{Validation}
+
+The study \path{examples/time_response/run_time_response_study.m} compares
+step responses computed from transfer functions with references obtained by
+different means (Table~\ref{tab:respval}, Figure~\ref{fig:respval}). The
+finite-element and modal truncations belong to the references, not to the
+inversion.
+
+\begin{table}[H]\centering\small
+\caption{Maximum absolute errors of step responses on $0\le t\le6$.}\label{tab:respval}
+\begin{tabular}{llr}\toprule
+Transfer function & Independent reference & Error\\\midrule
+$1/(s+1+0.5e^{-s})$ & method-of-steps series & $1.2\times10^{-8}$\\
+$e^{-0.7\sqrt s}$ & $\operatorname{erfc}(0.7/(2\sqrt t))$ & $4.6\times10^{-8}$\\
+heated rod (Chapter~\ref{ch:distributed}) & separation of variables, 150 modes & $1.1\times10^{-7}$\\
+beam and oscillator (Chapter~\ref{ch:beam}) & finite elements, 32 elements & $2.5\times10^{-5}$\\
+aeroelastic pitch, 160 and 180 ft/s & quadrature versus FFT & $<10^{-10}$\\
+\bottomrule\end{tabular}
+\end{table}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{time_response_validation.png}
+\caption{Step responses computed from the transfer functions (solid) and
+independent references (dashed).}
+\label{fig:respval}
+\end{figure}
+
+The aeroelastic example of Chapter~\ref{ch:aero} gives the pitch response to
+a pitch moment: the transfer function is the second entry of
+$D(s,U)^{-1}[0,1]^T$ --- an input/output channel, not the characteristic
+determinant --- with exact Theodorsen aerodynamics
+(Figure~\ref{fig:respaero}). Below flutter the oscillation decays to the
+static deflection; above flutter it grows at the rate predicted by the
+right-half-plane count.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{time_response_aeroelasticity.png}
+\caption{Pitch response to a unit pitch-moment step of the NASA section,
+below and above flutter. Circles: independent Bromwich quadrature.}
+\label{fig:respaero}
+\end{figure}
+
+The regression tests add analytical first-order, delayed, unstable,
+marginal and fractional cases, MATLAB's \code{lsim} with both holds, direct
+terms, unknown initial limits, scalar-only evaluators and resource limits.
+
+\section{Limitations}
+
+\begin{itemize}
+  \item Zero-state, real, single-input single-output responses; for matrix
+        models, a chosen input/output channel.
+  \item The inversion half-plane is an assertion for function handles.
+  \item The input is the chosen ZOH or FOH interpolant of its samples.
+  \item Jumps and corners unknown to the solver leave the sample at that
+        time unresolved.
+  \item Convergence is numerical (successive refinements agree); a feature
+        outside the sampled band cannot be excluded, and
+        \code{info.certified} is always false.
+\end{itemize}

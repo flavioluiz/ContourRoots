@@ -23,7 +23,7 @@ function build_release()
     mkdir(stage);
     cleaner = onCleanup(@() rmdir(fileparts(stage),'s'));
     items = {'matlab','examples','docs','setup_contourroots.m','README.md', ...
-        'LICENSE','CITATION.cff','CHANGELOG.md','CONTRIBUTING.md','ROADMAP.md'};
+        'LICENSE','THIRD_PARTY_NOTICES.md','CITATION.cff','CHANGELOG.md','CONTRIBUTING.md','ROADMAP.md'};
     for k = 1:numel(items)
         copyfile(fullfile(root,items{k}), fullfile(stage,items{k}));
     end

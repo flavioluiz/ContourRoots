@@ -31,7 +31,10 @@ function make_doc_figures()
         'distributed_systems/beam_accumulation.png'
         'coupled_beam/pole_sweeps.png'
         'coupled_beam/trends_and_validation.png'
-        'coupled_beam/coupled_modes.png'};
+        'coupled_beam/coupled_modes.png'
+        'time_response/time_response_validation.png'
+        'time_response/time_response_aeroelasticity.png'
+        'time_response/time_response_convergence.png'};
     for k = 1:numel(copies)
         src = fullfile(root,'output',copies{k});
         if ~isfile(src)

@@ -15,7 +15,9 @@ anything else you can write as a MATLAB function.
   rectangle contains, so the result tells you whether every root was found.
 - Pole-zero **cancellations** are detected, so `cpoles` returns the poles
   that really appear in the input/output behavior.
-- The interface mirrors MATLAB's `roots`, `pole`, `zero` and `pzmap`.
+- The interface mirrors MATLAB's `roots`, `pole`, `zero` and `pzmap`, and
+  `cstep`, `cimpulse` and `clsim` compute time responses from the same
+  nonrational $G(s)$, like `step`, `impulse` and `lsim`.
 
 ![Roots of a delay equation and pole-zero map of sinh(s/2)/sinh(s)](docs/assets/readme_overview.png)
 
@@ -138,6 +140,28 @@ conclusions. The same approach gives the
 [flutter speed of a wing section](docs/tutorials/09_aeroelasticity.md) with
 exact Theodorsen aerodynamics, without rational approximations.
 
+## Time responses without rational approximation
+
+`step`, `impulse` and `lsim` need a state-space model, which a transfer
+function with a delay, a diffusion term or unsteady aerodynamics does not
+have. `cstep`, `cimpulse` and `clsim` compute the same responses directly
+from $G(s)$, by numerically inverting the Laplace transform — no Padé or
+modal approximation, and with convergence checks:
+
+```matlab
+G = @(s) 1./(s + 1 + 0.5*exp(-s));         % loop with a delay
+t = (0:0.05:6).';
+[y, t, info] = cstep(G, t, 'SingularityBound', 0);
+info.status                                % 'converged'
+```
+
+`'SingularityBound',0` states that $G$ has no singularity with
+$\mathrm{Re}\,s > 0$ (true here, since $|s+1| \ge 1 > 0.5$ in that
+half-plane); for rational and `tf` models it is found automatically. All
+responses start from rest. See [Tutorial 10](docs/tutorials/10_time_response.md)
+for forced responses, impulses, unstable systems and the pitch response
+of the aeroelastic section.
+
 ## What ContourRoots does not do
 
 - Matrix-valued or MIMO problems (e.g. $\det(sI - A - Be^{-sT}) = 0$ as a
@@ -148,18 +172,20 @@ exact Theodorsen aerodynamics, without rational approximations.
 - Detect branch cuts or poles hidden inside an opaque function handle
   (see [Diagnostics and limits](docs/diagnostics_and_limits.md)).
 - Replace interval arithmetic when a rigorous proof is required.
+- Simulate from a nonzero initial state: time responses start from rest.
 
 ## Learn more
 
 - [Getting started](docs/getting_started.md): the first steps in detail.
 - [Documentation index](docs/index.md): tutorials from the first root to
   time-delay systems, the pitfalls of Padé approximations,
-  distributed-parameter systems, a beam coupled to an oscillator, and
-  [two-DOF aeroelasticity with exact Theodorsen aerodynamics](docs/tutorials/09_aeroelasticity.md).
+  distributed-parameter systems, a beam coupled to an oscillator,
+  [two-DOF aeroelasticity with exact Theodorsen aerodynamics](docs/tutorials/09_aeroelasticity.md),
+  and [time responses](docs/tutorials/10_time_response.md).
 - [Function reference](docs/api/index.md).
 - [ContourRoots manual (PDF)](docs/ContourRoots_manual.pdf): mathematical
   and algorithmic background, proofs and case studies.
-- In MATLAB: `help croots`, `help cpoles`, `help critical_delays`.
+- In MATLAB: `help croots`, `help cpoles`, `help cstep`, `help critical_delays`.
 
 ## For contributors
 
@@ -193,3 +219,5 @@ and the [roadmap](ROADMAP.md). Please report any problem you find.
 If ContourRoots helps your work, please cite it as described in
 [CITATION.cff](CITATION.cff). ContourRoots is released under the
 [MIT License](LICENSE).
+The adapted de Hoog recurrence carries a BSD-3-Clause notice in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

@@ -1,5 +1,28 @@
 # Troubleshooting
 
+**A time response warns `ContourRoots:ResponseUnresolved`**
+Some samples did not pass the convergence checks; `info.resolvedMask`
+shows which. The usual causes and fixes:
+- a single sample at a jump or corner the solver does not know (for
+  example a delay inside a function handle): expected; that sample is the
+  midpoint of the jump, the others are fine. With a `tf` model the jump
+  time is known and handled exactly;
+- the sample at $t = 0$ of a handle's impulse response: supply
+  `'InitialValue'` if you know $g(0^+)$, or start the grid at a positive time;
+- a long horizon for a growing response (see `info.amplification`):
+  shorten the time interval;
+- fast or very lightly damped dynamics: use a finer time grid, increase
+  `MaxPoints`, or check selected times with `'Method','quadrature'`.
+`'Warn',false` only hides the message; unresolved samples stay unresolved.
+
+**A time response asks for `SingularityBound`**
+For a function handle, ContourRoots cannot know where the transfer function
+is analytic, and the inversion line must lie to the right of all its
+singularities. Supply `'SingularityBound',a` with a justified value
+([Tutorial 10, Section 10.3](tutorials/10_time_response.md#103-the-one-assumption-where-is-g-analytic)).
+For `cimpulse` with a handle, also state `'RegularImpulse',true` (no
+hidden Dirac terms) and give `'Feedthrough'` if $G$ has a direct term.
+
 **`Undefined function 'croots'`**
 ContourRoots is not on the path. Run `setup_contourroots` from the
 installation folder (e.g. `run("ContourRoots/setup_contourroots.m")`), or

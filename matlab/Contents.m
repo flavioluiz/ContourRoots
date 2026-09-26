@@ -1,5 +1,5 @@
 % ContourRoots: poles, zeros and roots of nonrational scalar functions.
-% Version 0.3.0 26-Sep-2026
+% Version 0.4.0 26-Sep-2026
 %
 % Main functions
 %   croots               - Roots of a scalar analytic function in a rectangle.
@@ -7,6 +7,12 @@
 %   czeros               - Zeros of a transfer function (after cancellations).
 %   cpzmap               - Pole-zero map in a rectangle of the complex plane.
 %   ndpair               - Transfer function given as numerator/denominator.
+%
+% Zero-state time responses (SISO, original nonrational transfer function)
+%   cimpulse             - Ordinary impulse response and singular-term metadata.
+%   cstep                - Unit-step response by inverse Laplace transform.
+%   clsim                - Response to a sampled or function-handle input.
+%   cinvlaplace          - Inverse Laplace transform (FFT, de Hoog or quadrature).
 %
 % Solver and compatibility names
 %   complex_spectrum     - Core solver used by all functions above.

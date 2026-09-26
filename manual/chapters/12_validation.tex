@@ -28,6 +28,11 @@ layers.
     code shown in tutorials is identical to the example files.
 \end{description}
 
+The time-response extension additionally checks analytical impulse/step
+responses, unstable and fractional models, direct transmission, external
+delays, ZOH/FOH input reconstruction, optional MATLAB \code{lsim} agreement,
+conjugacy, resource limits, and explicit unresolved inversion cases.
+
 \section{Independent references in the studies}
 
 The studies of Chapters~\ref{ch:delay}--\ref{ch:aero} compare the solver
@@ -37,6 +42,10 @@ bound-based counts (stability maps), time-domain integration with
 \code{dde23}, a finite-element model (coupled beam), and published flutter
 benchmarks with an independent harmonic formulation (aeroelasticity). The references are
 never used as Newton seeds.
+
+Chapter~\ref{ch:response} adds method-of-steps, diffusion, rod modal and
+beam finite-element transient references, plus FFT/quadrature comparisons
+for the aeroelastic input/output channel.
 
 \section{Limitations}
 
@@ -54,4 +63,7 @@ never used as Newton seeds.
         and (for the bound) a retarded system.
   \item Tested with MATLAB R2023b; other releases and Octave have not been
         tested.
+  \item Time responses require a valid causal inversion domain, zero
+        initial states and prehistory, and explicit input interpolation.
+        Numerical refinement is not a certified tail or error bound.
 \end{itemize}
