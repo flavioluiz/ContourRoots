@@ -28,6 +28,16 @@ searches warn; invalid input gives clear errors.
 - **Baseline:** results recorded before the code was reorganized into this
   toolbox (research code at commit `57af5bf`) must be reproduced within
   $10^{-9}$ relative tolerance.
+- **Aeroelasticity:** NASA and dimensional two-DOF flutter benchmarks;
+  Bessel/Hankel identity, independent air-load assembly, still-air added
+  mass, contour refinement, modal residuals, right-half-plane stability
+  counts below and above flutter, a real unstable root above divergence,
+  flutter by `fzero` on the spectral abscissa, an independent harmonic
+  flutter solver, and the Jones state-space check.
+- **Search domain:** a function that raises an error outside the search
+  rectangle is never evaluated there (Newton steps and finite differences
+  stay inside the current cell).
+  See [Tutorial 9](tutorials/09_aeroelasticity.md) for the validation scope.
 
 ## Documentation tests (`tests/docs`)
 

@@ -17,12 +17,16 @@ Two large classes of models are not rational:
   \item \emph{distributed-parameter} systems, described by partial
         differential equations, whose transfer functions contain
         $\sinh$, $\cosh$, $\sqrt s$ and similar functions
-        \citep{curtain2009}.
+        \citep{curtain2009};
+  \item \emph{aeroelastic} systems, whose unsteady aerodynamics involve
+        Theodorsen's function, a ratio of Bessel functions
+        \citep{edwards1977}.
 \end{itemize}
 Their characteristic functions typically have infinitely many roots, and
 no finite matrix contains all of them. A common practice is to replace the
 nonrational terms by rational approximations, for example Padé
-approximations of $e^{-sT}$ or truncated modal expansions. The
+approximations of $e^{-sT}$, rational approximations of unsteady
+aerodynamics, or truncated modal expansions. The
 approximation makes the finite-dimensional toolbox available again, but
 it changes the question: one then computes the roots of a different
 function. Chapter~\ref{ch:delay} shows, on simple examples, that the
@@ -72,9 +76,10 @@ Chapter~\ref{ch:quick} is a short tour of the interface.
 Chapters~\ref{ch:background}--\ref{ch:inputs} give the mathematical
 background, the algorithm, and the precise meaning of each input form and
 of the analyticity assumption. Chapter~\ref{ch:api} is a compact reference.
-Chapters~\ref{ch:delay}--\ref{ch:beam} are case studies that can be read
+Chapters~\ref{ch:delay}--\ref{ch:aero} are case studies that can be read
 independently: time-delay systems and the limits of Padé approximations;
-distributed-parameter systems; and a beam coupled to an oscillator.
+distributed-parameter systems; a beam coupled to an oscillator; and
+aeroelastic flutter with exact Theodorsen aerodynamics.
 Chapter~\ref{ch:validation} summarizes the validation, and the appendices
 contain proofs and reproducibility information.
 

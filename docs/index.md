@@ -26,6 +26,7 @@ blocks into MATLAB in order.
 | 6 | [The pitfalls of Padé](tutorials/06_pade_pitfalls.md) | what a Padé approximation keeps and loses |
 | 7 | [Distributed-parameter systems](tutorials/07_distributed_systems.md) | heat, string, duct and beam transfer functions |
 | 8 | [Beam coupled to an oscillator](tutorials/08_coupled_beam.md) | deriving N/D for a PDE–ODE system, parameter studies, FEM check |
+| 9 | [Flutter without rational approximations](tutorials/09_aeroelasticity.md) | stability of a wing section with exact Theodorsen aerodynamics: unstable-root counts, root locus in the airspeed, flutter and divergence; Jones, quasi-steady and p-k comparisons |
 
 ## Reference
 

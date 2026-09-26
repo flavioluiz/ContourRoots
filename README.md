@@ -134,7 +134,9 @@ Z = unstable_root_count(2, [1 1], 1.5) % 2 roots with Re(s) > 0 at T = 1.5
 The [time-delay tutorial](docs/tutorials/05_time_delay_systems.md) explains
 these tools, and the [Padé tutorial](docs/tutorials/06_pade_pitfalls.md)
 shows how a Padé approximation of the delay can lead to wrong stability
-conclusions.
+conclusions. The same approach gives the
+[flutter speed of a wing section](docs/tutorials/09_aeroelasticity.md) with
+exact Theodorsen aerodynamics, without rational approximations.
 
 ## What ContourRoots does not do
 
@@ -152,7 +154,8 @@ conclusions.
 - [Getting started](docs/getting_started.md): the first steps in detail.
 - [Documentation index](docs/index.md): tutorials from the first root to
   time-delay systems, the pitfalls of Padé approximations,
-  distributed-parameter systems and a beam coupled to an oscillator.
+  distributed-parameter systems, a beam coupled to an oscillator, and
+  [two-DOF aeroelasticity with exact Theodorsen aerodynamics](docs/tutorials/09_aeroelasticity.md).
 - [Function reference](docs/api/index.md).
 - [ContourRoots manual (PDF)](docs/ContourRoots_manual.pdf): mathematical
   and algorithmic background, proofs and case studies.

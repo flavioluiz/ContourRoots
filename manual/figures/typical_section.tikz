@@ -1,0 +1,52 @@
+\begin{tikzpicture}[>=Latex,thick,font=\small,x=1.05cm,y=1.05cm,
+  spring/.style={decorate,decoration={zigzag,segment length=4pt,amplitude=3.5pt}}]
+  % Airfoil (symmetric, leading edge at x=-3, trailing edge at x=3; chord 2b)
+  \fill[blue!10] (-3,0) .. controls (-2.95,0.42) and (-1.9,0.62) .. (-0.6,0.58)
+       .. controls (0.8,0.52) and (2.2,0.22) .. (3,0)
+       .. controls (2.2,-0.22) and (0.8,-0.52) .. (-0.6,-0.58)
+       .. controls (-1.9,-0.62) and (-2.95,-0.42) .. (-3,0) -- cycle;
+  \draw[blue!60!black] (-3,0) .. controls (-2.95,0.42) and (-1.9,0.62) .. (-0.6,0.58)
+       .. controls (0.8,0.52) and (2.2,0.22) .. (3,0)
+       .. controls (2.2,-0.22) and (0.8,-0.52) .. (-0.6,-0.58)
+       .. controls (-1.9,-0.62) and (-2.95,-0.42) .. (-3,0) -- cycle;
+  \draw[gray,dashed,thin] (-3.3,0)--(3.4,0);
+  % Reference points: midchord (0), elastic axis (a b, here a<0), centre of gravity
+  \coordinate (EA) at (-1.2,0);
+  \coordinate (CG) at (-0.45,0);
+  \draw[thin] (0,-0.12)--(0,0.12);
+  \node[font=\scriptsize] at (0,-0.85) {midchord};
+  \draw[thin,gray] (0,-0.7)--(0,-0.14);
+  \fill[black] (CG) circle (2.2pt);
+  \node[font=\scriptsize,above] at (-0.45,0.05) {CG};
+  \filldraw[fill=white,draw=orange!80!black,very thick] (EA) circle (3.4pt);
+  \node[font=\scriptsize,above left] at (-1.25,0.05) {EA};
+  % Plunge spring k_h from the elastic axis to the ground
+  \draw (EA)--(-1.2,-0.8);
+  \draw[spring] (-1.2,-0.8)--(-1.2,-2.0);
+  \draw (-1.2,-2.0)--(-1.2,-2.2);
+  \draw (-1.7,-2.2)--(-0.7,-2.2);
+  \foreach \x in {-1.65,-1.45,...,-0.75} \draw[thin] (\x,-2.2)--(\x-0.15,-2.38);
+  \node[right] at (-1.0,-1.4) {$k_h$};
+  % Torsional spring k_alpha (spiral around the elastic axis)
+  \draw[orange!80!black] (-1.2,-0.32) arc[start angle=-90,end angle=160,radius=0.32]
+     arc[start angle=160,end angle=300,radius=0.45];
+  \node[orange!80!black,right] at (-0.95,-0.45) {$k_\alpha$};
+  % Free stream
+  \draw[->,blue!60!black] (-5.1,0.35)--(-3.7,0.35) node[midway,above] {$U$};
+  % Degrees of freedom
+  \draw[->,red!70!black] (3.7,0.6)--(3.7,-0.6) node[right] {$h$ (down)};
+  % Nose-up pitch: the leading edge (left) moves up, i.e. clockwise here.
+  \draw[->,red!70!black] (-2.8,-0.62) arc[start angle=201,end angle=148,radius=1.72]
+     node[above left] {$\alpha$ (nose-up)};
+  % Loads
+  \draw[->,accent,very thick] (-1.9,-0.2)--(-1.9,1.2) node[above] {$L$};
+  % Dimensions
+  \draw[<->,thin] (-3,2.2)--(0,2.2) node[midway,above] {$b$};
+  \draw[<->,thin] (0,2.2)--(3,2.2) node[midway,above] {$b$};
+  \draw[thin,gray] (-3,2.1)--(-3,0.1) (3,2.1)--(3,0.1) (0,2.1)--(0,0.7);
+  \draw[<->,thin] (-1.2,-2.75)--(0,-2.75);
+  \node[font=\scriptsize,right] at (0.05,-2.75) {$a\,b$ \ ($a<0$: elastic axis ahead of midchord)};
+  \draw[thin,gray] (0,-2.65)--(0,-1.0);
+  \draw[<->,thin] (-1.2,1.55)--(-0.45,1.55) node[midway,above,font=\scriptsize] {$x_\alpha b$};
+  \draw[thin,gray] (-1.2,1.45)--(-1.2,0.15) (-0.45,1.45)--(-0.45,0.1);
+\end{tikzpicture}

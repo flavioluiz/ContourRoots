@@ -29,7 +29,8 @@ end
 function testQuickstartScripts(tc)
     repo = tc.TestData.repo;
     scripts = [dir(fullfile(repo,'examples','quickstart','*.m')); ...
-               dir(fullfile(repo,'examples','coupled_beam','beam_direct_nd.m'))];
+               dir(fullfile(repo,'examples','coupled_beam','beam_direct_nd.m')); ...
+               dir(fullfile(repo,'examples','aeroelasticity','flutter_quickstart.m'))];
     tc.assertNotEmpty(scripts);
     before = findall(groot,'Type','figure');
     for k = 1:numel(scripts)

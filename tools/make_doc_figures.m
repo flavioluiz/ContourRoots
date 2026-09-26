@@ -40,6 +40,19 @@ function make_doc_figures()
         end
         copyfile(src, assets);
     end
+    aeroCopies = {
+        'nasa_study.png', 'aeroelastic_nasa.png';
+        'dlr_study.png', 'aeroelastic_dlr.png';
+        'theodorsen_and_domain.png', 'aeroelastic_theodorsen.png';
+        'nasa_parameter_study.png', 'aeroelastic_parameters.png'};
+    for k = 1:size(aeroCopies,1)
+        src = fullfile(root,'output','aeroelasticity',aeroCopies{k,1});
+        if ~isfile(src)
+            error('make_doc_figures:MissingStudy', ...
+                '%s not found. Run "buildtool examples" first.', src);
+        end
+        copyfile(src,fullfile(assets,aeroCopies{k,2}));
+    end
     schematic(root, assets);
     fprintf('Documentation figures written to %s\n', assets);
 end
@@ -121,14 +134,20 @@ function first_roots(file)
 end
 
 function schematic(root, assets)
-    tex = fullfile(root,'manual','figures','beam_schematic_standalone.tex');
-    build = fullfile(tempname); mkdir(build);
-    cleaner = onCleanup(@() rmdir(build,'s'));
-    cmd = sprintf(['cd "%s" && pdflatex -interaction=nonstopmode -output-directory="%s" ' ...
-        '"%s" >/dev/null && pdftocairo -svg "%s" "%s"'], fileparts(tex), build, tex, ...
-        fullfile(build,'beam_schematic_standalone.pdf'), fullfile(assets,'beam_schematic.svg'));
-    [status,out] = system(['PATH=$PATH:/Library/TeX/texbin:/opt/homebrew/bin:/usr/local/bin; ' cmd]);
-    if status ~= 0
-        warning('make_doc_figures:Schematic','Beam schematic not converted:\n%s',out);
+    % TikZ figures of the manual, converted to SVG for the Markdown docs.
+    figures = {'beam_schematic_standalone','beam_schematic.svg';
+               'typical_section_standalone','aeroelastic_section.svg'};
+    for k = 1:size(figures,1)
+        tex = fullfile(root,'manual','figures',[figures{k,1} '.tex']);
+        build = tempname; mkdir(build);
+        cleaner = onCleanup(@() rmdir(build,'s'));
+        cmd = sprintf(['cd "%s" && pdflatex -interaction=nonstopmode -output-directory="%s" ' ...
+            '"%s" >/dev/null && pdftocairo -svg "%s" "%s"'], fileparts(tex), build, tex, ...
+            fullfile(build,[figures{k,1} '.pdf']), fullfile(assets,figures{k,2}));
+        [status,out] = system(['PATH=$PATH:/Library/TeX/texbin:/opt/homebrew/bin:/usr/local/bin; ' cmd]);
+        if status ~= 0
+            warning('make_doc_figures:Schematic','%s not converted:\n%s',figures{k,2},out);
+        end
+        clear cleaner
     end
 end

@@ -16,7 +16,11 @@ layers.
     partial cancellation; an opaque handle with $Z-P=0$; symbolic and LTI
     input; the delay tools (closed-form critical delay, delay-independent
     stability, Padé predictions, bound-based counts); the coupled beam
-    (static compliance, limits, scaling, finite-element convergence).
+    (static compliance, limits, scaling, finite-element convergence);
+    aeroelasticity (published flutter speeds, Theodorsen's function,
+    load assembly, stability counts, divergence, an independent harmonic
+    flutter solver, Jones state space); and a function that raises an error
+    outside the search region, which the solver must never evaluate there.
   \item[Baseline] results of the research code from which the toolbox was
     extracted must be reproduced within a relative tolerance of $10^{-9}$.
   \item[Documentation tests] execute every MATLAB block of the README and
@@ -26,11 +30,12 @@ layers.
 
 \section{Independent references in the studies}
 
-The studies of Chapters~\ref{ch:delay}--\ref{ch:beam} compare the solver
+The studies of Chapters~\ref{ch:delay}--\ref{ch:aero} compare the solver
 with closed forms (critical delay of P1; heat, string and duct spectra),
 modal formulas (Kelvin--Voigt beam), the direct critical-delay method and
 bound-based counts (stability maps), time-domain integration with
-\code{dde23}, and a finite-element model (coupled beam). The references are
+\code{dde23}, a finite-element model (coupled beam), and published flutter
+benchmarks with an independent harmonic formulation (aeroelasticity). The references are
 never used as Newton seeds.
 
 \section{Limitations}

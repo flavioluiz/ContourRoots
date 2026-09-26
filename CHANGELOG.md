@@ -3,6 +3,24 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Aeroelasticity example: flutter of a two-degree-of-freedom wing section
+  with exact Theodorsen aerodynamics (`examples/aeroelasticity`,
+  `examples/models/aeroelastic_*.m`, `theodorsen_laplace.m`), validated
+  against NASA/TP-2015-218765 and Kaiser and Quero (2022); comparisons with
+  Jones, quasi-steady and p-k aerodynamics; Tutorial 9 and a new manual
+  chapter. `flutter_quickstart.m` shows a stability analysis in a few lines:
+  unstable-root count in the right half-plane, modes, root locus in the
+  airspeed, and flutter speed with `fzero`.
+
+### Fixed
+- Newton steps and finite-difference stencils never evaluate the function
+  outside the current search cell. Before, a search whose rectangle ended
+  next to a branch cut (e.g. the right half-plane for Theodorsen's
+  function) could step onto the cut and stop with an error.
+
 ## [0.2.0] — 2026-09-26
 
 Correctness release, following an independent review of 0.1.0 (carried out

@@ -38,7 +38,7 @@
 \fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}}
 
 \graphicspath{{../output/time_delay/figures/}{../output/distributed_systems/}%
-  {../output/coupled_beam/}{../docs/assets/}{figures/}}
+  {../output/coupled_beam/}{../output/aeroelasticity/}{../docs/assets/}{figures/}}
 
 \newcommand{\version}{0.2.0}
 \newcommand{\ii}{\mathrm{i}}
@@ -116,8 +116,8 @@ directly and gives a bound-based count of unstable roots. This manual
 describes the mathematical background, the algorithm and its numerical
 safeguards, the interface, and three families of case studies: time-delay
 systems and the limits of Padé approximations, distributed-parameter
-systems, and a beam coupled to an oscillator. Proofs are collected in the
-appendices.
+systems, a beam coupled to an oscillator, and aeroelastic flutter with
+exact Theodorsen aerodynamics. Proofs are collected in the appendices.
 \end{abstract}
 
 \tableofcontents
@@ -131,7 +131,8 @@ appendices.
 \input{chapters/07_time_delay}
 \input{chapters/08_distributed}
 \input{chapters/09_coupled_beam}
-\input{chapters/10_validation}
+\input{chapters/10_aeroelasticity}
+\input{chapters/11_validation}
 \appendix
 \input{chapters/A_proofs}
 \input{chapters/B_reproducibility}

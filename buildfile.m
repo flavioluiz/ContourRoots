@@ -41,6 +41,8 @@ function examplesTask(~)
         fprintf('Running %s ...\n', studies{k});
         run(fullfile(root,'examples',studies{k}));
     end
+    addpath(fullfile(root,'examples','aeroelasticity'));
+    run_aeroelastic_study;
 end
 
 function manualTask(~)

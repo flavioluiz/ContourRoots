@@ -1,0 +1,264 @@
+\chapter{Aeroelastic flutter without rational approximations}\label{ch:aero}
+
+Flutter is a dynamic instability of a flexible structure in an airflow:
+above a critical speed the aerodynamic forces feed energy into a structural
+mode, which then grows. Its analysis is a feedback-stability problem with an
+\emph{irrational} feedback path, Theodorsen's function. The standard
+practice approximates that function by a rational one, so that the
+aeroelastic system becomes a finite state-space model
+\citep{edwards1977,kaiser2022}. This chapter shows how to decide stability
+and compute the flutter speed with the exact function instead, using the
+two-degree-of-freedom typical section and two published benchmarks
+\citep{perry2015,kaiser2022}. The code is in
+\path{examples/aeroelasticity/} and \path{examples/models/}.
+
+\section{The typical section as a feedback system}
+
+The section (Figure~\ref{fig:section}) has semichord $b$, the elastic axis
+at $ab$ from midchord and the centre of gravity at $x_\alpha b$ behind the
+elastic axis. With plunge $h$ (positive downwards) and pitch $\alpha$
+(positive nose-up) about the elastic axis, $q=[h,\alpha]^T$,
+$S_\alpha=mx_\alpha b$ and $I_\alpha=mr_\alpha^2b^2$, the equations per unit
+span are
+\begin{equation}
+  M\ddot q+Kq=\begin{bmatrix}-L\\ M_a\end{bmatrix},\qquad
+  M=\begin{bmatrix}m&S_\alpha\\S_\alpha&I_\alpha\end{bmatrix},\qquad
+  K=\begin{bmatrix}k_h&0\\0&k_\alpha\end{bmatrix},
+\end{equation}
+with the lift $L$ (upwards) and the nose-up aerodynamic moment $M_a$ about
+the elastic axis.
+
+\begin{figure}[H]
+\centering
+\input{figures/typical_section.tikz}
+\caption{Typical section. The springs $k_h$ and $k_\alpha$ act at the
+elastic axis (EA); $L$ is the lift.}
+\label{fig:section}
+\end{figure}
+
+For a motion $e^{st}$, Theodorsen's theory (incompressible, inviscid,
+two-dimensional flow, small motions, Kutta condition) gives
+\begin{align}
+  L&=\pi\rho b^2\,[s^2h+Us\alpha-abs^2\alpha]+2\pi\rho Ub\,C(p)\,w,\\
+  M_a&=\pi\rho b^2\,[abs^2h-Ub(\tfrac12-a)s\alpha-b^2(\tfrac18+a^2)s^2\alpha]
+       +2\pi\rho Ub^2(a+\tfrac12)\,C(p)\,w,
+\end{align}
+where $w=sh+[U+b(\tfrac12-a)s]\alpha$ is the downwash at three-quarter chord
+and $p=sb/U$. The first terms are non-circulatory (added mass and damping
+of the air); the circulatory terms carry the memory of the wake through
+Theodorsen's function $C$. Writing the loads as $A(s,U)q$ gives the dynamic
+stiffness matrix and the characteristic function
+\begin{equation}
+  D(s,U)=s^2M+K-A(s,U),\qquad \Delta(s,U)=\det D(s,U),
+  \label{eq:aerodelta}
+\end{equation}
+whose roots are the aeroelastic modes, in the same way as the eigenvalues of
+a state-space matrix are the roots of $\det(sI-A)$. Explicitly,
+$A=\pi\rho U^2(p^2A_2+pA_1+A_0)$ with
+\begin{gather*}
+A_2=\begin{bmatrix}-1&ab\\ab&-(\tfrac18+a^2)b^2\end{bmatrix},\qquad
+A_0=\begin{bmatrix}0&-2Cb\\0&2C(\tfrac12+a)b^2\end{bmatrix},\\
+A_1=\begin{bmatrix}-2C&[-1-2C(\tfrac12-a)]\,b\\2C(\tfrac12+a)\,b&(\tfrac12-a)[2C(\tfrac12+a)-1]\,b^2\end{bmatrix},
+\end{gather*}
+in agreement with \citet[Eq.~(33)]{kaiser2022}. At $U=0$ the limit is
+$D=s^2(M+M_{\mathrm{air}})+K$ with the still-air added mass
+$M_{\mathrm{air}}=\pi\rho b^2\left[\begin{smallmatrix}1&-ab\\-ab&(1/8+a^2)b^2\end{smallmatrix}\right]$.
+
+\section{Theodorsen's function in the Laplace domain}
+
+The generalized Theodorsen function is \citep{edwards1977}
+\begin{equation}
+  C(p)=\frac{K_1(p)}{K_0(p)+K_1(p)},
+\end{equation}
+with the modified Bessel functions $K_0$, $K_1$. On the imaginary axis,
+$p=\ii k$ with the reduced frequency $k=\omega b/U$, it reduces to the
+classical $C(k)=H_1^{(2)}(k)/[H_1^{(2)}(k)+\ii H_0^{(2)}(k)]$; $C(0)=1$ and
+$C\to\tfrac12$ at high frequency. The implementation uses exponentially
+scaled Bessel functions, whose common factor cancels in the ratio.
+
+$C$ is analytic in the plane cut along the negative real axis; $s=0$ is a
+logarithmic branch point, and $C(0)=1$ is a limit, not an analytic value.
+Therefore $\Delta(\cdot,U)$ is analytic on any region that does not touch
+$(-\infty,0]$, and in particular on
+\begin{itemize}
+  \item the right half-plane $\Real s>0$, which contains the positive real
+        axis --- this window counts the unstable roots, including real ones;
+  \item the upper half-plane $\Imag s>0$ --- this window shows the stable
+        oscillatory modes; since $\Delta(\bar s)=\overline{\Delta(s)}$ the
+        lower half-plane holds the conjugates.
+\end{itemize}
+The branch cut also produces a non-exponential contribution to transient
+responses \citep{edwards1977}; the stability statements below concern the
+roots of~\eqref{eq:aerodelta}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{theodorsen_and_domain.png}
+\caption{Left: real and imaginary parts of $C(\ii k)$ and of Jones'
+approximation. Centre: the approximation error. Right: the branch cut and
+the two valid search regions.}
+\label{fig:theodorsen}
+\end{figure}
+
+\section{Stability in three steps}
+
+The function $\Delta$ is passed to ContourRoots as a handle, with
+\code{AssumeAnalytic} justified by the preceding section. The scaled
+determinant $\det(S^{-1}DS^{-1})$, $S=\operatorname{diag}(\sqrt{k_h},\sqrt{k_\alpha})$,
+is used for conditioning; functions such as $|\det D|$ or the smallest
+singular value are not analytic and must not be used.
+
+\paragraph{1. Stability at a given speed.} The number of roots with
+$\Real s>0$, the analogue of \code{any(real(eig(A))>0)}:
+\begin{lstlisting}
+model = aeroelastic_section('nasa');
+Delta = @(s,U) aeroelastic_delta(s,U,model);
+[p,info] = croots(@(s) Delta(s,170), [1e-3 60 -250 250], 'AssumeAnalytic', true);
+\end{lstlisting}
+At $U=170$\,ft/s the count is zero (stable); at $180$\,ft/s it is two, a
+pair $2.132\pm74.78\ii$. For large $|s|$ the inertia terms dominate,
+$D\approx s^2(M+M_{\mathrm{air}})$, so a window of a few times the
+structural frequencies suffices; enlarging it is a cheap check. When a mode
+is very close to the imaginary axis --- at very low speed, where the air
+adds little damping, or within a fraction of a percent of flutter --- the
+count needs more contour samples; it is then reported as
+\code{unresolved} until \code{ContourRefinements} is increased.
+
+\paragraph{2. Modes.} The window $[-100,50]\times[0.5,180]$ gives, at
+170\,ft/s, the modes $-1.1504+75.8683\ii$ ($\zeta=0.015$) and
+$-31.4233+63.4831\ii$ ($\zeta=0.444$).
+
+\paragraph{3. Flutter speed.} The spectral abscissa
+$\alpha(U)=\max\Real s$ over the modes crosses zero at the flutter speed,
+which \code{fzero} locates:
+\begin{lstlisting}
+upper = [-100 50 0.5 180];
+alpha = @(U) max(real(croots(@(s) Delta(s,U), upper, 'AssumeAnalytic', true)));
+Uf = fzero(alpha, [150 200]);            % 173.2624 ft/s
+\end{lstlisting}
+Alternatively, \code{aeroelastic\_flutter} solves
+$\Real\Delta(\ii\omega,U)=\Imag\Delta(\ii\omega,U)=0$ for $(\omega,U)$ by
+Newton's method and returns $\Real(ds/dU)=-\Real(\Delta_U/\Delta_s)>0$ at the
+crossing.
+
+\paragraph{Divergence.} With $C(0)=1$, static divergence occurs at
+$U_d=\sqrt{k_\alpha/[2\pi\rho b^2(a+\frac12)]}$ for $a>-\frac12$, when a real
+root crosses into the right half-plane through $s=0$. Real roots are
+invisible to the upper window but not to the right-half-plane count: at
+$1.05\,U_d$ the count finds the real root $s=1.888$ (NASA case).
+
+\section{Benchmarks}
+
+The NASA standard case \citep[Appendix C]{perry2015} recomputes the
+flexure--torsion example of NACA Report 496: $\pi\rho b^2/m=0.1$, $a=-0.4$,
+$x_\alpha=0.2$, $r_\alpha^2=0.25$, uncoupled frequencies
+$\omega_h=\sqrt{k_h/m}=50$ and $\omega_\alpha=\sqrt{k_\alpha/I_\alpha}=100$\,rad/s,
+$b=1$\,ft. The dimensional case of \citet[Table 1]{kaiser2022} is in SI
+units. Table~\ref{tab:aerobench} compares the results; the published values
+are never used as starting points.
+
+\begin{table}[H]\centering\small
+\caption{Flutter of the two benchmarks.}\label{tab:aerobench}
+\begin{tabular}{lrrrrr}\toprule
+Case & Published $U_f$ & Computed $U_f$ & $\omega_f$ [rad/s] & $k_f$ & $U_d$\\\midrule
+NASA & 173.26 ft/s, $k_f=0.4355$ & 173.2624 ft/s & 75.462 & 0.43554 & 353.55 ft/s\\
+Kaiser--Quero & 212.2 m/s & 212.1729 m/s & 58.438 & 0.27542 & 394.69 m/s\\
+\bottomrule\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{nasa_study.png}
+\caption{NASA case. Top: root loci (exact, full lines; p-k, dashed) and
+frequencies versus speed. Bottom left: largest real part of the modes for
+exact, Jones and quasi-steady aerodynamics. Bottom right: difference in
+growth rate between p-k and exact.}
+\label{fig:nasastudy}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{dlr_study.png}
+\caption{The dimensional benchmark of \citet{kaiser2022}, same layout as
+Figure~\ref{fig:nasastudy}.}
+\label{fig:dlrstudy}
+\end{figure}
+
+\section{What rational approximations change}
+
+\paragraph{Jones' approximation.} The two-lag approximation
+\[
+  C_J(p)=1-\frac{0.165\,p}{p+0.0455}-\frac{0.335\,p}{p+0.3}
+\]
+is rational; with two aerodynamic lag states the system becomes a
+six-state model whose eigenvalues are computed with \code{eig}
+(\code{aeroelastic\_rational\_roots}). At 170\,ft/s it gives
+$-1.0467\pm75.0313\ii$ and $-32.4827\pm66.1864\ii$, plus two real lag roots
+($-7.12$ and $-34.96$), against the exact $-1.1504\pm75.8683\ii$ and
+$-31.4233\pm63.4831\ii$: the critical mode has about 9\,\% less damping. The
+flutter speeds are close (Table~\ref{tab:aeroapprox}); a small error in the
+flutter speed does not imply small errors in damping elsewhere.
+
+\paragraph{Quasi-steady aerodynamics.} Setting $C=1$ while keeping the
+non-circulatory terms ignores the wake memory. For the NASA case it predicts
+flutter at 100.01\,ft/s; the dimensional case is already unstable at
+$0.01$\,m/s.
+
+\paragraph{The p-k method.} Evaluating the whole aerodynamic matrix at
+$p=\ii\,\Imag(s)b/U$ while keeping the complex $s$ in the structural terms
+\citep[Eq.~(4)]{kaiser2022} gives the same equation as the exact method on
+the imaginary axis, hence the same flutter speed, but different damping away
+from it (Figure~\ref{fig:nasastudy}). The p-k target is not analytic in $s$
+and is solved by Newton's method in two real variables, never by contour
+counting.
+
+\begin{table}[H]\centering\small
+\caption{Flutter speed with approximate aerodynamics.}\label{tab:aeroapprox}
+\begin{tabular}{lrrr}\toprule
+Case & Exact & Jones (difference) & Quasi-steady\\\midrule
+NASA [ft/s] & 173.2624 & 172.8573 ($-0.23$\,\%) & 100.01\\
+Kaiser--Quero [m/s] & 212.1729 & 210.9854 ($-0.56$\,\%) & unstable at $0.01$\\
+\bottomrule\end{tabular}
+\end{table}
+
+\section{Parameter study}
+
+Varying only the plunge stiffness of the NASA case, so that
+$\omega_h/\omega_\alpha$ goes from 0.30 to 0.80, lowers the flutter speed from
+197.8 to 135.7\,ft/s: flutter is easier as the uncoupled frequencies
+approach each other (Figure~\ref{fig:aeroparam}). Every point is confirmed
+by contour counts at 98\,\% and 102\,\% of its flutter speed.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{nasa_parameter_study.png}
+\caption{Flutter speed and reduced frequency versus the uncoupled frequency
+ratio (NASA case).}
+\label{fig:aeroparam}
+\end{figure}
+
+\section{Validation and limitations}
+
+The study \path{examples/aeroelasticity/run_aeroelastic_study.m} and the
+regression tests check: the published flutter values; the Bessel form of $C$
+against the Hankel form, its limits and conjugate symmetry; the lift and
+moment formulas assembled independently of the matrix implementation; the
+still-air added mass; complete contour counts with two modes in the upper
+window at every speed of the sweeps, with enlarged windows and doubled
+sampling at selected speeds; zero unstable roots below and two above flutter
+wherever the count is conclusive, and a real unstable root above divergence;
+an independent harmonic flutter formulation (eigenvalues in $U^2$ of
+$Kq=U^2B(k)q$ with Hankel functions), which agrees to $10^{-6}$ in speed; and
+the Jones state-space eigenvalues against the Jones characteristic function.
+
+The model is linear, incompressible and two-dimensional; ``exact'' refers to
+evaluating it without rational approximation. The counts are complete within
+the stated rectangles; flutter candidates from Newton's method are confirmed
+by the sweeps and counts, not by a global search in the $(\omega,U)$ plane.
+
+\begin{remark}
+This example required one change in the solver: Newton steps and
+finite-difference stencils are now kept inside the current cell, so that a
+function is never evaluated outside the search region. Before, a
+right-half-plane search could step onto the branch cut of $C$.
+\end{remark}
