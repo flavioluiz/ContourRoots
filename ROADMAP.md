@@ -39,13 +39,14 @@ welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Later
 
-- **Continuous-wing migration, remaining stages.** Version 0.7.0
-  completes the example-local hybrid demonstration, structured matrix
-  evaluation and native MIMO zero-state responses (M1/M2/M4; Tutorial 12).
-  Next are matrix characteristic values (`cmodes`, M3) with log-determinant
-  counting and, only after a second physical example, a generic port/network
-  assembler (M5). Transfer poles and transmission zeros remain a separate
-  programme, not a claim made by `cdyn`. See the
+- **Continuous-wing migration, remaining stages.** Versions 0.7.0 and
+  0.8.0 complete the hybrid demonstration, structured matrix evaluation,
+  native MIMO zero-state responses (M1/M2/M4; Tutorial 12) and matrix
+  characteristic values with `cmodes` (M3; Tutorial 13). Remaining: Jordan
+  structure of defective modes, block contour moments and a sparse backend
+  for larger matrices; and, only after a second physical example, a generic
+  port/network assembler (M5). Transfer poles and transmission zeros remain
+  a separate programme. See the
   [MIMO proposal](https://github.com/flavioluiz/ContourRoots/blob/main/docs/development/mimo_implementation_plan.md).
 
 - **Multiple roots on the imaginary axis and tangential crossings** in
