@@ -22,6 +22,9 @@ function build_manual()
     if ~isfile(fullfile(root,'output','time_response','time_response_results.mat'))
         addpath(fullfile(root,'examples','time_response')); run_time_response_study;
     end
+    if ~isfile(fullfile(root,'output','continuous_wing','continuous_wing_results.mat'))
+        addpath(fullfile(root,'examples','continuous_wing')); run_continuous_wing_study;
+    end
     make_doc_figures();
 
     tex = fullfile(root,'manual','ContourRoots_manual.tex');

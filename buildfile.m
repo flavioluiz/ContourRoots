@@ -45,6 +45,8 @@ function examplesTask(~)
     run_aeroelastic_study;
     addpath(fullfile(root,'examples','time_response'));
     run_time_response_study;
+    addpath(fullfile(root,'examples','continuous_wing'));
+    run_continuous_wing_study;
 end
 
 function manualTask(~)

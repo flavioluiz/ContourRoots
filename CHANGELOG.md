@@ -3,6 +3,29 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
+## [0.6.0] — 2026-09-27
+
+### Added
+- Tutorial 11 and `examples/continuous_wing`: poles, stability, flutter and
+  time responses of the continuous Goland wing (bending–torsion cantilever
+  with exact Theodorsen strip loads), with no structural discretization, no
+  modal truncation and no rational aerodynamic fit. Migrated from a research
+  prototype after review. Validated against closed-form beam frequencies, an
+  independent finite-element model with Hankel-form loads (second-order
+  convergence to the continuous flutter speed, 136.984 m/s) and an analytic
+  modal time series. Manual chapter 12.
+- Example models `wing_model`, `wing_propagator`, `wing_matrix`,
+  `wing_delta`, `wing_transfer` (adaptive multiple shooting at high
+  frequency), `wing_fem`, `wing_fem_matrix`, `theodorsen_loads_hankel`.
+- `theodorsen_loads`: exact strip air loads, now shared by
+  `aeroelastic_matrix` (no change in results).
+- Regression tests `test_continuous_wing`.
+
+### Documentation
+- Tutorial 10 and ROADMAP: the de Hoog method can report convergence on a
+  wrong plateau for responses with many lightly damped modes; prefer FFT and
+  cross-check with quadrature.
+
 ## [0.5.0] — 2026-09-26
 
 ### Added

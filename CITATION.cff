@@ -6,8 +6,8 @@ authors:
   - family-names: "Cardoso-Ribeiro"
     given-names: "Flávio Luiz"
     orcid: "https://orcid.org/0000-0002-6454-9671"
-version: "0.5.0"
-date-released: "2026-09-26"
+version: "0.6.0"
+date-released: "2026-09-27"
 license: MIT
 repository-code: "https://github.com/flavioluiz/ContourRoots"
 keywords:

@@ -28,6 +28,7 @@ blocks into MATLAB in order.
 | 8 | [Beam coupled to an oscillator](tutorials/08_coupled_beam.md) | deriving N/D for a PDE–ODE system, parameter studies, FEM check |
 | 9 | [Flutter without rational approximations](tutorials/09_aeroelasticity.md) | stability of a wing section with exact Theodorsen aerodynamics: unstable-root counts, root locus in the airspeed, flutter and divergence; Jones, quasi-steady and p-k comparisons |
 | 10 | [Time responses](tutorials/10_time_response.md) | `cstep`, `cimpulse`, `clsim`, `cinvlaplace`: responses from $G(s)$ itself; delays, diffusion, aeroelasticity and reusable `ckernel` preparation |
+| 11 | [Flutter of a continuous wing](tutorials/11_continuous_wing.md) | poles, stability, flutter and time responses of a bending–torsion cantilever with exact Theodorsen strips: nothing discretized, validated against closed-form frequencies and a converging finite-element model |
 
 ## Reference
 

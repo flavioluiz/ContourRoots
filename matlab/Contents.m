@@ -1,5 +1,5 @@
 % ContourRoots: poles, zeros and roots of nonrational scalar functions.
-% Version 0.5.0 26-Sep-2026
+% Version 0.6.0 27-Sep-2026
 %
 % Main functions
 %   croots               - Roots of a scalar analytic function in a rectangle.

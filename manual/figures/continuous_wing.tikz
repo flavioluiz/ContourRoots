@@ -1,0 +1,41 @@
+\begin{tikzpicture}[>=Latex,thick,font=\small,x=1cm,y=1cm]
+  % Planform: span along x (0 = root, 9 = tip), chord along y (LE at top).
+  \fill[blue!8] (0,-1) rectangle (9,1);
+  \draw[blue!60!black] (0,-1) rectangle (9,1);
+  % Clamped root
+  \fill[pattern=north east lines] (-0.35,-1.5) rectangle (0,1.5);
+  \draw (0,-1.5)--(0,1.5);
+  % Elastic axis (33% chord) and centre of gravity (43% chord)
+  \draw[orange!80!black,dashed] (0,0.34)--(9,0.34);
+  \node[orange!80!black,font=\scriptsize,anchor=west] at (9.1,0.34) {elastic axis};
+  \draw[black,dotted] (0,0.14)--(9,0.14);
+  \node[font=\scriptsize,anchor=west] at (9.1,0.0) {centre of mass};
+  \node[font=\scriptsize,anchor=west] at (9.1,1.0) {leading edge};
+  % One strip with exact Theodorsen loads
+  \fill[teal!25] (5.4,-1) rectangle (6.1,1);
+  \draw[teal!60!black] (5.4,-1) rectangle (6.1,1);
+  \draw[->,teal!60!black,very thick] (5.75,0.55)--(5.75,1.75);
+  \node[teal!50!black,font=\scriptsize,align=center] at (5.75,2.35)
+      {strip loads $Q(s,U)\,[w;\alpha]$\\exact $C(sb/U)$, no fit};
+  % Free stream
+  \foreach \x in {1.2,2.6,4.0} \draw[->,blue!60!black] (\x,2.1)--(\x,1.25);
+  \node[blue!60!black] at (2.6,2.35) {$U$};
+  % Degrees of freedom at the tip (section view arrows)
+  \draw[->,red!70!black] (8.55,0.34)--(8.55,-0.6);
+  \node[red!70!black,font=\scriptsize,anchor=east] at (8.5,-0.45) {$w$ (down)};
+  \draw[->,red!70!black] (7.3,0.75) arc[start angle=150,end angle=30,radius=0.45];
+  \node[red!70!black,font=\scriptsize,anchor=south] at (7.7,0.95) {$\alpha$ (nose-up)};
+  % Span coordinate
+  \draw[->] (0,-1.9)--(9.4,-1.9) node[right] {$y$};
+  \draw (9,-1.8)--(9,-2.0) node[below] {$L$};
+  \node[below] at (0,-2.0) {$0$};
+  % Boundary conditions and the exact propagation
+  \node[font=\scriptsize,align=center] at (0.3,-2.75)
+      {clamped root\\$w=w'=\alpha=0$};
+  \node[font=\scriptsize,align=center] at (8.8,-2.75)
+      {free tip\\$V=M=T=0$};
+  \node[font=\scriptsize,align=center] at (4.5,-3.75)
+      {$z=[w,\,w',\,\alpha,\,V,\,M,\,T]^T,\qquad z'=A(s,U)\,z
+       \;\Rightarrow\; z(L)=e^{A(s,U)L}\,z(0)$\\[2pt]
+       no finite elements, no modal truncation};
+\end{tikzpicture}

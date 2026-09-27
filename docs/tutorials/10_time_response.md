@@ -308,6 +308,15 @@ Padé-type continued fraction. That is a numerical device for summing the
 integral, not a rational approximation of $G$.) There is no automatic
 switching: if a method cannot converge, it says so.
 
+**Caution with de Hoog.** Like any accelerated series, de Hoog's method
+can settle on a slightly wrong plateau when $G$ has many lightly damped
+poles close to the imaginary axis, for example a flexible structure. Its
+period, degree and shift checks then agree with each other, and it reports
+convergence anyway. For the continuous wing of
+[Tutorial 11](11_continuous_wing.md#118-time-responses-from-the-same-model)
+it is off by 0.5 % while the FFT and quadrature agree to $10^{-4}$. For such
+systems prefer the FFT, and use `'quadrature'` as the independent check.
+
 ## 10.8 A known input transform: `cinvlaplace`
 
 When the input has a simple Laplace transform, invert the product

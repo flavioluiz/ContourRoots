@@ -1,0 +1,248 @@
+\chapter{Flutter of a continuous wing with nothing discretized}\label{ch:wing}
+
+Chapter~\ref{ch:aero} treated a wing \emph{section}: two degrees of freedom
+and exact Theodorsen aerodynamics. A wing is a flexible beam with infinitely
+many modes. The standard route to its flutter involves two independent
+approximations:
+\begin{enumerate}
+  \item a spatial discretization, usually finite elements, followed by a
+        truncation to $N$ vibration modes;
+  \item a rational fit of the unsteady aerodynamic forces, tabulated at a
+        few reduced frequencies, which turns the system into a large
+        state-space model \citep{edwards1977,kaiser2022}.
+\end{enumerate}
+Each approximation raises its own convergence question, and the fit can
+introduce spurious poles. This chapter computes the poles, the stability,
+the flutter speed and the time responses of the classical Goland wing
+\citep{goland1945} with \emph{neither} approximation. The bending and
+torsion equations are solved exactly along the span, and Theodorsen's
+function is evaluated from Bessel functions at every complex $s$. The only
+modelling assumption on the aerodynamics is strip theory. The code is in
+\path{examples/continuous_wing/} and \path{examples/models/wing_*.m}.
+
+\section{Model}
+
+\begin{figure}[H]
+\centering
+\input{figures/continuous_wing.tikz}
+\caption{The continuous wing. Each spanwise strip carries the exact
+two-dimensional Theodorsen load; the state $z(y)$ is propagated exactly
+from the clamped root to the free tip.}
+\label{fig:wing}
+\end{figure}
+
+The wing (Figure~\ref{fig:wing}) is a straight cantilever of span $L$. Its
+section at position $y$ moves with the plunge $w(y,t)$, positive
+downwards at the elastic axis, and the nose-up pitch $\alpha(y,t)$. Bending
+follows Euler--Bernoulli theory (stiffness $EI$) and torsion Saint-Venant
+theory (stiffness $GJ$). The mass per unit span is $\mu$, the pitch
+inertia $I_\alpha$ and the static moment $S=\mu x_\alpha b$; the static
+moment couples the two motions through inertia. For a motion $e^{st}$, the
+section equations are
+\begin{equation}
+  EI\,w''''+s^2(\mu w+S\alpha)=Q_{11}w+Q_{12}\alpha,\qquad
+  -GJ\,\alpha''+s^2(Sw+I_\alpha\alpha)=Q_{21}w+Q_{22}\alpha,
+  \label{eq:wingpde}
+\end{equation}
+with $'=d/dy$. $Q(s,U)$ is the strip load matrix of
+Chapter~\ref{ch:aero}, $Q=\pi\rho U^2(p^2A_2+pA_1+A_0)$ with $p=sb/U$ and
+Theodorsen's function $C(p)=K_1(p)/(K_0(p)+K_1(p))$
+\citep{theodorsen1935,kaiser2022}. The example uses the Goland parameters
+as tabulated by \citet[Table~2.4]{cal1992}:
+\begin{itemize}
+  \item $L=6.096$~m, $b=0.9144$~m;
+  \item $EI=9.773\times10^6$~N\,m$^2$, $GJ=9.876\times10^5$~N\,m$^2$;
+  \item $\mu=35.717$~kg/m, $I_\alpha=8.642$~kg\,m;
+  \item elastic axis at 33\,\% of the chord, centre of mass at 43\,\%;
+  \item $\rho=1.225$~kg/m$^3$.
+\end{itemize}
+
+\section{An exact characteristic function}
+
+With $s$ as a parameter, \eqref{eq:wingpde} is a linear ordinary
+differential equation in $y$. Collect displacement, slope, twist, shear
+force, bending moment and torque in the state vector
+\begin{equation}
+  z=[\,w,\;w',\;\alpha,\;V,\;M,\;T\,]^T,\qquad M=EI\,w'',\quad V=-M',\quad T=GJ\,\alpha'.
+\end{equation}
+Then $z'=A(s,U)\,z$, where the only nonzero entries of $A$ are
+\begin{equation}
+  A_{12}=1,\; A_{25}=\tfrac1{EI},\; A_{36}=\tfrac1{GJ},\; A_{54}=-1,\qquad
+  [A_{41}\;A_{43}]=D_{1,:},\; [A_{61}\;A_{63}]=D_{2,:},
+\end{equation}
+with $D(s,U)=s^2\bigl[\begin{smallmatrix}\mu&S\\S&I_\alpha\end{smallmatrix}\bigr]-Q(s,U)$.
+On a span of constant properties, the solution is exact:
+$z(L)=e^{A(s,U)L}z(0)$. For a wing whose properties vary, the span is
+divided into $N$ strips of constant properties, with one propagator
+$E_j=e^{A_j\ell_j}$ each.
+
+Let $x=[z_0;\dots;z_N]$ be the (fixed-scaled) states at the strip
+boundaries. The clamped root, the $N$ propagation relations and the free tip
+give a square homogeneous system $K(s,U)\,x=0$:
+\begin{equation}
+  w_0=w_0'=\alpha_0=0,\qquad z_{j}-E_j\,z_{j-1}=0\;(j=1,\dots,N),\qquad
+  V_N=M_N=T_N=0.
+\end{equation}
+The wing has a mode at $s$ exactly when $K(s,U)$ is singular, so the
+characteristic function is
+\begin{equation}
+  \Delta(s,U)=\det K(s,U).
+  \label{eq:wingdelta}
+\end{equation}
+Three properties make \eqref{eq:wingdelta} suitable for the argument
+principle:
+\begin{itemize}
+  \item The matrix exponential is an entire function of the entries of
+        $A$. $\Delta$ is therefore entire in vacuum, and analytic except on
+        the negative real axis (the branch cut of $C$) with air. So
+        \code{AssumeAnalytic} holds in any rectangle that avoids that axis.
+  \item Nothing is inverted. Condensing $K$ to a small transfer or hybrid
+        matrix would divide by functions of $s$ and create artificial
+        poles.
+  \item For identical strips $e^{AL}=(e^{AL/N})^N$, so $\Delta$ does not
+        depend on $N$. The study confirms this to $1.4\times10^{-14}$ for
+        $N=1,2,4,8$. For a uniform wing the strips are bookkeeping, not
+        discretization.
+\end{itemize}
+The state is scaled by constants, independent of $s$, to improve the
+conditioning of $K$.
+
+\section{Stability, root locus and flutter}
+
+In vacuum and without inertial coupling, the zeros of $\Delta$ found by
+\code{croots} reproduce the closed-form cantilever frequencies
+($\beta_n^2\sqrt{EI/\mu}/L^2$ in bending, $(2n-1)\pi\sqrt{GJ/I_\alpha}/(2L)$
+in torsion). The eight frequencies below 900~rad/s agree to
+$4\times10^{-14}$. A finite-element model reaches this accuracy only in the
+limit of a fine mesh.
+
+Stability is decided, as in Chapter~\ref{ch:aero}, by counting the zeros
+of $\Delta$ in a rectangle of the right half-plane. This rectangle
+includes the real axis, so a divergence root would also be counted. In
+$[10^{-3},60]\times[-400,400]$ the count is 0 at 120~m/s and 2 at
+150~m/s, where the unstable pair is $3.70\pm68.2i$. Each count takes a
+fraction of a second.
+
+Figure~\ref{fig:winglocus} follows the four lowest modes from 0 to
+180~m/s. The first torsion branch (93~rad/s in still air) moves down towards
+the first bending frequency, turns, and crosses the imaginary axis near
+70~rad/s: classical bending--torsion flutter. The flutter speed is the zero
+of the spectral abscissa, found by \code{fzero}. A local Newton solution of
+$\Delta(i\omega,U)=0$ in the real unknowns $(U,\omega)$ agrees to
+$10^{-9}$:
+\begin{equation}
+  U_f=136.983977~\text{m/s},\qquad \omega_f=70.033013~\text{rad/s}.
+\end{equation}
+Larger windows up to 700~rad/s at $0.95\,U_f$ and $1.05\,U_f$ contain six
+modes in the upper half-plane, with 0 and 1 unstable, respectively.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{wing_root_locus.png}
+\caption{Left: modes of the continuous Goland wing from 0 to 180~m/s,
+labelled by their still-air character. Right: spectral abscissa and number
+of roots counted in the right half-plane.}
+\label{fig:winglocus}
+\end{figure}
+
+\section{A finite-element model converges to the continuous answer}
+
+An independent calculation follows the usual route:
+\begin{itemize}
+  \item cubic Hermite elements for bending and linear elements for
+        torsion;
+  \item projection onto the vacuum modes;
+  \item air loads assembled from Theodorsen's lift and moment formulas,
+        with $C(k)$ written in Hankel functions rather than the modified
+        Bessel functions of the main model.
+\end{itemize}
+Its flutter speed decreases towards the continuous value, and the error
+falls by a factor of four each time the mesh is doubled
+(Table~\ref{tab:wingfe}, Figure~\ref{fig:wingconv}). This is second-order
+convergence to the limit that ContourRoots computes directly.
+
+\begin{table}[H]
+\centering
+\caption{Flutter speed of the finite-element model versus the continuous result.}
+\label{tab:wingfe}
+\begin{tabular}{rrrr}
+\toprule
+Elements & Modes & $U_f$ (m/s) & $|U_f^{\mathrm{FE}}/U_f-1|$\\
+\midrule
+8 & 8 & 137.308301 & $2.4\times10^{-3}$\\
+16 & 12 & 137.065051 & $5.9\times10^{-4}$\\
+32 & 20 & 137.004259 & $1.5\times10^{-4}$\\
+64 & 28 & 136.989048 & $3.7\times10^{-5}$\\
+128 & 36 & 136.985245 & $9.3\times10^{-6}$\\
+\midrule
+\multicolumn{2}{l}{continuous (ContourRoots)} & 136.983977 & ---\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For a tapered wing the strips do approximate the geometry, since the
+properties are replaced by constant values within each strip. For a
+synthetic wing whose chord decreases linearly by 30\,\%, the flutter speed
+takes the values 151.58, 155.81, 156.81, 157.05 and 157.11~m/s for 2, 4,
+8, 16 and 32 strips. The solution within each strip remains exact, and
+there is still no modal truncation and no aerodynamic fit.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{wing_convergence.png}
+\caption{Left: convergence of the finite-element flutter speed to the
+continuous value. Right: strip refinement of a tapered wing.}
+\label{fig:wingconv}
+\end{figure}
+
+\section{Time responses}
+
+The tip transfer function, for example tip force to tip deflection, follows
+from solving $K(s,U)x=f$ with the load in the tip rows. It is evaluated at
+any complex $s$, so \code{cstep} and \code{clsim}
+(Chapter~\ref{ch:response}) give the response directly. There is no modal
+ordinary differential equation and no aerodynamic lag state.
+
+At the high frequencies sampled by the inversion, a bending wave grows or
+decays like $e^{\kappa y}$ with $\kappa=(|s|^2\mu/EI)^{1/4}$. At
+$10^4$~rad/s, $\kappa L\approx27$. The transfer evaluation therefore
+subdivides each strip into identical pieces with $\kappa\ell\le3$. This is
+multiple shooting \citep{ascher1995}, and it is exact for constant
+properties: results with $n$ and $2n$ pieces agree to $10^{-12}$.
+
+The inversion line is placed with \code{SingularityBound=5}, to the right
+of the unstable pair counted at 150~m/s. The output is expressed in mm per
+kN, so that the absolute tolerance $10^{-3}$ is one micrometre.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{wing_time_response.png}
+\caption{Left: vacuum response to a 1~kN half-sine tip pulse against an
+analytic 150-mode series. Right: 1~kN tip step below and above flutter;
+circles: adaptive quadrature.}
+\label{fig:wingtime}
+\end{figure}
+
+Figure~\ref{fig:wingtime} shows the results. In vacuum, the pulse response
+agrees with the analytic series to $1.9\times10^{-6}$~mm on a 13~mm
+response. Below flutter, the tip step settles near its static deflection;
+above flutter it grows at the rate $\operatorname{Re}s=3.70$ predicted by
+the root count. The FFT and adaptive quadrature agree to
+$7\times10^{-4}$~mm. The de Hoog method, however, converges to a plateau
+0.04~mm (0.5\,\%) off while all its internal checks agree. The accelerated
+series is misled by the many lightly damped poles close to the imaginary
+axis. For such systems the FFT, cross-checked by quadrature, is
+recommended.
+
+\section{Scope}
+
+The aerodynamics is two-dimensional strip theory: incompressible, with no
+spanwise interaction and no stall. The structure is linear and undamped,
+with no shear deformation or warping. These are modelling choices, and the
+solver adds no approximation to them. Root counts are complete in the
+chosen rectangles, conditional on analyticity, and time responses start
+from rest. $\Delta$ is the determinant of a small dense matrix.
+Matrix-valued methods, which would count characteristic values without
+forming a determinant, are discussed in the development notes of the
+toolbox. The same exact dynamic-stiffness idea underlies the wing analyses
+of \citet{banerjee2016}.

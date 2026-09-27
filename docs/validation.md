@@ -78,6 +78,32 @@ to the refined FEM reference). NASA pitch-step FFT/quadrature differences
 are 3.0e-11 at 160 ft/s and 6.7e-11 at 180 ft/s. These are observed errors
 for the specified test grids and parameters, not general accuracy promises.
 
+## Continuous wing (`test_continuous_wing`)
+
+The Goland wing of [Tutorial 11](tutorials/11_continuous_wing.md) is a
+continuous bending–torsion beam with exact Theodorsen strip loads. The
+tests and the study `examples/continuous_wing/run_continuous_wing_study.m`
+check that:
+- the vacuum frequencies match the closed-form cantilever formulas
+  (relative error at most $4\times10^{-14}$);
+- the static tip flexibility matches the beam formulas ($10^{-12}$);
+- $\Delta$ is the same function for 1 to 8 uniform strips
+  ($1.4\times10^{-14}$), and for $n$ and $2n$ multiple-shooting pieces;
+- the Laplace strip loads equal Theodorsen's lift and moment formulas
+  written with Hankel functions ($10^{-12}$);
+- $\Delta$ satisfies the Cauchy–Riemann equations and conjugate symmetry;
+- the right-half-plane counts are 0 at 130 m/s and 2 at 145 m/s;
+- the flutter speed from `fzero` on the spectral abscissa matches a local
+  Newton solution ($10^{-9}$);
+- an independent finite-element model with Hankel-form loads converges to
+  the continuous flutter speed at second order (8 to 128 elements, from
+  $2.4\times10^{-3}$ to $9.3\times10^{-6}$);
+- the vacuum step and pulse responses match an analytic modal series;
+- the FFT and adaptive-quadrature tip responses agree within tolerance.
+
+The values are recorded in
+[examples/continuous_wing/VALIDATION.md](../examples/continuous_wing/VALIDATION.md).
+
 ## Documentation tests (`tests/docs`)
 
 Every `matlab` block of the README and of `docs/` is executed, in order,

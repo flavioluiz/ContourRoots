@@ -140,6 +140,30 @@ conclusions. The same approach gives the
 [flutter speed of a wing section](docs/tutorials/09_aeroelasticity.md) with
 exact Theodorsen aerodynamics, without rational approximations.
 
+## A continuous wing: flutter with nothing discretized
+
+The same idea scales to a flexible wing. The Goland wing is a cantilever
+beam that bends and twists, with exact Theodorsen air loads on every
+spanwise strip. Its modes are the zeros of $\Delta(s,U) = \det K(s,U)$,
+built from the *exact* solution of the beam equations along the span. There
+are **no finite elements, no modal truncation and no rational fit of the
+aerodynamics**. Stability is a root count in the right half-plane:
+
+```matlab
+addpath(fullfile(fileparts(fileparts(which('croots'))), 'examples', 'models'))
+wing = wing_model('goland');           % continuous beam + exact Theodorsen strips
+p = croots(@(s) wing_delta(s, 150, wing), [1e-3 60 -400 400], 'AssumeAnalytic', true)
+% p = 3.70 +/- 68.18i: at 150 m/s one pair is unstable (flutter)
+```
+
+![Root locus of the continuous Goland wing](docs/assets/wing_root_locus.png)
+
+The flutter speed, 136.984 m/s, is the limit that a finite-element model
+approaches as its mesh is refined.
+[Tutorial 11](docs/tutorials/11_continuous_wing.md) derives the model,
+checks it against closed-form beam frequencies and an independent
+finite-element model, and computes time responses of the wing tip.
+
 ## Time responses without rational approximation
 
 `step`, `impulse` and `lsim` need a state-space model, which a transfer
@@ -188,7 +212,8 @@ repeated, and each input still gets its own accuracy check
   time-delay systems, the pitfalls of Padé approximations,
   distributed-parameter systems, a beam coupled to an oscillator,
   [two-DOF aeroelasticity with exact Theodorsen aerodynamics](docs/tutorials/09_aeroelasticity.md),
-  and [time responses](docs/tutorials/10_time_response.md).
+  [time responses](docs/tutorials/10_time_response.md) and the
+  [flutter of a continuous wing](docs/tutorials/11_continuous_wing.md).
 - [Function reference](docs/api/index.md).
 - [ContourRoots manual (PDF)](docs/ContourRoots_manual.pdf): mathematical
   and algorithmic background, proofs and case studies.
