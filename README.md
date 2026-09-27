@@ -200,12 +200,19 @@ the continuous wing to a tip force and a tip torque applied together
 ([Tutorial 12](docs/tutorials/12_hybrid_mimo.md), which also builds the
 wing from connected parts).
 
+**Modes of a matrix.** `cmodes(H,region,'AssumeAnalytic',true)` finds the
+points where an analytic square matrix $H(s)$ is singular, without forming
+$\det H$, which can overflow or underflow. It also returns the null
+vectors, which give mode shapes: for the continuous wing, the exact shape
+of the flutter mode along the span
+([Tutorial 13](docs/tutorials/13_matrix_modes.md)).
+
 ## What ContourRoots does not do
 
-- Matrix-valued *spectral* searches (e.g. $\det(sI - A - Be^{-sT}) = 0$ as a
-  matrix, MIMO transfer poles, transmission zeros): pole and zero searches
-  are scalar, so write the determinant yourself. MIMO *time responses* are
-  supported.
+- General MIMO transfer-pole and transmission-zero searches. `cmodes`
+  searches analytic characteristic matrices, not arbitrary meromorphic
+  transfer matrices. Scalar pole/zero searches and MIMO time responses
+  are supported.
 - Find *all* roots of a function with infinitely many: it works in the
   rectangle you choose.
 - Detect branch cuts or poles hidden inside an opaque function handle

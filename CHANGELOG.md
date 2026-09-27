@@ -3,6 +3,28 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
+## [0.8.0] — 2026-09-27
+
+### Added
+- `cmodes(H,region,'AssumeAnalytic',true)`: characteristic values of an
+  analytic square matrix $H(s)$ (or of the $H$ factor of a `cdyn` model),
+  counted from LU pivot phases and log-magnitudes with permutation parity,
+  so no determinant is formed (no overflow/underflow). Subdivision with
+  count conservation, bordered Newton refinement, local-count confirmation,
+  optional trace-integral cross-check with a supplied derivative, left/right
+  null vectors, nullity versus algebraic count (defective modes reported as
+  unresolved clusters), bounded work.
+- `wing_mode_shape`: the exact, continuous mode shape of the wing from a
+  `cmodes` null vector, by propagation with the strip propagators.
+- Tutorial 13 and manual chapter 14: modes of a matrix, hidden modes,
+  overflow example, double and defective modes, the wing's stability from
+  its matrix and its flutter mode shape (twist lags bending by 62°).
+- `run_matrix_modes_comparison`: `cmodes` vs `croots(det K)`, closed-form dry
+  frequencies, scaling stress cases and the flutter mode figure.
+
+Implemented by Codex; reviewed, documented and extended (mode shapes) by
+Claude Code.
+
 ## [0.7.0] — 2026-09-27
 
 ### Added

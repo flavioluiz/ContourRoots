@@ -1,0 +1,180 @@
+\chapter{Matrix modes without determinants}\label{ch:matrixmodes}
+
+\section{Characteristic modes are not transfer poles}
+
+Version 0.8.0 adds \code{cmodes}, which searches a square analytic matrix $K(s)$ directly. A characteristic value
+$\lambda$ satisfies $K(\lambda)v=0$ for some nonzero $v$. For a structured
+model $G=C K^{-1}B+D$, such a value need not be visible as a transfer pole:
+the input may not excite it or the output may not observe it. The new
+function deliberately does not perform that visibility analysis.
+
+\begin{lstlisting}
+K = @(s) [s+1 .2*exp(-s); 0 s+2];
+Kp = @(s) [1 -.2*exp(-s); 0 1];
+box = [-3 0 -1 1];
+[r,info] = cmodes(K,box,'AssumeAnalytic',true, ...
+    'Derivative',Kp);
+M = cdyn(K,[1;0],[1 0],0,'Dimensions',[2 1 1]);
+[m,im] = cmodes(M,box,'AssumeAnalytic',true);
+% Both searches return -1 and -2, but G(s) = 1/(s+1).
+\end{lstlisting}
+
+\code{AssumeAnalytic=true} asserts that $K$ is regular and analytic in a
+neighborhood of the closed rectangle. The boundary must be nonsingular.
+A \code{cdyn} argument supplies only its $K$ factor and domain guard;
+the other factors are not evaluated. Direct handles must return a
+fixed-size square matrix. Sparse inputs are accepted, but the initial
+engine uses dense LU/SVD and is intended for small to moderate matrices.
+
+\section{Counting without a product of pivots}
+
+Jacobi's identity connects the matrix and scalar argument principles:
+\begin{equation}
+ N=\frac{1}{2\pi\ii}\oint_\Gamma
+       \operatorname{tr}\bigl(K(s)^{-1}K'(s)\bigr)\,ds
+   =\frac{1}{2\pi}\Delta_\Gamma\arg\det K(s).
+\end{equation}
+Choose diagonal nonsingular scalings $L_0,R_0$ at a regular reference
+point and freeze them. Then $A=L_0KR_0$ has the same characteristic values.
+At each contour node compute $PA=LU$. The logarithmic determinant
+magnitude is $\sum_j\log|U_{jj}|$, and its phase is the sum of the pivot
+phases plus the permutation phase. There is no multiplication of pivots.
+Neither the changing pivot choices nor singular values are treated as
+analytic functions of $s$.
+
+\begin{algobox}{Bounded contour search for matrix modes}
+\begin{enumerate}
+ \item Select fixed scaling at an admissible regular reference node.
+ \item Sample the counterclockwise rectangle. Refine until phase/log-magnitude
+       increments are resolved and integer winding agrees twice successively.
+ \item If an analytic derivative is supplied, cross-check the outer count
+       by integrating $\operatorname{tr}(A\backslash A')$.
+ \item Refine candidate locations by a damped bordered Newton solve;
+       multiple-count cells can also use the logarithmic derivative.
+ \item Confirm a candidate by a small local contour. Compare its algebraic
+       count with numerical nullity and the projected derivative.
+ \item Otherwise split the cell, shifting internal split lines if needed.
+       Accept children only when their counts sum to the parent count.
+ \item Report unresolved cells/clusters when any work or resolution limit
+       is reached. Never replace failure with a successful empty spectrum.
+\end{enumerate}
+\end{algobox}
+
+The bordered simple-mode step solves
+\begin{equation}
+ \begin{bmatrix}A(\lambda)&A'(\lambda)v\\v^*&0\end{bmatrix}
+ \begin{bmatrix}\delta v\\\delta\lambda\end{bmatrix}
+ =-\begin{bmatrix}A(\lambda)v\\0\end{bmatrix},\qquad \|v\|_2=1.
+\end{equation}
+The next iterate uses $\lambda+\delta\lambda$ with damping inside the cell.
+Without a supplied derivative, four-direction finite differences are used
+only for refinement; the trace cross-check is explicitly marked unavailable.
+Singular vectors supply left/right residual checks, not the analytic target
+of a scalar zero search. Vectors are mapped back as $v=R_0\widetilde v$ and
+$w=L_0^*\widetilde w$ and normalized in the original coordinates.
+
+\section{Multiplicity, clusters and numerical limits}
+
+For $K=(s+1)I_2$, the algebraic count and nullity are both two; the projected
+derivative is nonsingular, supporting a numerical semisimple double mode.
+For
+\begin{equation}
+ K=\begin{bmatrix}s+1&1\\0&s+1\end{bmatrix},
+\end{equation}
+the count is two but nullity is one. The initial engine returns a counted
+cluster with unknown local multiplicity, not an invented simple mode or a
+computed Jordan chain. Very close distinct roots may also remain clusters.
+\code{countComplete} can therefore be true while \code{complete} is false.
+The returned representative must be read together with \code{localCounts},
+\code{multiplicity}, \code{nullity} and \code{clusters}.
+
+Default local confirmation squares have half-width
+$10^{-8}(1+|\lambda|)$; rank decisions use $10^{-8}$ times the fixed scaled
+reference norm. Residuals use that same regular-reference norm rather than
+the vanishing matrix norm at a mode. Unscaled residuals are also returned.
+No partial multiplicities, contour moments or sparse large-scale extraction
+are claimed. Subdivision is not limited to the matrix dimension: the scalar
+matrix $\sinh s$ already has seven roots in $[-1,1]\times[-10,10]$.
+
+\section{Determinant and continuous-wing comparisons}
+
+For $K=c\left[\begin{smallmatrix}0&s+2\\s+1&0\end{smallmatrix}\right]$,
+$c=10^{-200}$ or $10^{200}$, the raw determinant at $s=0.5$ is zero or
+negative infinity in floating-point arithmetic. The scalar determinant
+search is unresolved; the matrix search finds $-1,-2$ with complete counts.
+This demonstrates a representable-range advantage, not immunity to
+ill-conditioning or to overflow inside the supplied function.
+
+For the wing, search the implicit boundary-value matrix of
+Chapter~\ref{ch:wing}, not the meromorphic hybrid port matrix of
+Chapter~\ref{ch:hybrid}. Keep the number of exact numerical pieces fixed
+during each search so that the dimension does not change:
+\begin{lstlisting}
+wing = wing_model('goland'); U = 150; pieces = 2;
+K = @(s) wing_matrix(s,U,wing,pieces);
+box = [-40 15 1 320]; % above the Theodorsen branch cut
+[r,i] = cmodes(wing_cdyn(U,wing,pieces),box, ...
+    'AssumeAnalytic',true);
+[d,j] = croots(@(s) det(full(K(s))),box, ...
+    'AssumeAnalytic',true);
+\end{lstlisting}
+
+\begin{table}[htbp]\centering\small
+\caption{Matrix search versus determinant roots and independent dry
+frequencies. Error is $|\lambda-\lambda_{\rm ref}|/(1+|\lambda_{\rm ref}|)$.}
+\begin{tabular}{llrrrr}\toprule
+Model & Pieces & Dimension & Count & Determinant error & Dry exact error\\\midrule
+Dry & 1 & 12 & 4 & $2.25\,10^{-13}$ & $2.25\,10^{-13}$\\
+Dry & 2 & 18 & 4 & $2.82\,10^{-15}$ & $5.63\,10^{-16}$\\
+Dry & 4 & 30 & 4 & $2.60\,10^{-15}$ & $4.22\,10^{-16}$\\
+150 m/s & 1 & 12 & 3 & $5.88\,10^{-16}$ & ---\\
+150 m/s & 2 & 18 & 3 & $9.21\,10^{-16}$ & ---\\
+150 m/s & 4 & 30 & 3 & $2.50\,10^{-16}$ & ---\\\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\textwidth]{matrix_modes_comparison.png}
+\caption{Continuous-wing modes from the matrix and determinant routes;
+agreement across fixed exact subdivisions.}
+\end{figure}
+
+All six runs have reconciled counts. The dry search window is
+$[-2,2]\times[1,320]$; the air-loaded window is the one in the listing
+(its left edge is kept well away from the mode near $-29.6+57i$).
+Subdivision changes the numerical representation, not the constant-strip
+equations. The improved dry frequency error with two/four pieces supports
+a conditioning benefit in this example, not a universal monotonic rule.
+Matrix/determinant agreement is not independent validation of the shared
+aerodynamic model; the physical checks remain those of Chapter~\ref{ch:wing}.
+The reproducible script is
+\path{examples/continuous_wing/run_matrix_modes_comparison.m}.
+
+\section{The flutter mode shape}
+
+The right null vector at a mode holds the scaled states at every node of
+$K$. Propagating the root state $z_0$ with the exact strip propagators,
+$z(y)=e^{A(\lambda,U)y}z_0$ within each strip, gives the mode shape at
+every span position without interpolation or modal basis
+(\code{wing\_mode\_shape}). At the flutter speed $U_f=136.984$~m/s,
+\code{cmodes} returns the mode $\lambda=70.0330i$, and the propagated shape
+satisfies the free-tip conditions to $5\times10^{-14}$ relative to the root
+loads (Figure~\ref{fig:fluttermode}). At the tip the twist is as large as
+the bending motion, $b|\alpha|/|w|=1.034$, and lags it by $62^\circ$. This
+phase difference lets the air do net work on the structure in each cycle,
+the mechanism of bending--torsion flutter. One and two exact pieces give
+the same ratio and phase.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\textwidth]{wing_flutter_mode.png}
+\caption{Flutter mode of the continuous Goland wing. Left: bending and
+twist amplitudes along the span (tip deflection normalized to one).
+Right: tip motion over one cycle.}
+\label{fig:fluttermode}
+\end{figure}
+
+This qualifies the contour-based M3 migration, not general MIMO spectra.
+Adequate sampling and analyticity remain assumptions; \code{certified} is
+always false. Work limits do not control allocations inside callbacks.
+Full contracts and deferred capabilities are documented in
+\path{docs/api/cmodes.md}.

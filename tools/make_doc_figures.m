@@ -39,7 +39,9 @@ function make_doc_figures()
         'continuous_wing/wing_convergence.png'
         'continuous_wing/wing_time_response.png'
         'hybrid_comparison/hybrid_comparison.png'
-        'hybrid_comparison/hybrid_superposition.png'};
+        'hybrid_comparison/hybrid_superposition.png'
+        'matrix_modes/matrix_modes_comparison.png'
+        'matrix_modes/wing_flutter_mode.png'};
     for k = 1:numel(copies)
         src = fullfile(root,'output',copies{k});
         if ~isfile(src)

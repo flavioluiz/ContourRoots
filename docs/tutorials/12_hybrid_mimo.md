@@ -278,9 +278,10 @@ results = run_hybrid_comparison;   % about 2 min; writes output/hybrid_compariso
   MIMO zero-state responses with reusable kernel banks. See the
   [matrix models](../api/matrix_models.md) and
   [MIMO responses](../api/matrix_responses.md) references.
-- **What is not.** Pole and zero searches remain scalar. There is no
-  `cmodes`, no MIMO transfer poles and no transmission zeros. For the
-  modes of a matrix problem, use $\det K$ as in Tutorial 11.
+- **Characteristic modes.** The development `cmodes` engine now searches
+  the implicit analytic K directly; see [Tutorial 13](13_matrix_modes.md).
+  Do not pass the meromorphic hybrid port matrix as an analytic K.
+  General MIMO transfer poles and transmission zeros remain unsupported.
 - **The hybrid connector** (`wing_hybrid`, `wing_hybrid_join`) is an
   example for a chain of beam strips, not a general network assembler.
 - As everywhere in the toolbox, responses start from rest, and the

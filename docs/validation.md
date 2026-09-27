@@ -11,6 +11,16 @@ agree with the core solver; polynomial input agrees with `roots`;
 cancellations remove the right locations; exploratory and incomplete
 searches warn; invalid input gives clear errors.
 
+`test_matrix_modes` additionally checks LU winding against determinant
+roots, permutation signs, scales from 1e-200 to 1e200, trace integration,
+semisimple versus defective roots, close unresolved clusters, hidden modes,
+domain guards and exhausted budgets. `test_matrix_modes_wing` compares
+fixed-size wing assemblies against closed-form dry frequencies and the
+scalar determinant route, and checks the exact flutter mode shape obtained
+from the null vector (clamped root, free tip, independence of the number of
+pieces). The reproducible full comparison is recorded in
+[MATRIX_MODES_VALIDATION.md](../examples/continuous_wing/MATRIX_MODES_VALIDATION.md).
+
 ## Regression tests (`tests/regression`)
 
 - **Analytic spectra:** a triple root; three known roots under a scaling of

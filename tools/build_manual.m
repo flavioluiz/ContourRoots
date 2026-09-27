@@ -28,6 +28,9 @@ function build_manual()
     if ~isfile(fullfile(root,'output','hybrid_comparison','hybrid_comparison.mat'))
         addpath(fullfile(root,'examples','continuous_wing')); run_hybrid_comparison;
     end
+    if ~isfile(fullfile(root,'output','matrix_modes','matrix_modes_comparison.mat'))
+        addpath(fullfile(root,'examples','continuous_wing')); run_matrix_modes_comparison;
+    end
     make_doc_figures();
 
     tex = fullfile(root,'manual','ContourRoots_manual.tex');

@@ -31,6 +31,7 @@ Type `help <name>` in MATLAB for the same information in short form.
 | [`cdyn`](matrix_models.md) | Structured model $H(s)x = B(s)u$, $y = C(s)x + D(s)u$. |
 | [`ceval`](matrix_models.md) | Evaluate a matrix model at complex points (one block solve per point). |
 | [`cchannel`](matrix_models.md) | One channel of a matrix model as a scalar function. |
+| [`cmodes`](cmodes.md) | Characteristic modes of square analytic `H(s)`, including a `cdyn` model's H factor. |
 | [MIMO responses](matrix_responses.md) | `clsim`, `cstep`, `cimpulse`, `ckernel` on matrix models: shapes, tolerances, kernel banks. |
 | [Options and diagnostics](time_response_options.md) | Inversion-domain contracts, convergence and limits. |
 
@@ -49,10 +50,11 @@ Type `help <name>` in MATLAB for the same information in short form.
 |---|---|
 | `setup_contourroots` | Add ContourRoots to the path for the current session (`'-quiet'` to suppress output). |
 | `contourroots` | Print the version and an overview. |
-| `contourroots_version` | Version string, e.g. `'0.7.0'`. |
+| `contourroots_version` | Version string, e.g. `'0.8.0'`. |
 | `characteristic_roots`, `transfer_poles` | Earlier names of `croots` and `cpoles`, kept for compatibility. |
 
 ## The `info` structure
 
-All searches return the same diagnostics structure. Its fields are
+Scalar searches return the same diagnostics structure. Its fields are
 described in [Diagnostics and limits](../diagnostics_and_limits.md#every-field-of-info).
+Matrix characteristic searches have the distinct [cmodes diagnostics](cmodes.md#outputs).

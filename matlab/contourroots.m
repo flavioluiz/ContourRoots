@@ -29,6 +29,7 @@ function contourroots()
     fprintf('  ndpair(N,D)         G = N/D from two analytic functions\n');
     fprintf('  cmimo / cdyn       explicit matrix transfer / structured model\n');
     fprintf('  ceval(M,s)         matrix evaluation with shared block solves\n');
+    fprintf('  cmodes(H,region)   characteristic modes of an analytic square matrix\n');
     fprintf('  cimpulse(G,t)       unit-impulse response\n');
     fprintf('  cstep(G,t)          unit-step response\n');
     fprintf('  clsim(G,u,t)        zero-state response to an input\n');

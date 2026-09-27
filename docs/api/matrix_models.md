@@ -102,7 +102,9 @@ declarations, forbidden nodes, failed evaluations and resource limits.
 Handle errors are not turned into missing channels or zeros.
 
 These constructors do not add matrix dispatch to `croots`, `cpoles`,
-`czeros` or `cpzmap`. Matrix modes and transmission zeros are not implemented.
+`czeros` or `cpzmap`. Use [`cmodes`](cmodes.md) for characteristic modes of
+the `H` factor of a `cdyn` model. General MIMO transfer poles and transmission
+zeros are not implemented; characteristic modes may be hidden from the transfer.
 
 ## See also
 

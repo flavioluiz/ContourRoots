@@ -1,6 +1,10 @@
 # MIMO poles, transmission zeros and matrix characteristic problems
 
-Status: implementation proposal; the APIs described here are not implemented.
+Status: historical implementation proposal. Matrix models/responses shipped
+in 0.7.0. The M3 contour-based `cmodes` subset is now implemented in the
+working tree; see [its API](../api/cmodes.md). Block moments and general
+MIMO transfer poles/transmission zeros remain future work. Proposed APIs
+below should not be mistaken for the currently supported API.
 
 Prepared on 2026-09-26. Initial inspection found HEAD `a30f607` (0.4.0)
 and uncommitted kernel-reuse/release work declaring version 0.5.0. During

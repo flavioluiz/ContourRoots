@@ -48,6 +48,7 @@ function examplesTask(~)
     addpath(fullfile(root,'examples','continuous_wing'));
     run_continuous_wing_study;
     run_hybrid_comparison;
+    run_matrix_modes_comparison;
 end
 
 function manualTask(~)

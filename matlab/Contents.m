@@ -1,5 +1,5 @@
 % ContourRoots: poles, zeros and roots of nonrational scalar functions.
-% Version 0.7.0 27-Sep-2026
+% Version 0.8.0 27-Sep-2026
 %
 % Main functions
 %   croots               - Roots of a scalar analytic function in a rectangle.
@@ -8,7 +8,8 @@
 %   cpzmap               - Pole-zero map in a rectangle of the complex plane.
 %   ndpair               - Transfer function given as numerator/denominator.
 %
-% Explicit matrix models (spectral searches remain scalar)
+% Explicit matrix models and characteristic modes
+%   cmodes               - Characteristic values of an analytic square H(s).
 %   cmimo                - Matrix transfer from channels, constants or a handle.
 %   cdyn                 - Structured model H*x=B*u, y=C*x+D*u.
 %   ceval                - Matrix evaluation with shared block solves.
@@ -22,7 +23,7 @@
 %   cinvlaplace          - Inverse Laplace transform (FFT, de Hoog or quadrature).
 %
 % Solver and compatibility names
-%   complex_spectrum     - Core solver used by all functions above.
+%   complex_spectrum     - Scalar spectral solver (cmodes has a separate engine).
 %   characteristic_roots - Same as croots (name kept for compatibility).
 %   transfer_poles       - Same as cpoles (name kept for compatibility).
 %
