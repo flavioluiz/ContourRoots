@@ -1,6 +1,6 @@
 function c = spectrum_count(f,box,opt)
 % Numerical argument principle; convergence is evidence, not an interval proof.
-    previous = NaN; stable = 0;
+    previous = NaN; stable = 0; oldZ=[]; oldV=[];
     c = struct('count',NaN,'ok',false,'center',NaN,'samples',0);
     for level = 0:opt.ContourRefinements
         n = opt.ContourPoints*2^level;
@@ -9,7 +9,15 @@ function c = spectrum_count(f,box,opt)
             box(2)+1i*(box(3)+diff(box(3:4))*t), ...
             box(2)-diff(box(1:2))*t+1i*box(4), ...
             box(1)+1i*(box(4)-diff(box(3:4))*t)];
-        v = spectrum_values(f,z);
+        % Dyadic refinement retains every previous node. Reuse only exact
+        % coordinate matches, within this contour call (never persistently).
+        if ~isempty(oldZ) && isequal(z(1:2:end),oldZ)
+            v=zeros(size(z)); v(1:2:end)=oldV;
+            v(2:2:end)=spectrum_values(f,z(2:2:end));
+        else
+            v = spectrum_values(f,z);
+        end
+        oldZ=z; oldV=v;
         c.samples = numel(z);
         if any(~isfinite(v) | v==0), return; end
         phase = angle(v); logmag = log(abs(v));

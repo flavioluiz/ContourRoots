@@ -6,6 +6,7 @@ function plan = buildfile
 %   buildtool examples   run the full example studies (slow, writes output/)
 %   buildtool manual     run the studies, then compile the PDF manual (LaTeX)
 %   buildtool release    tests, docs, studies, manual, then dist/ContourRoots.zip/.mltbx
+%   buildtool package    archives ONLY; no tests/studies/manual regeneration
 %   buildtool clean      delete dist/ and LaTeX build files
 %
 %   Users of the toolbox do not need any of this: see README.md.
@@ -21,13 +22,13 @@ end
 function testTask(~)
 % Run the unit and regression tests.
     addpath(fullfile(repo_root(),'tests'));
-    run_tests('unit','regression');
+    timed('tests',@() run_tests('unit','regression'));
 end
 
 function docsTask(~)
 % Execute the README, the Markdown documentation and the quick-start examples.
     addpath(fullfile(repo_root(),'tests'));
-    run_tests('docs');
+    timed('docs',@() run_tests('docs'));
 end
 
 function examplesTask(~)
@@ -39,29 +40,43 @@ function examplesTask(~)
         fullfile('coupled_beam','run_coupled_beam_study.m')};
     for k = 1:numel(studies)
         fprintf('Running %s ...\n', studies{k});
-        run(fullfile(root,'examples',studies{k}));
+        file=fullfile(root,'examples',studies{k});
+        [~,name]=fileparts(file); timed(name,@() run_study(file));
     end
     addpath(fullfile(root,'examples','aeroelasticity'));
-    run_aeroelastic_study;
+    timed('aeroelastic_study',@() run_aeroelastic_study);
     addpath(fullfile(root,'examples','time_response'));
-    run_time_response_study;
+    timed('time_response_study',@() run_time_response_study);
     addpath(fullfile(root,'examples','continuous_wing'));
-    run_continuous_wing_study;
-    run_hybrid_comparison;
-    run_matrix_modes_comparison;
+    timed('continuous_wing_study',@() run_continuous_wing_study);
+    timed('hybrid_comparison',@() run_hybrid_comparison);
+    timed('matrix_modes_comparison',@() run_matrix_modes_comparison);
 end
 
 function manualTask(~)
 % Compile manual/ContourRoots_manual.tex and copy the PDF to docs/.
     addpath(fullfile(repo_root(),'tools'));
-    build_manual();
+    timed('manual',@() build_manual());
 end
 
 function releaseTask(~)
 % Build dist/ContourRoots.zip and dist/ContourRoots.mltbx.
     addpath(fullfile(repo_root(),'tools'));
-    build_release();
+    timed('packaging',@() build_release());
 end
+
+function packageTask(~)
+% Archives only. This is NOT a substitute for the release validation gates.
+    fprintf('PACKAGING ONLY: no tests, studies or manual regeneration. Use release for validation.\n');
+    addpath(fullfile(repo_root(),'tools'));
+    timed('packaging',@() build_release());
+end
+
+function timed(name,operation)
+    addpath(fullfile(repo_root(),'tools'));
+    time_build_step(name,operation);
+end
+function run_study(file), run(file); end
 
 function cleanTask(~)
 % Remove release builds and LaTeX intermediate files.

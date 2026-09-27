@@ -7,7 +7,8 @@ function [H,info]=wing_hybrid(s,U,strip,scale)
 %   element: INFO.implicit remains usable. No pivot regularization is done.
     E=wing_propagator(s,U,strip,scale);
     a=E(1:3,1:3); b=E(1:3,4:6); c=E(4:6,1:3); d=E(4:6,4:6);
-    info=struct('available',rcond(d)>1e-12,'rcond',rcond(d), ...
+    reciprocalCondition=rcond(d);
+    info=struct('available',reciprocalCondition>1e-12,'rcond',reciprocalCondition, ...
         'propagator',E,'implicit',[-E eye(6)]);
     H=NaN(6); if ~info.available, return; end
     X=d\[c eye(3)];

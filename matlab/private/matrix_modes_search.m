@@ -55,7 +55,7 @@ function [roots,info]=matrix_modes_search(H,region,varargin)
     nullity=zeros(0,1); radii=zeros(0,1); residuals=zeros(0,1); leftResiduals=zeros(0,1);
     rawResiduals=zeros(0,1); rawLeft=zeros(0,1); slopes=zeros(0,1);
     right={}; left={}; singularValues={}; unresolved=zeros(0,4); clusters=zeros(0,4);
-    evaluations=0; factorizations=0; linearSolves=0; cells=0; svds=0;
+    evaluations=0; factorizations=0; linearSolves=0; cells=0; svds=0; contourReuses=0;
     L=[]; R=[]; referenceNorm=NaN; referenceNode=NaN; stopReason='';
     history=struct('box',{},'count',{},'ok',{},'samples',{},'minPivotRatio',{});
     outer=emptycount();
@@ -111,7 +111,7 @@ function [roots,info]=matrix_modes_search(H,region,varargin)
         'simpleModeSlope',slopes(ix),'rightVectors',{right(ix)},'leftVectors',{left(ix)}, ...
         'singularValues',{singularValues(ix)},'evaluations',evaluations, ...
         'factorizations',factorizations,'linearSolves',linearSolves,'svds',svds, ...
-        'cells',cells,'history',history,'traceCheck',traceInfo,'stopReason',stopReason, ...
+        'cells',cells,'contourReuses',contourReuses,'history',history,'traceCheck',traceInfo,'stopReason',stopReason, ...
         'scaling',struct('method',o.Scaling,'left',L,'right',R, ...
           'referenceNode',referenceNode,'referenceNorm',referenceNorm), ...
         'analyticSource','User assertion for H only','options',o);
@@ -159,6 +159,7 @@ function [roots,info]=matrix_modes_search(H,region,varargin)
     end
     function c=countbox(box,checkTrace)
         c=emptycount(); previous=NaN; stable=0;
+        oldZ=[]; oldPhase=[]; oldLogs=[]; oldTrace=[]; oldRatio=Inf;
         for level=0:o.ContourRefinements
             np=o.ContourPoints*2^level;
             if np*4*128>o.MaxMemoryMB*1024^2, error('ContourRoots:MatrixBudget','Contour workspace exceeds MaxMemoryMB.'); end
@@ -166,22 +167,27 @@ function [roots,info]=matrix_modes_search(H,region,varargin)
             z=[x0+(x1-x0)*t+1i*y0, x1+1i*(y0+(y1-y0)*t), ...
                 x1-(x1-x0)*t+1i*y1, x0+1i*(y1-(y1-y0)*t)];
             phase=zeros(size(z)); logs=phase; tr=phase; minRatio=Inf;
-            for j=1:numel(z)
-                A=value(z(j)); [a,b,p]=lu(A); factorizations=factorizations+1;
+            indices=1:numel(z);
+            if ~isempty(oldZ)&&isequal(z(1:2:end),oldZ)
+                phase(1:2:end)=oldPhase; logs(1:2:end)=oldLogs; tr(1:2:end)=oldTrace;
+                minRatio=oldRatio; indices=2:2:numel(z);
+                contourReuses=contourReuses+numel(oldZ);
+            end
+            for j=indices
+                A=value(z(j)); [a,b,perm]=lu(A,'vector'); factorizations=factorizations+1;
                 d=diag(b);
                 if any(d==0)||any(~isfinite(d)), record(); return; end
-                % Permutation determinant is exactly +/-1; count inversions
-                % rather than taking the determinant of the permutation.
-                [~,perm]=max(p,[],2); parity=0;
-                for ip=1:n, parity=parity+sum(perm(ip+1:end)<perm(ip)); end
-                phase(j)=sum(angle(d))+pi*mod(parity,2);
+                % Cycle parity is O(n); neither a dense permutation matrix
+                % nor an O(n^2) inversion count is needed.
+                phase(j)=sum(angle(d))+pi*permutation_parity(perm);
                 logs(j)=sum(log(abs(d)));
                 minRatio=min(minRatio,min(abs(d))/max(abs(d)));
                 if checkTrace && ~isempty(o.Derivative)
                     D=derivative(z(j),region);
-                    tr(j)=trace(b\(a\(p*D))); linearSolves=linearSolves+1;
+                    tr(j)=trace(b\(a\D(perm,:))); linearSolves=linearSolves+1;
                 end
             end
+            oldZ=z; oldPhase=phase; oldLogs=logs; oldTrace=tr; oldRatio=minRatio;
             nxt=[2:numel(z) 1]; dp=angle(exp(1i*(phase(nxt)-phase)));
             dm=logs(nxt)-logs; winding=sum(dp)/(2*pi); total=round(winding);
             resolved=max(abs(dp))<pi/3&&max(abs(dm))<2&&abs(winding-total)<1e-7;
@@ -315,4 +321,13 @@ function yes=inside(z,b)
 end
 function yes=strictinside(z,b)
     yes=real(z)>b(1)&&real(z)<b(2)&&imag(z)>b(3)&&imag(z)<b(4);
+end
+function parity=permutation_parity(p)
+    visited=false(size(p)); cycles=0;
+    for k=1:numel(p)
+        if visited(k), continue; end
+        cycles=cycles+1; j=k;
+        while ~visited(j), visited(j)=true; j=p(j); end
+    end
+    parity=mod(numel(p)-cycles,2);
 end

@@ -89,6 +89,7 @@ part. Consult `multiplicity` before interpreting a representative as one root.
 | `traceCheck` | Availability, integral, agreement and omission/check reason |
 | `history` | Count attempts, cells, sample counts and minimum LU pivot ratios (not singular-value condition numbers) |
 | `evaluations`, `factorizations`, `linearSolves`, `svds`, `cells` | Callback calls, explicit factorization/solve/SVD calls and cells; excludes work hidden in callbacks and conditioning routines such as `rcond` |
+| `contourReuses` | Already validated nodes reused during exact dyadic refinement of one contour; no new evaluation/factorization at these nodes |
 | `stopReason`, `warnings`, `assumptions`, `options` | Termination and provenance |
 
 Repeated semisimple roots are classified using local counts, numerical
@@ -119,8 +120,10 @@ callback or repair an intrinsically ill-conditioned eigenproblem.
 Memory options gate estimated dense workspaces and contour arrays, not a
 hard process-memory cap: callbacks, vendor LU/SVD workspaces, retained
 history/vectors and MATLAB overhead are outside that estimate. The global
-evaluation/cell limits bound total work. Nodes are not persistently cached;
-no model state survives a search. Block contour moments and a sparse
+evaluation/cell limits bound total work. Exact nested contour nodes retain
+their logarithmic data until that contour finishes; no model state survives
+a search. As with all analytic searches, the evaluator must represent the
+same function throughout a call. Block contour moments and a sparse
 large-scale backend are later enhancements.
 
 See [Tutorial 13](../tutorials/13_matrix_modes.md) for determinant and wing
