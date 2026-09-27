@@ -37,7 +37,9 @@ function make_doc_figures()
         'time_response/time_response_convergence.png'
         'continuous_wing/wing_root_locus.png'
         'continuous_wing/wing_convergence.png'
-        'continuous_wing/wing_time_response.png'};
+        'continuous_wing/wing_time_response.png'
+        'hybrid_comparison/hybrid_comparison.png'
+        'hybrid_comparison/hybrid_superposition.png'};
     for k = 1:numel(copies)
         src = fullfile(root,'output',copies{k});
         if ~isfile(src)
@@ -143,7 +145,8 @@ function schematic(root, assets)
     % TikZ figures of the manual, converted to SVG for the Markdown docs.
     figures = {'beam_schematic_standalone','beam_schematic.svg';
                'typical_section_standalone','aeroelastic_section.svg';
-               'continuous_wing_standalone','continuous_wing.svg'};
+               'continuous_wing_standalone','continuous_wing.svg';
+               'hybrid_ports_standalone','hybrid_ports.svg'};
     for k = 1:size(figures,1)
         tex = fullfile(root,'manual','figures',[figures{k,1} '.tex']);
         build = tempname; mkdir(build);

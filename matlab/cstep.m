@@ -7,5 +7,11 @@ function [y,tOut,info] = cstep(G,t,varargin)
 %   Options: Method ('fft'/'dehoog'/'quadrature'), AbsTol, RelTol, MaxPoints,
 %   MaxRefinements, Feedthrough, Plot, Parent, Warn, Display.
 %   No outputs plots. See CIMPULSE, CLSIM, CINVLAPLACE.
-    [y,tOut,info]=response_run('step',G,[],t,varargin,nargout==0);
+%   Explicit CMIMO/CDYN input returns Nt-by-ny-by-nu (one step per input).
+%   Matrix AbsTol may have one value per output; see docs/api/matrix_responses.md.
+    if isa(G,'ContourRootsModel')
+        [y,tOut,info]=matrix_response_run('step',G,[],t,varargin,nargout==0);
+    else
+        [y,tOut,info]=response_run('step',G,[],t,varargin,nargout==0);
+    end
 end

@@ -1,4 +1,4 @@
-function data=response_prepare(G,t,args)
+function data=response_prepare(G,t,args,m)
 % Prepare a fixed, input-independent numerical snapshot. No persistent cache.
     [o,t]=response_options('lsim',t,[{'AbsTol',1e-8,'RelTol',1e-6} args],false);
     if o.Plot || ~isempty(o.Parent)
@@ -8,7 +8,7 @@ function data=response_prepare(G,t,args)
     if storage>o.MaxMemoryMB*2^20
         error('ContourRoots:ResponseBudget','Prepared kernels and diagnostics exceed MaxMemoryMB.');
     end
-    m=response_model(G,o);
+    if nargin<4, m=response_model(G,o); end
     [S,si]=response_kernels(m,t,1,o); R=[]; ri=[];
     if strcmp(o.Interpolation,'foh'), [R,ri]=response_kernels(m,t,2,o); end
     if ~si.converged || (~isempty(ri)&&~ri.converged)

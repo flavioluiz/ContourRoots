@@ -1,0 +1,28 @@
+\begin{tikzpicture}[>=Latex,thick,font=\small,x=1cm,y=1cm,
+  inp/.style={->,blue!70!black}, outp/.style={->,red!75!black}]
+  % Two elements
+  \foreach \x/\n in {0/A,8/B} {
+    \filldraw[fill=teal!12,draw=teal!60!black,rounded corners] (\x,-0.9) rectangle (\x+3,0.9);
+    \node at (\x+1.5,0.3) {element \n};
+    \node[font=\scriptsize] at (\x+1.5,-0.35) {$\begin{bmatrix}f_L\\q_R\end{bmatrix}=H_\n(s)\begin{bmatrix}q_L\\f_R\end{bmatrix}$};
+  }
+  % Left external port of A
+  \draw[inp]  (-1.6,0.45)--(0,0.45) node[pos=0.35,above] {$q_L$};
+  \draw[outp] (0,-0.45)--(-1.6,-0.45) node[pos=0.65,below] {$f_L$};
+  % Interface between A and B
+  \draw[outp] (3,0.45)--(4.2,0.45) node[pos=0.5,above] {$q_R^A$};
+  \draw[inp]  (4.2,-0.45)--(3,-0.45) node[pos=0.5,below] {$f_R^A$};
+  \draw[inp]  (6.8,0.45)--(8,0.45) node[pos=0.5,above] {$q_L^B$};
+  \draw[outp] (8,-0.45)--(6.8,-0.45) node[pos=0.5,below] {$f_L^B$};
+  \node[draw,dashed,rounded corners,fill=white,align=center,font=\scriptsize,inner sep=3pt]
+      at (5.5,0) {$q_R^A=q_L^B$\\$f_R^A+f_L^B=0$};
+  \node[font=\scriptsize,align=center] at (5.5,-1.65) {interface: solved and eliminated\\(not a product $H_AH_B$)};
+  % Right external port of B
+  \draw[inp]  (12.6,-0.45)--(11,-0.45) node[pos=0.35,below] {$f_R$};
+  \draw[outp] (11,0.45)--(12.6,0.45) node[pos=0.65,above] {$q_R$};
+  % Legend
+  \draw[inp] (0,-2.0)--(0.7,-2.0); \node[anchor=west,font=\scriptsize] at (0.75,-2.0) {input (given)};
+  \draw[outp] (0,-2.45)--(0.7,-2.45); \node[anchor=west,font=\scriptsize] at (0.75,-2.45) {output (computed)};
+  \node[font=\scriptsize,align=left,anchor=west] at (8.4,-2.2)
+      {$q=[w,\,w',\,\alpha]$: displacements\\$f=[V,\,M,\,T]$: loads};
+\end{tikzpicture}

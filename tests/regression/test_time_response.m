@@ -144,3 +144,15 @@ function testNegativeExplicitImpulseLine(tc)
         'RegularImpulse',true,'InitialValue',1,'Method','quadrature');
     tc.verifyTrue(i.converged); tc.verifyLessThan(max(abs(g-exp(-20*t))),2e-6);
 end
+
+function testZOHDelayedFeedthroughSampleIndex(tc)
+    % Regression (0.6.1): t - delay can fall one ulp below a grid point
+    % (2.09 - 0.5 = 1.5899...), and the held direct term picked the previous
+    % sample: error D*|du| = 2e-2 here. Reference: delay-free response shifted.
+    tc.assumeTrue(~isempty(ver('control')),'Control System Toolbox not available.');
+    t=(0:0.01:4).'; n=50; g0=tf([1 3],[1 2]); g=g0; g.IODelay=n*0.01;
+    u=sin(2*t)+1; y0=lsim(g0,u,t,'zoh'); exact=[zeros(n,1); y0(1:end-n)];
+    [y,~,info]=clsim(g,u,t,'Interpolation','zoh');
+    tc.verifyTrue(info.converged);
+    tc.verifyLessThan(max(abs(y-exact)),1e-7);
+end

@@ -1,7 +1,9 @@
-function [y,t,i]=response_run(kind,G,u,t,args,plotDefault,data)
+function [y,t,i]=response_run(kind,G,u,t,args,plotDefault,data,m)
     if nargin<7, data=[]; end
     [o,t]=response_options(kind,t,args,plotDefault);
-    if isempty(data), m=response_model(G,o); else, m=data.model; end
+    if nargin<8 || isempty(m)
+        if isempty(data), m=response_model(G,o); else, m=data.model; end
+    end
     if strcmp(kind,'impulse') && ~m.known && ~o.RegularImpulse
         error('ContourRoots:ResponseImpulse','For an opaque model assert RegularImpulse=true after excluding hidden Dirac terms; supply Feedthrough when present.');
     end
@@ -10,7 +12,9 @@ function [y,t,i]=response_run(kind,G,u,t,args,plotDefault,data)
             [y,i]=response_kernels(m,t,0,o);
             if m.D~=0, i.singularTerms=struct('time',m.delay,'order',0,'weight',m.D); end
         case 'step'
-            [y,i]=response_kernels(m,t,1,o); y=y+m.D*(t>=m.delay);
+            [y,i]=response_kernels(m,t,1,o);
+            tau=t-m.delay; tau(abs(tau)<=8*eps*max(1,abs(t)))=0;
+            y=y+m.D*(tau>=0);
         case 'lsim'
             u=input_values(u,t);
             convSigma=0;
@@ -81,9 +85,19 @@ function u=input_values(u,t)
     u=double(u(:));
 end
 function y=held(u,t,q,method)
-    y=zeros(size(q)); active=q>=0 & q<=t(end);
-    if strcmp(method,'zoh'), method='previous'; else, method='linear'; end
-    y(active)=interp1(t,u,q(active),method);
+% Input held/interpolated at shifted times q = t - delay on the uniform grid.
+% ZOH picks the sample at or before q by INDEX, with a round-off allowance:
+% t - delay can fall one ulp below a grid point (2.09-0.5 = 1.5899...),
+% and interp1(...,'previous') would then take the wrong (earlier) sample.
+    q(abs(q)<=8*eps*max(1,abs(t)))=0;
+    y=zeros(size(q)); active=q>=0 & q<=t(end)*(1+8*eps);
+    if strcmp(method,'zoh')
+        dt=(t(end)-t(1))/(numel(t)-1); pos=(q(active)-t(1))/dt;
+        k=floor(pos+64*eps*max(1,abs(pos)));
+        y(active)=u(min(numel(u),k+1));
+    else
+        y(active)=interp1(t,u,min(q(active),t(end)),'linear');
+    end
 end
 function e=error_conv(e,w,t,o)
     if any(~isfinite(e))

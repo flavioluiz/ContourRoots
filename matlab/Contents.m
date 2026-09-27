@@ -1,5 +1,5 @@
 % ContourRoots: poles, zeros and roots of nonrational scalar functions.
-% Version 0.6.1 27-Sep-2026
+% Version 0.7.0 27-Sep-2026
 %
 % Main functions
 %   croots               - Roots of a scalar analytic function in a rectangle.
@@ -8,7 +8,13 @@
 %   cpzmap               - Pole-zero map in a rectangle of the complex plane.
 %   ndpair               - Transfer function given as numerator/denominator.
 %
-% Zero-state time responses (SISO, original nonrational transfer function)
+% Explicit matrix models (spectral searches remain scalar)
+%   cmimo                - Matrix transfer from channels, constants or a handle.
+%   cdyn                 - Structured model H*x=B*u, y=C*x+D*u.
+%   ceval                - Matrix evaluation with shared block solves.
+%   cchannel             - Scalar evaluator for one matrix channel.
+%
+% Zero-state time responses (SISO and explicit MIMO models)
 %   cimpulse             - Ordinary impulse response and singular-term metadata.
 %   cstep                - Unit-step response by inverse Laplace transform.
 %   clsim                - Response to a sampled or function-handle input.

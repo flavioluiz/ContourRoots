@@ -4,10 +4,12 @@ function v=response_values(f,s)
         v=f(s);
         if isscalar(v) && numel(s)>1, v=arrayfun(f,s); end
         if ~isequal(size(v),size(s)), v=arrayfun(f,s); end
-    catch
+    catch firstError
+        if startsWith(firstError.identifier,'ContourRoots:Matrix'), rethrow(firstError); end
         try
             v=arrayfun(f,s);
         catch err
+            if startsWith(err.identifier,'ContourRoots:Matrix'), rethrow(err); end
             error('ContourRoots:ResponseEvaluation','Transfer evaluation failed: %s',err.message);
         end
     end

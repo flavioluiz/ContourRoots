@@ -3,6 +3,38 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
+## [0.7.0] — 2026-09-27
+
+### Added
+- Explicit `cmimo` and `cdyn` matrix models, `ceval` with dimension/domain
+  checks and block solves, and `cchannel` scalar extraction. Batched handle
+  layouts are opt-in; matrix evaluation budgets and counters are explicit.
+- MIMO `clsim`, `cstep`, `cimpulse` and `ckernel` dispatch, preserving scalar
+  behavior. Matrix kernel banks are immutable numeric snapshots, with
+  per-channel delays/direct terms, shared bounded evaluation caches,
+  per-output tolerances and cancellation-aware error accounting.
+- Hybrid beam ports and joining helpers, a comparison with implicit
+  assembly, a matrix response study and Tutorial 12/manual chapter.
+  No matrix spectral solver or general network API is included.
+
+### Fixed
+- `clsim` with ZOH and a delayed direct term (for example a `tf` with
+  `IODelay` and nonzero feedthrough): $t - T$ could fall one ulp below a
+  grid point, and the held input took the previous sample (error
+  $D\,|\Delta u|$, 2e-2 in the regression case). Present since 0.4; the held
+  sample is now chosen by index with a round-off allowance.
+- Matrix responses: the shared `MaxEvaluations` budget defaulted to 1e6,
+  so a simple 2×2 rational model with delays failed where four scalar
+  `clsim` calls succeeded. The default is now `Inf`, as in the scalar API.
+  Channel-cell models evaluate only the requested channel at each node
+  (previously the whole page): 62 s → 0.6 s on that case.
+
+### Documentation
+- Tutorial 12 and manual chapter rewritten: motivation (assembly from
+  parts, simultaneous loads), hybrid parameters of a two-port, an explicit
+  artificial pole of the hybrid form, and a superposition figure; hybrid
+  port diagram as TikZ (manual and Markdown).
+
 ## [0.6.1] — 2026-09-27
 
 ### Fixed

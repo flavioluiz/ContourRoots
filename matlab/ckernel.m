@@ -20,5 +20,12 @@ function [K,info] = ckernel(G,t,varargin)
 %       assert(info.evaluations == 0 && info.kernelReused);
 %
 %   See also CLSIM, CSTEP, CINVLAPLACE.
-    K=ContourRootsKernel(G,t,varargin{:}); info=K.Info;
+%   Explicit CMIMO/CDYN input prepares every channel in a separate immutable
+%   ContourRootsMatrixKernel bank. Shared matrix evaluations occur only here.
+    if isa(G,'ContourRootsModel')
+        K=ContourRootsMatrixKernel(G,t,varargin{:});
+    else
+        K=ContourRootsKernel(G,t,varargin{:});
+    end
+    info=K.Info;
 end

@@ -29,6 +29,7 @@ blocks into MATLAB in order.
 | 9 | [Flutter without rational approximations](tutorials/09_aeroelasticity.md) | stability of a wing section with exact Theodorsen aerodynamics: unstable-root counts, root locus in the airspeed, flutter and divergence; Jones, quasi-steady and p-k comparisons |
 | 10 | [Time responses](tutorials/10_time_response.md) | `cstep`, `cimpulse`, `clsim`, `cinvlaplace`: responses from $G(s)$ itself; delays, diffusion, aeroelasticity and reusable `ckernel` preparation |
 | 11 | [Flutter of a continuous wing](tutorials/11_continuous_wing.md) | poles, stability, flutter and time responses of a bending–torsion cantilever with exact Theodorsen strips: nothing discretized, validated against closed-form frequencies and a converging finite-element model |
+| 12 | [Building a wing from parts; MIMO responses](tutorials/12_hybrid_mimo.md) | strips as hybrid two-ports and their connection, the same transfer from the implicit assembly, artificial poles of the hybrid form; `cmimo`/`cdyn` matrix models and responses to simultaneous tip force and torque |
 
 ## Reference
 

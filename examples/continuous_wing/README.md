@@ -34,9 +34,19 @@ The study checks:
   quadrature.
 
 See [VALIDATION.md](VALIDATION.md) for the recorded values.
+See [HYBRID_VALIDATION.md](HYBRID_VALIDATION.md) for the matrix/hybrid extension.
+
+The development extension [Tutorial 12](../../docs/tutorials/12_hybrid_mimo.md)
+adds `hybrid_quickstart.m` and `run_hybrid_comparison.m`: explicitly connect
+6-by-6 hybrid ports, compare the implicit `cdyn` model, and simulate/reuse
+all tip channels through the matrix response API. The full comparison also
+checks independent scalar-channel superposition and writes
+`output/hybrid_comparison/` (about 2 min). The optional all-port run
+(`[1 2 3]`) takes much longer; the fast algebraic tests need no stored
+results.
 
 This example was first developed as a research prototype, then reviewed
-and migrated into the toolbox. It uses only the public scalar functions
-`croots`, `cstep` and `clsim`. Native matrix-valued (MIMO) spectra and
-responses are future work; see
+and migrated into the toolbox. Tutorial 11 uses the public scalar functions
+`croots`, `cstep` and `clsim`. Tutorial 12 adds native matrix responses;
+matrix-valued spectra remain future work; see
 the [MIMO proposal](https://github.com/flavioluiz/ContourRoots/blob/main/docs/development/mimo_implementation_plan.md).

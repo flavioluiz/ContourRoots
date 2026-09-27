@@ -3,6 +3,8 @@
 Response of a nonrational transfer function to a prescribed input, without
 a rational approximation (the analogue of `lsim`).
 
+**Matrix models.** Explicit `cmimo`/`cdyn` models and matrix kernel banks accept `Nt`-by-`nu` inputs and return `Nt`-by-`ny` outputs; see [MIMO responses](matrix_responses.md).
+
 ## Syntax
 
 ```text

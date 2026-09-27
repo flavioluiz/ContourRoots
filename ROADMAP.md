@@ -39,16 +39,13 @@ welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Later
 
-- **Continuous-wing migration, next stages.** The example of Tutorial 11
-  uses the scalar API only. Items of stage M1 of the migration plan that
-  were deferred: an example-local demonstration of the 6×6 hybrid element
-  and of joining two elements; `ckernel` reuse on the wing; and example-local
-  MIMO superposition of tip channels. Generic stages from its migration plan: a
-  structured matrix model $G = C H^{-1} B + D$ with batched evaluation
-  (shared by all channels); matrix characteristic values (`cmodes`) with a
-  log-determinant count instead of an explicit determinant; native MIMO
-  zero-state responses and kernel banks; and, only after a second physical
-  example, a generic port/network assembler. See the
+- **Continuous-wing migration, remaining stages.** Version 0.7.0
+  completes the example-local hybrid demonstration, structured matrix
+  evaluation and native MIMO zero-state responses (M1/M2/M4; Tutorial 12).
+  Next are matrix characteristic values (`cmodes`, M3) with log-determinant
+  counting and, only after a second physical example, a generic port/network
+  assembler (M5). Transfer poles and transmission zeros remain a separate
+  programme, not a claim made by `cdyn`. See the
   [MIMO proposal](https://github.com/flavioluiz/ContourRoots/blob/main/docs/development/mimo_implementation_plan.md).
 
 - **Multiple roots on the imaginary axis and tangential crossings** in

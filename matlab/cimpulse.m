@@ -6,5 +6,11 @@ function [g,tOut,info] = cimpulse(G,t,varargin)
 %   assertion (SingularityBound or Abscissa). InitialValue may specify g(0+).
 %   Method: 'fft' (uniform T), 'dehoog' or 'quadrature' (nonuniform T too).
 %   No outputs plots. See CSTEP, CLSIM, CINVLAPLACE.
-    [g,tOut,info]=response_run('impulse',G,[],t,varargin,nargout==0);
+%   Explicit CMIMO/CDYN input returns Nt-by-ny-by-nu; singular terms are
+%   tagged with output/input indices. Feedthrough/InitialValue are matrices.
+    if isa(G,'ContourRootsModel')
+        [g,tOut,info]=matrix_response_run('impulse',G,[],t,varargin,nargout==0);
+    else
+        [g,tOut,info]=response_run('impulse',G,[],t,varargin,nargout==0);
+    end
 end

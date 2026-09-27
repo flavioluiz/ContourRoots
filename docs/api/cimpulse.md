@@ -3,6 +3,8 @@
 Impulse response of a nonrational transfer function, without a rational
 approximation.
 
+**Matrix models.** Explicit `cmimo`/`cdyn` models are also supported; see [MIMO responses](matrix_responses.md) for channel-tagged singular terms and matrix output shapes.
+
 ## Syntax
 
 ```text

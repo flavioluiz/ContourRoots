@@ -3,6 +3,8 @@
 Unit-step response of a nonrational transfer function, without a rational
 approximation.
 
+**Matrix models.** Explicit `cmimo`/`cdyn` models are also supported; see [MIMO response shapes and metadata](matrix_responses.md). Scalar behavior below is unchanged.
+
 ## Syntax
 
 ```text

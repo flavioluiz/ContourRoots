@@ -193,11 +193,19 @@ of `G`: `K = ckernel(G,t,...); y = clsim(K,u,t)`. No inverse transform is
 repeated, and each input still gets its own accuracy check
 ([Tutorial 10, Section 10.5.1](docs/tutorials/10_time_response.md#1051-several-inputs-one-preparation)).
 
+**Several inputs and outputs.** The same functions accept matrix models:
+`cmimo` builds a transfer matrix and `cdyn` a structured model
+$G = C\,H(s)^{-1}B + D$. For example, `clsim` then gives the response of
+the continuous wing to a tip force and a tip torque applied together
+([Tutorial 12](docs/tutorials/12_hybrid_mimo.md), which also builds the
+wing from connected parts).
+
 ## What ContourRoots does not do
 
-- Matrix-valued or MIMO problems (e.g. $\det(sI - A - Be^{-sT}) = 0$ as a
-  matrix): write the scalar determinant yourself, or use a dedicated
-  delay-eigenvalue solver.
+- Matrix-valued *spectral* searches (e.g. $\det(sI - A - Be^{-sT}) = 0$ as a
+  matrix, MIMO transfer poles, transmission zeros): pole and zero searches
+  are scalar, so write the determinant yourself. MIMO *time responses* are
+  supported.
 - Find *all* roots of a function with infinitely many: it works in the
   rectangle you choose.
 - Detect branch cuts or poles hidden inside an opaque function handle

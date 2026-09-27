@@ -3,6 +3,8 @@
 Prepare the numerical kernels of a system once, then simulate many inputs
 with `clsim` without inverting the Laplace transform again.
 
+**Matrix models.** Explicit matrix models prepare a `ContourRootsMatrixKernel` bank for all channels. See [MIMO responses](matrix_responses.md); the scalar snapshot class and behavior described below remain unchanged.
+
 ## Syntax
 
 ```text

@@ -27,6 +27,8 @@ function contourroots()
     fprintf('  czeros(G,region)    zeros of a transfer function G\n');
     fprintf('  cpzmap(G,region)    pole-zero map\n');
     fprintf('  ndpair(N,D)         G = N/D from two analytic functions\n');
+    fprintf('  cmimo / cdyn       explicit matrix transfer / structured model\n');
+    fprintf('  ceval(M,s)         matrix evaluation with shared block solves\n');
     fprintf('  cimpulse(G,t)       unit-impulse response\n');
     fprintf('  cstep(G,t)          unit-step response\n');
     fprintf('  clsim(G,u,t)        zero-state response to an input\n');

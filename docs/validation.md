@@ -104,6 +104,27 @@ check that:
 The values are recorded in
 [examples/continuous_wing/VALIDATION.md](../examples/continuous_wing/VALIDATION.md).
 
+## Matrix models and hybrid assembly
+
+`test_matrix_models`, `test_matrix_response` and `test_wing_hybrid` cover
+the explicit matrix API, no constructor probing, batched shapes, shared
+factorizations, domain/budget errors, optional symbolic/LTI adapters,
+singular-descriptor rejection, both holds and all inversion methods,
+delays/direct terms, singleton and rectangular models, inactive-input
+reactivation, cancellation-aware errors, serialized immutable kernels,
+and optional MIMO MATLAB `lsim` agreement, including a 2×2 model with a
+different transport delay in each channel (ZOH, $1.4\times10^{-9}$). Scalar
+kernel compatibility is also exercised by the existing suite.
+
+The hybrid tests compare an element with two joined halves, check interface
+compatibility/equilibrium and static compliance, compare every tip channel
+against implicit and structured assembly, and verify explicit failure of
+the hybrid chart at a cantilever eigenfrequency of a piece (an artificial
+pole: the assembled transfer is finite there). The full
+`run_hybrid_comparison` study adds both temporal assemblies and independent
+scalar-channel superposition; results are saved with tolerances and runtime
+metadata. It requires no pre-existing research artifacts.
+
 ## Documentation tests (`tests/docs`)
 
 Every `matlab` block of the README and of `docs/` is executed, in order,

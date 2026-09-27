@@ -1,0 +1,151 @@
+\chapter{Building a wing from parts; MIMO responses}\label{ch:hybrid}
+
+Chapter~\ref{ch:wing} treated the Goland wing as a single object, with
+one characteristic function and one tip transfer function. This chapter
+addresses two further needs. The first is \emph{assembly from parts}:
+describe each substructure by its ports and connect the parts, the idea
+of the transfer-matrix and dynamic-stiffness methods for beams
+\citep{banerjee2016}. The second is \emph{several inputs at once}: the
+response to simultaneous loads, the analogue of \code{lsim} for a
+multi-input, multi-output system. Nothing is discretized. Each block is
+the exact solution of the beam equations with exact Theodorsen strip
+loads; the matrices are small because they describe ports, not truncated
+modes. The code is \path{examples/continuous_wing/hybrid_quickstart.m}.
+
+\section{A strip as a hybrid two-port}
+
+A strip of constant properties maps its left state to its right state
+exactly, with displacements $q=[w,w',\alpha]$ and internal loads
+$p=[V,M,T]$:
+\begin{equation}
+ \begin{bmatrix}q_R\\p_R\end{bmatrix}
+ =E(s)\begin{bmatrix}q_L\\p_L\end{bmatrix},\qquad
+ E=e^{A(s)\ell}=\begin{bmatrix}a&b\\c&d\end{bmatrix}.
+\end{equation}
+A neighbour imposes a displacement at one end and a load at the other.
+The strip is therefore rewritten with mixed inputs: $q_L$ and the load
+$f_R=p_R$ are given, and $f_L=-p_L$ and $q_R$ are computed. Solving
+$p_R=cq_L+dp_L$ for $p_L$ gives
+\begin{equation}\label{eq:hybridports}
+ \begin{bmatrix}f_L\\q_R\end{bmatrix}
+ =H(s)\begin{bmatrix}q_L\\f_R\end{bmatrix},\qquad
+ H=\begin{bmatrix}d^{-1}c&-d^{-1}\\a-bd^{-1}c&bd^{-1}\end{bmatrix}.
+\end{equation}
+These are the hybrid (h-) parameters of a two-port, familiar from circuit
+theory, with three displacements and three loads per port. $H$ is
+$6\times6$ because the beam has six state variables, and its entries are
+transcendental functions of $s$ (Figure~\ref{fig:hybridports}).
+
+\begin{figure}[htbp]\centering
+\input{figures/hybrid_ports.tikz}
+\caption{Two hybrid elements. Inputs (blue) are given and outputs (red)
+computed. The interface conditions are solved and eliminated.}
+\label{fig:hybridports}
+\end{figure}
+
+\section{Connection is not multiplication}
+
+At a junction, the displacements are shared and the mutual loads balance:
+$q_R^A=q_L^B=q_I$ and $f_R^A+f_L^B=0$. With $H^A,H^B$ partitioned into
+$3\times3$ blocks,
+\begin{equation}
+ (I+H^A_{22}H^B_{11})\,q_I=H^A_{21}\,q_L-H^A_{22}H^B_{12}\,f_R,
+\end{equation}
+and eliminating $q_I$ yields the hybrid matrix $H^{AB}$ of the pair, with
+the same port structure (\code{wing\_hybrid\_join}). The product
+$H^AH^B$ would feed the loads of $A$ into the displacement inputs of $B$
+and is meaningless. Two joined half-span strips reproduce one full-span
+strip to $3\times10^{-16}$. With a clamped root ($q_L=0$) and tip loads
+$u=f_R$, the tip displacements are $q_R=H^{AB}_{22}u$: $H^{AB}_{22}$ is the
+$3\times3$ tip transfer matrix.
+
+The implicit assembly of Chapter~\ref{ch:wing} keeps the interface states
+as unknowns and gives $K(s)x=Bu$, $y=Cx$, that is $G=CK^{-1}B$. The
+structured model \code{cdyn} represents it, and \code{ceval} evaluates
+all nine channels with one factorization of $K$. The two assemblies
+impose the same conditions and differ only in when the interface unknowns
+are eliminated. At $s=3+70i$ and 120~m/s they agree to $2\times10^{-15}$.
+
+\section{Artificial poles of the hybrid form}
+
+The hybrid form inverts $d$ and $I+H^A_{22}H^B_{11}$, which depend on
+$s$. $d$ is singular exactly when the piece alone, clamped at its left
+end and free at its right end, has a mode. That is a property of the
+piece, not of the assembled wing. In vacuum, a half-span piece has such a
+mode at $4\times49.49=197.97$~rad/s. The whole wing has none there (its
+nearest mode is at 261~rad/s), and its implicit transfer is finite, while
+the hybrid matrix of the piece does not exist. These artificial poles are
+the reason why the characteristic function must be built from the
+implicit matrix: $\det H$ has poles that belong to no physical mode. The
+functions report a singular pivot (\code{available=false}, or an error
+from the transfer evaluators) and never regularize it. With air, the
+artificial poles leave the imaginary axis; along $\operatorname{Re}s=6$ the
+two assemblies agree to $1.6\times10^{-9}$ up to $2\times10^4$~rad/s.
+
+\section{Matrix models and simultaneous inputs}
+
+\code{cmimo} builds a transfer matrix, from channels, a constant matrix
+or a matrix-valued handle; \code{cdyn} builds a structured model
+$H(s)x=B(s)u$, $y=C(s)x+D(s)u$. \code{clsim}, \code{cstep},
+\code{cimpulse} and \code{ckernel} accept both. \code{clsim} takes one
+input column per input and returns one column per output, with all
+inputs acting together. \code{cstep} and \code{cimpulse} return
+$N_t\times n_y\times n_u$ arrays, one experiment per input. Each channel
+uses the scalar inversion of Chapter~\ref{ch:response}. Evaluations of the
+matrix model are shared between channels within one call, and a kernel
+bank from \code{ckernel} stores the kernels of every channel.
+
+Figure~\ref{fig:hybridsup} shows the tip response of the wing at
+120~m/s to a force $1+0.2\sin10t$~kN and a torque $0.3\cos5t$~kN\,m. One
+bank is prepared (about 30~s), and three \code{clsim} calls give the
+response to both loads, to the force alone and to the torque alone. Each
+call takes milliseconds and evaluates the wing model zero times. The
+coupling is strong in both directions. The force twists the wing about as
+much as the torque, and the torque raises the tip by up to 4~mm, partly
+cancelling the deflection due to the force. The coupling is inertial
+(centre of mass behind the elastic axis) and aerodynamic. The combined
+response equals the sum of the two contributions to $9\times10^{-16}$. The inversion bound 5 is an assumption
+supported by the root counts of Chapter~\ref{ch:wing}, not a proof.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\textwidth]{hybrid_superposition.png}
+\caption{Tip deflection and twist at 120~m/s: contributions of the force
+and of the torque, and the response to both (black).}
+\label{fig:hybridsup}
+\end{figure}
+
+Each output is a sum of channel contributions, and so is its error.
+\code{clsim} adds the estimated channel errors of each output and
+compares the total with $\mathrm{AbsTol}_i+\mathrm{RelTol}|y_i|$, with one
+absolute tolerance per output in its own units. Destructive cancellation
+between channels therefore shows up as an unresolved output instead of
+being hidden.
+
+\section{Verification}
+
+\begin{itemize}
+  \item \textbf{Transfer matrices.} Hybrid and implicit tip transfer
+        matrices, all nine channels, agree to $1.6\times10^{-13}$. This
+        holds for dry, uniform and tapered wings, with 1, 2, 4 and 8
+        strips, at five complex frequencies.
+  \item \textbf{Structured model.} \code{cdyn} agrees with the scalar
+        tip transfer of Chapter~\ref{ch:wing} to $2\times10^{-14}$.
+  \item \textbf{Time responses.} The hybrid and implicit kernel banks
+        agree to $5\times10^{-14}$. The matrix bank agrees with the sum of
+        independent scalar \code{clsim} calls within the requested output
+        tolerance: $3\times10^{-4}$~mm against $10^{-2}$.
+  \item \textbf{A rational oracle.} A $2\times2$ rational model with a
+        different transport delay in each channel agrees with MATLAB's
+        \code{lsim} with zero-order hold to $1.4\times10^{-9}$.
+\end{itemize}
+These checks show that the representations agree; the physical
+references remain those of Chapter~\ref{ch:wing}.
+
+\section{Scope}
+
+The new functions provide matrix models and MIMO zero-state responses.
+Pole and zero searches remain scalar: matrix characteristic values, MIMO
+transfer poles and transmission zeros are not implemented, and the
+characteristic function of a matrix problem is still an analytic
+determinant such as $\det K$. The hybrid connector is an example for a
+chain of beam strips, not a general network assembler.

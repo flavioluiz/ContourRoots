@@ -47,6 +47,7 @@ function examplesTask(~)
     run_time_response_study;
     addpath(fullfile(root,'examples','continuous_wing'));
     run_continuous_wing_study;
+    run_hybrid_comparison;
 end
 
 function manualTask(~)

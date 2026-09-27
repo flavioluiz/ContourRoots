@@ -84,8 +84,10 @@ center of a cluster whose size is about `locationRadius`.
 
 ## Scope
 
-- Scalar functions of one complex variable only. For a matrix problem,
-  pass the scalar determinant, taking care that it is analytic.
+- Spectral searches accept scalar functions of one complex variable. For
+  a matrix characteristic problem, pass an analytic scalar determinant.
+  Explicit matrix models and MIMO time responses are supported separately;
+  they do not add matrix spectral searches or transmission zeros.
 - A rectangle, not an arbitrary curve.
 - One evaluation of the function is done at a time on vectors of points;
   the cost is dominated by function evaluations on contours.
