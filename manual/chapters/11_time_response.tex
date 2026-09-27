@@ -114,7 +114,10 @@ positive times and serve as cross-checks. \code{Method='dehoog'} sums the
 Fourier series of \eqref{eq:aliasing} with the continued-fraction
 acceleration of \citet{dehoog1982}; its quotient-difference table is a
 Padé-type device for summing the series, not a rational approximation of
-$G$. It checks the degree, the period and the line shift.
+$G$. It checks the degree, the period and the line shift; each degree
+check doubles the degree, hence the sampled bandwidth, so that consecutive
+degrees cannot share a plateau that omits lightly damped poles just above
+the band (Chapter~\ref{ch:wing}).
 \code{Method='quadrature'} integrates a truncated Bromwich integral with
 adaptive Gauss--Kronrod quadrature and checks the cutoff, the quadrature
 tolerance and the line; it avoids the conditioning limits of the

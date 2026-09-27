@@ -3,6 +3,32 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
+## [0.6.1] — 2026-09-27
+
+### Fixed
+- `'Method','dehoog'` could report convergence on a false plateau for
+  responses with many lightly damped poles near the imaginary axis (the
+  continuous-wing tip step at 120 m/s: 8.0987 mm instead of 8.0553 mm at
+  t = 0.3 s, four times the tolerance). Successive degrees were only 1.4
+  times apart and shared a truncated series that omitted higher modes. The
+  degree ladder is now 10, 20, 40, 80, 160, 320: each check doubles the
+  sampled bandwidth. Regression test `testDeHoogNoFalseConvergence`, which
+  fails on 0.6.0.
+
+### Documentation
+- `SingularityBound` values supported by finite-rectangle root counts
+  (Tutorials 10 and 11, quickstart, manual) are now stated as assumptions,
+  not as guaranteed bounds.
+- Tutorial 11 and manual chapter 12: correct explanation of condensation.
+  A reduction without inversion, $\det E_{pp}(s)$, is equivalent to
+  $\det K$; only condensations that invert $s$-dependent blocks create
+  artificial poles. The full matrix is kept for conditioning.
+- Links from packaged documents to `docs/development` (not shipped) now
+  point to GitHub.
+- ROADMAP lists the deferred items of stage M1 of the continuous-wing
+  migration (hybrid-element demonstration, `ckernel` reuse, local MIMO
+  superposition).
+
 ## [0.6.0] — 2026-09-27
 
 ### Added

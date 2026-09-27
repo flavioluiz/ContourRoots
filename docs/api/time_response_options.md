@@ -25,7 +25,7 @@ the line came from.
 |---|---|---|
 | `Method` | `'fft'` | `'fft'` (uniform times), `'dehoog'` or `'quadrature'` (any positive times) |
 | `AbsTol`, `RelTol` | `1e-6`, `1e-4` | a sample is accepted when successive refinements differ by less than `AbsTol + RelTol*abs(y)` |
-| `MaxRefinements` | 8 | maximum refinement rounds (de Hoog: at most 8 degrees) |
+| `MaxRefinements` | 8 | maximum refinement rounds (de Hoog: at most 6 degrees, 10 to 320, each doubling the previous) |
 | `MaxPoints` | `2^20` | largest FFT or convolution size; evaluations per quadrature integral |
 | `MaxMemoryMB` | 256 | memory budget for work arrays |
 

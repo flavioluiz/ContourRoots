@@ -122,3 +122,18 @@ function testModelValidation(tc)
     tc.verifyTrue(all(diff([t.strips.b]) < 0));
     tc.verifyLessThan(abs(sum([t.strips.length])-t.L), 1e-12);
 end
+
+function testDeHoogNoFalseConvergence(tc)
+    % Regression (0.6.0): with a 1.4x degree ladder, de Hoog settled on a
+    % plateau that omitted lightly damped high modes (8.0987 mm instead of
+    % 8.0553 mm at t = 0.3 s) and still reported convergence. It must now
+    % either agree with quadrature within tolerance or report unresolved.
+    w = wing_model('goland'); G = @(s) 1e6*wing_transfer(s,120,w,1,1);
+    opts = {'SingularityBound',5,'AbsTol',1e-3,'RelTol',1e-3,'Warn',false};
+    [q,~,iq] = cstep(G, 0.3, opts{:}, 'Method', 'quadrature');
+    [d,~,id] = cstep(G, 0.3, opts{:}, 'Method', 'dehoog');
+    tc.verifyTrue(iq.converged);
+    if id.converged
+        tc.verifyLessThanOrEqual(abs(d-q), 2*(1e-3+1e-3*abs(q)));
+    end
+end

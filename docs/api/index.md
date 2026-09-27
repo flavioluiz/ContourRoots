@@ -39,7 +39,7 @@ Type `help <name>` in MATLAB for the same information in short form.
 |---|---|
 | `setup_contourroots` | Add ContourRoots to the path for the current session (`'-quiet'` to suppress output). |
 | `contourroots` | Print the version and an overview. |
-| `contourroots_version` | Version string, e.g. `'0.6.0'`. |
+| `contourroots_version` | Version string, e.g. `'0.6.1'`. |
 | `characteristic_roots`, `transfer_poles` | Earlier names of `croots` and `cpoles`, kept for compatibility. |
 
 ## The `info` structure

@@ -132,19 +132,20 @@ function results = run_continuous_wing_study(outputDir)
         assert(iy.converged); steps(:,k) = y;
     end
     % 6c. The same step at 120 m/s by adaptive quadrature at a few times
-    % (an independent inversion method). The de Hoog method is recorded
-    % too: on this response, with many lightly damped beam modes, its
-    % accelerated series settles on a slightly wrong plateau (known issue).
+    % (an independent inversion method), and by de Hoog, which before 0.6.1
+    % settled here on a false plateau (many lightly damped beam modes).
     tc = (0.1:0.1:0.5).'; ix = round(tc/0.005)+1;
     G120 = @(s) 1e6*wing_transfer(s,120,wing,1,1);
     [yq,~,iq] = cstep(G120, tc, 'SingularityBound', 5, 'Method', 'quadrature', tol{:});
     assert(iq.converged);
-    yd = cstep(G120, tc, 'SingularityBound', 5, 'Method', 'dehoog', tol{:}, 'Warn', false);
+    [yd,~,id] = cstep(G120, tc, 'SingularityBound', 5, 'Method', 'dehoog', tol{:});
+    assert(id.converged);
     results.timeAero = struct('t',ts,'speeds',speedsT,'steps',steps, ...
         'checkTimes',tc,'quadrature',yq, ...
         'quadratureDifference',max(abs(yq-steps(ix,1))), ...
         'dehoogDifference',max(abs(yd-steps(ix,1))));
     assert(results.timeAero.quadratureDifference < 1e-3 + 1e-3*max(abs(steps(:,1))));
+    assert(results.timeAero.dehoogDifference < 1e-3 + 1e-3*max(abs(steps(:,1))));
     fprintf('   FFT vs quadrature at 120 m/s: %.2e mm (de Hoog: %.2e mm)\n', ...
         results.timeAero.quadratureDifference, results.timeAero.dehoogDifference);
 

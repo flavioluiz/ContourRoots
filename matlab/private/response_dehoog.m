@@ -2,7 +2,10 @@ function [y,i]=response_dehoog(f,t,o,bound)
 % Double-precision de Hoog inversion with degree, period and shift checks.
 % Q-D recurrence adapted from mpmath (BSD-3-Clause); see THIRD_PARTY_NOTICES.
     i=response_info(t,o); y=NaN(size(t)); history=zeros(0,5);
-    degrees=[12 20 28 40 56 80 112 160];
+    % Each level DOUBLES the degree, hence the sampled bandwidth 2M*2*pi/P.
+    % A smaller ratio (e.g. 1.4) lets consecutive degrees share a false
+    % plateau that omits lightly damped modes just above the band.
+    degrees=[10 20 40 80 160 320];
     for k=1:numel(t)
         P=4*t(k); sigma=response_line(o,bound,P);
         i.abscissa=maxfinite(i.abscissa,sigma); amp=exp(max(0,sigma)*t(k));
@@ -29,8 +32,9 @@ function [y,i]=response_dehoog(f,t,o,bound)
             history(end+1,:)=[t(k) M ep ed es]; %#ok<AGROW>
             if err<=o.AbsTol+o.RelTol*abs(b), success=success+1; else, success=0; end
             % Low degrees can share a false plateau before an oscillatory
-            % mode enters the sampled band. Require a degree-40 guard probe.
-            % This is still finite resolution, not a global spectral bound.
+            % mode enters the sampled band. Require a degree-40 guard probe
+            % and two successive doublings in agreement. This is still
+            % finite resolution, not a global spectral bound.
             if success>=2 && M>=40, i.resolvedMask(k)=true; break; end
             previous=b;
         end

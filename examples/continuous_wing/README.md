@@ -39,4 +39,4 @@ This example was first developed as a research prototype, then reviewed
 and migrated into the toolbox. It uses only the public scalar functions
 `croots`, `cstep` and `clsim`. Native matrix-valued (MIMO) spectra and
 responses are future work; see
-[docs/development](../../docs/development/mimo_implementation_plan.md).
+the [MIMO proposal](https://github.com/flavioluiz/ContourRoots/blob/main/docs/development/mimo_implementation_plan.md).

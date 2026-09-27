@@ -1,6 +1,6 @@
 # Validation record: continuous Goland wing
 
-Values from `run_continuous_wing_study` (ContourRoots 0.6.0,
+Values from `run_continuous_wing_study` (ContourRoots 0.6.1,
 MATLAB R2023b, macOS). They are observed agreements for the stated
 parameters and tolerances, not general accuracy guarantees.
 
@@ -16,9 +16,9 @@ parameters and tolerances, not general accuracy guarantees.
 | tapered wing, 2/4/8/16/32 strips | 151.58 / 155.81 / 156.81 / 157.05 / 157.11 m/s |
 | vacuum 1 kN half-sine pulse vs 150-mode series | 1.9e-6 mm (response 13.3 mm) |
 | 1 kN tip step at 120 m/s: FFT vs adaptive quadrature | 7.0e-4 mm |
-| same, FFT vs de Hoog | 4.3e-2 mm: de Hoog false plateau (known issue, see ROADMAP) |
+| same, FFT vs de Hoog (0.6.1) | 6.7e-3 mm, within the tolerance of about 9e-3 mm (0.6.0: 4.3e-2 mm, false plateau reported as converged) |
 
-Regression tests: `tests/regression/test_continuous_wing.m` (9 tests, ~16 s).
+Regression tests: `tests/regression/test_continuous_wing.m` (10 tests, ~20 s).
 
 The research prototype (in the author's `delay_systems` repository, with a
 Portuguese report) additionally validated the section loads on the NASA

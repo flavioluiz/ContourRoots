@@ -45,8 +45,9 @@ fprintf('Flutter: U = %.4f m/s, omega = %.4f rad/s\n', Uf, imag(p(k)));
 %% 5. Time response to a tip force, below and above flutter
 % Tip deflection in mm per kN of tip force, from the same continuous model:
 % no modal ODE, no aerodynamic lag states. The inversion line must lie
-% right of every singularity: step 3 found no unstable root at 120 m/s and
-% one pair with Re(s) = 3.70 at 150 m/s, so SingularityBound = 5 is safe.
+% right of every singularity. SingularityBound = 5 is an ASSUMPTION,
+% supported (not proved) by step 3: no unstable root at 120 m/s and one
+% pair with Re(s) = 3.70 at 150 m/s, inside a finite rectangle.
 % Tolerances are in the units of the output: 1e-3 mm (1 micrometre).
 tip = @(U) @(s) 1e6*wing_transfer(s, U, wing, 1, 1);   % mm per kN
 t = (0:0.005:0.5).';

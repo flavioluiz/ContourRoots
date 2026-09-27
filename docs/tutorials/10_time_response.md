@@ -308,14 +308,16 @@ Padé-type continued fraction. That is a numerical device for summing the
 integral, not a rational approximation of $G$.) There is no automatic
 switching: if a method cannot converge, it says so.
 
-**Caution with de Hoog.** Like any accelerated series, de Hoog's method
-can settle on a slightly wrong plateau when $G$ has many lightly damped
-poles close to the imaginary axis, for example a flexible structure. Its
-period, degree and shift checks then agree with each other, and it reports
-convergence anyway. For the continuous wing of
-[Tutorial 11](11_continuous_wing.md#118-time-responses-from-the-same-model)
-it is off by 0.5 % while the FFT and quadrature agree to $10^{-4}$. For such
-systems prefer the FFT, and use `'quadrature'` as the independent check.
+**Caution with accelerated series.** An accelerated series can settle on
+a wrong plateau when $G$ has many lightly damped poles close to the
+imaginary axis, as a flexible structure does. If the sampled band stops
+below some of those poles, a few successive degrees agree with each other
+and yet all omit them. Version 0.6.0 compared degrees only 1.4 times apart
+and was caught this way by the continuous wing of
+[Tutorial 11](11_continuous_wing.md#118-time-responses-from-the-same-model):
+0.5 % off, reported as converged. Since 0.6.1 each de Hoog degree check
+doubles the sampled bandwidth. Checks remain finite, though, so for
+structures a second method at a few times is still recommended.
 
 ## 10.8 A known input transform: `cinvlaplace`
 
@@ -352,8 +354,10 @@ legend('160 ft/s (below flutter)', '180 ft/s (above flutter)')
 xlabel('t [s]'), ylabel('pitch per unit moment')
 ```
 
-The bound 5 lies to the right of the unstable pair $2.13 \pm 74.8i$ found at
-180 ft/s by the right-half-plane count of Tutorial 9. Below flutter the
+The bound 5 is an assumption. It lies to the right of the unstable pair
+$2.13 \pm 74.8i$ found at 180 ft/s by the right-half-plane count of
+Tutorial 9, which supports it within the counted rectangle but does not
+exclude singularities outside it. Below flutter the
 oscillation decays to the static deflection; above flutter it grows at the
 predicted rate. Each curve takes a few seconds.
 

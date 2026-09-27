@@ -119,9 +119,19 @@ Three details keep $\Delta$ well-behaved:
   Section 9.3). So `'AssumeAnalytic',true` is justified in any rectangle
   that avoids that axis.
 - **Nothing is inverted.** $K$ keeps the states at the root and the tip as
-  unknowns. Eliminating some of them (a "condensed" or transfer-matrix
-  determinant) would divide by functions of $s$. That creates artificial
-  poles, which a pole–zero count would then have to account for.
+  unknowns. Not every reduction is harmful. Split the transfer matrix
+  $E = \prod_j E_j$ into blocks acting on $q = [w, w', \alpha]$ and
+  $p = [V, M, T]$. The conditions $q_{\text{root}} = 0$ and
+  $p_{\text{tip}} = 0$ then give $E_{pp}(s)\,p_{\text{root}} = 0$, and
+  $\det E_{pp}(s)$ is a small characteristic function built without any
+  inversion. For this wing it equals $\det K$ exactly. What must be
+  avoided are reductions that **invert blocks depending on $s$**, such as
+  the $6\times6$ hybrid or dynamic-stiffness form of each element. They
+  divide by functions that vanish at some $s$ and create artificial poles,
+  which a zero–pole count would then have to account for. $K$ is kept
+  rather than $E_{pp}$ for another reason: conditioning. Its shooting
+  structure keeps every exponential moderate, and the same matrix also
+  gives the transfer functions (Section 11.6).
 - **The states are scaled by fixed constants**, independent of $s$. This
   conditions $K$ better without changing where it is singular.
   (`wing_model` stores the scales.)
@@ -304,11 +314,15 @@ Two choices matter:
   $10^{-5}$ m, as small as the default `AbsTol` of $10^{-6}$. Scale the
   transfer to a convenient unit, here mm per kN, and state the
   tolerances in that unit: `AbsTol = 1e-3` is one micrometre.
-- **The inversion line.** It must lie to the right of every singularity.
-  Step 2 counted no unstable root at 120 m/s and one pair with
-  $\mathrm{Re}\,s = 3.70$ at 150 m/s, so `SingularityBound = 5` is safe for
-  both speeds. This is a counted rectangle, not a proof over the infinite
-  spectrum. `info.certified` stays false.
+- **The inversion line.** It must lie to the right of every singularity
+  of the whole, infinite spectrum. `SingularityBound = 5` is an
+  **assumption** that you make. The counts support it but do not prove it:
+  step 2 found no unstable root at 120 m/s and one pair with
+  $\mathrm{Re}\,s = 3.70$ at 150 m/s, both inside a finite rectangle.
+  Proving the bound would need an argument about the modes outside that
+  rectangle, for instance that the high-frequency beam modes are damped by
+  the air. None is given here. The time response is therefore conditional
+  on this assumption, and `info.certified` stays false.
 
 ```matlab
 tip = @(U) @(s) 1e6*wing_transfer(s, U, wing, 1, 1);   % mm per kN
@@ -332,11 +346,19 @@ root count. Adaptive quadrature (`'Method','quadrature'`, circles)
 reproduces the FFT result to $7\times10^{-4}$ mm. Each response takes
 about 10 s.
 
-This response is also a severe test of the inversion methods. The wing has
-many lightly damped modes close to the imaginary axis. The de Hoog method
-(`'Method','dehoog'`) settles here on a slightly wrong plateau, off by
-0.04 mm, and still reports convergence. Use the default FFT, and
-cross-check with `'quadrature'` (see [Tutorial 10, Section 10.7](10_time_response.md#107-three-inversion-methods)).
+This response is also a severe test of the inversion methods, because the
+wing has many lightly damped modes close to the imaginary axis. In
+version 0.6.0, `'Method','dehoog'` settled here on a wrong plateau
+(8.0987 mm instead of 8.0553 mm at $t = 0.3$ s, four times the tolerance)
+and still reported convergence. The truncated series omitted the higher
+modes, and its degree checks were too close together to notice. Since
+0.6.1 each degree check doubles the sampled bandwidth. De Hoog then gives
+8.0555 mm at $t = 0.3$ s, and at the five check times it stays within the
+requested tolerance of the FFT (largest difference $6.7\times10^{-3}$ mm,
+against a tolerance of about $9\times10^{-3}$ mm). A regression test keeps
+this case (see [Tutorial 10, Section 10.7](10_time_response.md#107-three-inversion-methods)).
+Comparing two independent methods at a few times remains the best
+safeguard.
 
 ## 11.9 How the results are checked
 
@@ -379,7 +401,7 @@ results = run_continuous_wing_study;   % about 90 s; writes output/continuous_wi
 - **Scalar characteristic function.** $\Delta$ is the determinant of a
   small dense matrix, $6(N+1)$ square. This works well here. Very large or
   badly scaled matrices would call for the matrix-valued methods discussed
-  in the [MIMO proposal](../development/mimo_implementation_plan.md).
+  in the [MIMO proposal](https://github.com/flavioluiz/ContourRoots/blob/main/docs/development/mimo_implementation_plan.md).
 
 ## References
 

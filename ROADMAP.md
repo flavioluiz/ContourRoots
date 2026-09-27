@@ -30,24 +30,26 @@ welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
   (balancing the polynomial in $\omega^2$) would make the method robust to
   crossing frequencies spread over many orders of magnitude.
 
-- **De Hoog false plateau.** For responses with many lightly damped poles
-  near the imaginary axis, `'Method','dehoog'` can converge to a wrong value
-  while all its internal checks agree. Reproducible case: the tip step of
-  the continuous wing at 120 m/s (Tutorial 11), off by 0.5 % at t = 0.3 s,
-  while FFT and quadrature agree to 1e-4. Options: a cheap independent probe
-  (a few quadrature times) before declaring convergence, or restricting
-  de Hoog to responses it can verify. Documented in Tutorial 10, Section 10.7.
+- **Independent probe for accelerated inversion.** The de Hoog false
+  plateau of 0.6.0 (fixed in 0.6.1 by doubling the degree at each check)
+  shows that internal refinement checks can agree on a wrong value. Consider
+  an optional cheap cross-check (a few quadrature times) before declaring
+  convergence, and more adversarial fixtures with dense, lightly damped
+  spectra.
 
 ## Later
 
 - **Continuous-wing migration, next stages.** The example of Tutorial 11
-  uses the scalar API only. Generic stages from its migration plan: a
+  uses the scalar API only. Items of stage M1 of the migration plan that
+  were deferred: an example-local demonstration of the 6×6 hybrid element
+  and of joining two elements; `ckernel` reuse on the wing; and example-local
+  MIMO superposition of tip channels. Generic stages from its migration plan: a
   structured matrix model $G = C H^{-1} B + D$ with batched evaluation
   (shared by all channels); matrix characteristic values (`cmodes`) with a
   log-determinant count instead of an explicit determinant; native MIMO
   zero-state responses and kernel banks; and, only after a second physical
   example, a generic port/network assembler. See the
-  [MIMO proposal](docs/development/mimo_implementation_plan.md).
+  [MIMO proposal](https://github.com/flavioluiz/ContourRoots/blob/main/docs/development/mimo_implementation_plan.md).
 
 - **Multiple roots on the imaginary axis and tangential crossings** in
   `critical_delays`: higher-order direction analysis instead of the label
@@ -78,5 +80,5 @@ welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
   eigenvalue problems are out of scope for now. A bounded MIMO extension
   (matrix characteristic values, transfer poles, transmission zeros) is
   under study: see the proposal in
-  [docs/development/mimo_implementation_plan.md](docs/development/mimo_implementation_plan.md)
-  and its [review](docs/development/mimo/review.md). Nothing is scheduled.
+  [the development notes](https://github.com/flavioluiz/ContourRoots/blob/main/docs/development/mimo_implementation_plan.md)
+  and its [review](https://github.com/flavioluiz/ContourRoots/blob/main/docs/development/mimo/review.md). Nothing is scheduled.

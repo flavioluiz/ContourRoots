@@ -96,9 +96,15 @@ principle:
         $A$. $\Delta$ is therefore entire in vacuum, and analytic except on
         the negative real axis (the branch cut of $C$) with air. So
         \code{AssumeAnalytic} holds in any rectangle that avoids that axis.
-  \item Nothing is inverted. Condensing $K$ to a small transfer or hybrid
-        matrix would divide by functions of $s$ and create artificial
-        poles.
+  \item Nothing is inverted. Write $E=\prod_jE_j$ in blocks acting on
+        $q=[w,w',\alpha]$ and $p=[V,M,T]$. The conditions $q_0=0$,
+        $p_N=0$ give $E_{pp}(s)\,p_0=0$, a reduced characteristic function
+        $\det E_{pp}$ obtained without inversion; it equals $\det K$. What
+        must be avoided are condensations that invert $s$-dependent blocks,
+        such as hybrid or dynamic-stiffness element matrices. They create
+        artificial poles where those blocks are singular. $K$ is preferred
+        to $E_{pp}$ for conditioning: its multiple-shooting structure keeps
+        each exponential moderate.
   \item For identical strips $e^{AL}=(e^{AL/N})^N$, so $\Delta$ does not
         depend on $N$. The study confirms this to $1.4\times10^{-14}$ for
         $N=1,2,4,8$. For a uniform wing the strips are bookkeeping, not
@@ -210,8 +216,11 @@ subdivides each strip into identical pieces with $\kappa\ell\le3$. This is
 multiple shooting \citep{ascher1995}, and it is exact for constant
 properties: results with $n$ and $2n$ pieces agree to $10^{-12}$.
 
-The inversion line is placed with \code{SingularityBound=5}, to the right
-of the unstable pair counted at 150~m/s. The output is expressed in mm per
+The inversion line is placed with \code{SingularityBound=5}. This is an
+assumption supported, not proved, by the counts: it lies to the right of
+the unstable pair found at 150~m/s, but the counts cover a finite
+rectangle, and excluding singularities outside it would need an additional
+argument about the rest of the spectrum. The output is expressed in mm per
 kN, so that the absolute tolerance $10^{-3}$ is one micrometre.
 
 \begin{figure}[H]
@@ -228,11 +237,14 @@ agrees with the analytic series to $1.9\times10^{-6}$~mm on a 13~mm
 response. Below flutter, the tip step settles near its static deflection;
 above flutter it grows at the rate $\operatorname{Re}s=3.70$ predicted by
 the root count. The FFT and adaptive quadrature agree to
-$7\times10^{-4}$~mm. The de Hoog method, however, converges to a plateau
-0.04~mm (0.5\,\%) off while all its internal checks agree. The accelerated
-series is misled by the many lightly damped poles close to the imaginary
-axis. For such systems the FFT, cross-checked by quadrature, is
-recommended.
+$7\times10^{-4}$~mm. In version 0.6.0 the de Hoog method converged here to
+a plateau 0.04~mm (0.5\,\%) off, with all its internal checks in
+agreement. Its truncated series omitted lightly damped higher modes, and
+successive degrees only 1.4 times apart could not reveal them. Since 0.6.1
+every degree check doubles the sampled bandwidth. De Hoog then stays within
+the requested tolerance of the FFT (largest difference
+$6.7\times10^{-3}$~mm at five times; tolerance about $9\times10^{-3}$~mm).
+A regression test keeps the case.
 
 \section{Scope}
 
