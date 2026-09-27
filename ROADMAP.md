@@ -58,4 +58,8 @@ welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
 - A package namespace (`+contourroots`) before 1.0, to keep unqualified
   calls stable.
 - Interval-arithmetic certification, a GUI, and general MIMO nonlinear
-  eigenvalue problems are out of scope for now.
+  eigenvalue problems are out of scope for now. A bounded MIMO extension
+  (matrix characteristic values, transfer poles, transmission zeros) is
+  under study: see the proposal in
+  [docs/development/mimo_implementation_plan.md](docs/development/mimo_implementation_plan.md)
+  and its [review](docs/development/mimo/review.md). Nothing is scheduled.
