@@ -3,6 +3,28 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
+## [0.5.0] — 2026-09-26
+
+### Added
+- `ckernel(G,t,...)` prepares the step (and, for FOH, ramp) kernels of a
+  system once; `clsim(K,u,t)` then simulates any input on the same grid and
+  hold without evaluating $G$ or inverting again. Direct terms and known
+  delays are kept. `K` is a read-only snapshot (no live function handle, no
+  hidden cache) and can be saved to a MAT file.
+- Separate kernel tolerances (default `1e-8`/`1e-6`) and output tolerances;
+  the propagated output error is checked for every input, and an input
+  that needs more accuracy is reported unresolved, never silently refined.
+- `info.kernelReused` and `info.kernelPreparationEvaluations` in `clsim`.
+- `ckernel` reference page, Tutorial 10 Section 10.5.1 (a sine sweep that
+  reproduces $|G(i\omega)|$), manual section, example `reuse_kernels.m`.
+- Regression tests: agreement with fresh responses for all methods and
+  holds, zero model evaluations on reuse, an exact delayed reference,
+  superposition, option/grid rejection, read-only properties, MAT round trip.
+
+### Documentation
+- `clsim` explains why MATLAB's `lsim` with FOH and an `InputDelay` differs
+  from `clsim` just after the delay when $u(0) \ne 0$.
+
 ## [0.4.0] — 2026-09-26
 
 ### Added

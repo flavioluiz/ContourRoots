@@ -161,7 +161,7 @@ With $G=D+G_r$, define the step and ramp responses
 $S_r=\mathcal L^{-1}\{G_r/s\}$ and $R_r=\mathcal L^{-1}\{G_r/s^2\}$, both
 zero before $t=0$. A held input is a sum of delayed steps, one per jump
 $u_j-u_{j-1}$ (with $u_{-1}=0$):
-\begin{equation}
+\begin{equation}\label{eq:zoh-sum}
   y(t)=Du(t)+\sum_{t_j\le t}(u_j-u_{j-1})\,S_r(t-t_j).
 \end{equation}
 A piecewise-linear input with slopes $m_j=(u_{j+1}-u_j)/(t_{j+1}-t_j)$ is a
@@ -176,7 +176,65 @@ $\sum_j w_jK(t_n-t_j)=e^{\sigma t_n}\sum_j (w_je^{-\sigma t_j})
 (K(t_n-t_j)e^{-\sigma(t_n-t_j)})$, which limits the dynamic range for
 growing kernels. The kernel error estimates are propagated through the same
 sums. For rational models the result agrees with MATLAB's \code{lsim} with
-the same hold to about $10^{-10}$ (ZOH) and $10^{-9}$ (FOH).
+the same hold to about $10^{-10}$ (ZOH) and $10^{-9}$ (FOH). With an
+\code{InputDelay} $T$ and $u_0\ne0$, \code{lsim}'s FOH lets the delayed input
+rise linearly from zero over the sample interval ending at $T$, while
+\code{clsim} keeps the jump of the interpolant at $T$; the two then differ
+by about $g(0^+)\,u_0\,\Delta t/2$ just after $T$. The delay-free response
+shifted by $T$ confirms \code{clsim} to $10^{-8}$.
+
+\subsection{Several inputs with the same model}
+
+In \eqref{eq:zoh-sum} and its FOH analogue, only the weights depend on the
+input; the kernels $S$ and $R$ depend on the system alone. When many inputs
+are applied to the same system, such as a sine sweep, a family of reference
+signals or random disturbances, the inversions can be done once.
+\code{ckernel} performs them and returns a read-only object \code{K};
+\code{clsim} accepts \code{K} in place of $G$ and only evaluates the
+convolution. The example below ``measures'' the frequency response of the
+delayed loop by simulation, fitting a sinusoid to the steady part of each
+output:
+\begin{lstlisting}
+G = @(s) 1./(s + 1 + 0.5*exp(-s));
+t = (0:0.02:20).';
+K = ckernel(G, t, 'SingularityBound', 0);    % inversions, once
+w = 0.5:0.25:2;  late = t > 10;
+for k = 1:numel(w)
+    [y,~,info] = clsim(K, sin(w(k)*t), t);   % convolution only
+    ab = [sin(w(k)*t(late)) cos(w(k)*t(late))] \ y(late);
+    gain(k) = norm(ab);                      % compare with abs(G(1i*w(k)))
+end
+\end{lstlisting}
+The seven gains agree with $|G(i\omega)|$ to about $10^{-4}$, the size of
+the transient left at $t = 10$ (the rightmost characteristic root has
+$\operatorname{Re}s\approx-1.10$). Every \code{info.evaluations} is zero,
+and the script takes about 1.2\,s against 2.8\,s for seven ordinary calls.
+
+\paragraph{What is stored.} FOH preparation stores $R_r$ and $S_r$, so a
+later input may start at $u_0\ne0$; ZOH stores $S_r$ only. The direct term
+and a known transport delay are kept. \code{K} holds numbers for one model,
+one grid and one hold, not the function handle: changing a parameter, the
+time samples or the hold requires a new preparation, and \code{clsim}
+rejects a mismatched grid, hold or model option. Each call is an
+independent zero-state experiment.
+
+\paragraph{Two tolerances.} The error of the stored kernels is amplified by
+each input. With a step-kernel error estimate $\epsilon_S$, the ZOH output
+error is estimated as
+\begin{equation}
+ \epsilon_y(t_n)=\sum_{j=0}^{n}|u_j-u_{j-1}|\,\epsilon_S(t_n-t_j),
+\end{equation}
+and FOH propagates $\epsilon_R$ through the slope changes and adds
+$|u_0|\,\epsilon_S$. The kernels are therefore prepared at tighter
+tolerances ($10^{-8}$ absolute, $10^{-6}$ relative) than the output
+($10^{-6}$, $10^{-4}$), and $\epsilon_y$ is recomputed and checked for every
+input. A large or rapidly varying input may fail that check even though the
+preparation converged; the samples are then marked unresolved and the
+kernels are \emph{not} refined automatically. The user either prepares
+tighter kernels or relaxes an unnecessarily strict output tolerance. The
+estimate is conservative (true errors near $10^{-9}$ when it first exceeds
+$10^{-6}$ in the tests), and it retains the finite-bandwidth caveat of the
+inversion: it is not a certified bound.
 
 \section{Validation}
 

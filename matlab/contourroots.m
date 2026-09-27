@@ -30,6 +30,7 @@ function contourroots()
     fprintf('  cimpulse(G,t)       unit-impulse response\n');
     fprintf('  cstep(G,t)          unit-step response\n');
     fprintf('  clsim(G,u,t)        zero-state response to an input\n');
+    fprintf('  ckernel(G,t)        reusable kernels for several clsim inputs\n');
     fprintf('  cinvlaplace(F,t)    inverse Laplace transform\n');
     fprintf('  critical_delays     stability crossings of D(s)+N(s)exp(-sT)\n\n');
     fprintf('  region = [xmin xmax ymin ymax] in the complex plane\n\n');

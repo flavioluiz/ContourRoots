@@ -34,6 +34,15 @@ API reference and Tutorial 10 describe the implemented contracts.
 
 ## 1. Objective and scope
 
+Kernel-reuse follow-up (released in 0.5.0): `ckernel(G,t,...)`
+now prepares an explicit read-only value snapshot for `clsim(K,u,t,...)`.
+FOH stores step and ramp kernels; ZOH stores only the step kernel. Reuse
+validates the same grid/hold, rejects inversion/model changes, and propagates
+stored errors for every input without new evaluations or silent refinement.
+No persistent handle hash or live evaluator is retained. Automatic input
+resampling remains outside this feature; the original implementation record
+above describes the 0.4.0 release.
+
 Compute the zero-state response of a causal, continuous-time LTI system
 directly from its nonrational transfer function:
 

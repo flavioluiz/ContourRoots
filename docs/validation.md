@@ -52,6 +52,26 @@ method-of-steps, rod modal and beam FEM references plus an aeroelastic
 input/output-channel cross-check. Convergence remains conditional on the
 declared inversion half-plane and finite numerical resolution.
 
+**Kernel reuse (`ckernel`).** `test_kernel_reuse` checks that:
+- prepared and ordinary `clsim` responses agree (to $2\times10^{-6}$) for
+  both holds and all three inversion methods, and for nonrational
+  (diffusion, delay feedback) and unstable models;
+- reuse evaluates the model zero times: the test evaluator counts its
+  calls and is disabled after preparation; changing a parameter it
+  captures does not change the prepared object;
+- a delayed `tf` with direct transmission matches the delay-free `lsim`
+  response shifted by the delay to $5\times10^{-8}$ (ramp, sine and step
+  inputs, ZOH and FOH), and superposition holds to $10^{-12}$;
+- a large, fast input is reported unresolved rather than silently
+  refined; other grids, holds and model options are rejected; a failed
+  preparation raises an error; properties are read-only; a MAT-file round
+  trip gives identical results.
+
+An additional check against `dde23` for $\dot x = -x - 0.5x(t-1) + \sin 2t$
+agreed to $2\times10^{-5}$ (the ODE solver's accuracy), and the sine sweep
+of `examples/time_response/reuse_kernels.m` reproduces $|G(i\omega)|$ to
+$10^{-4}$.
+
 The study's maximum absolute errors are approximately 1.2e-8 (delay
 feedback), 4.6e-8 (diffusion), 1.1e-7 (finite rod), and 2.5e-5 (beam relative
 to the refined FEM reference). NASA pitch-step FFT/quadrature differences

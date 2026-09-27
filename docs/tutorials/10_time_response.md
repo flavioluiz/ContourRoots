@@ -176,6 +176,76 @@ if license('test', 'Control_Toolbox')
 end
 ```
 
+### 10.5.1 Several inputs, one preparation
+
+In the two-stage recipe above, only the weights depend on the input; the
+kernels $S$ and $R$ depend on the system alone. When you want to try many
+inputs on the same system (a sine sweep, a family of reference signals,
+random disturbances), it is wasteful to invert $G$ again each time.
+`ckernel` computes the kernels once, and `clsim` accepts the result `K` in
+place of `G`:
+
+```text
+K = ckernel(G, t, ...)      % expensive: inverse transforms, done once
+y = clsim(K, u, t)          % cheap: convolution only, for any input u
+```
+
+A natural control-engineering use is to "measure" the frequency response
+by simulation: excite the delayed loop with sines, wait for the transient
+to die out, and read the amplitude of the output. The result should
+reproduce $|G(i\omega)|$:
+
+<!-- file: examples/time_response/reuse_kernels.m -->
+```matlab
+%% Several inputs, one preparation: a sine sweep through a delayed loop
+% Run setup_contourroots once per session before this script.
+% G is analytic in Re(s) > 0 because |s + 1| >= 1 > 0.5 there.
+
+G = @(s) 1./(s + 1 + 0.5*exp(-s));
+t = (0:0.02:20).';
+K = ckernel(G, t, 'SingularityBound', 0);     % the inversions happen here
+
+w = 0.5:0.25:2;                               % input frequencies (rad/s)
+late = t > 10;                                % the transient has died out
+measured = zeros(size(w));
+for k = 1:numel(w)
+    [y, ~, info] = clsim(K, sin(w(k)*t), t);  % no new inversion
+    assert(info.converged && info.evaluations == 0)
+    ab = [sin(w(k)*t(late)) cos(w(k)*t(late))] \ y(late);  % fit a sinusoid
+    measured(k) = norm(ab);
+end
+predicted = abs(G(1i*w));
+table(w.', measured.', predicted.', ...
+      'VariableNames', {'omega', 'measured_gain', 'abs_G_jw'})
+fprintf('%d transfer evaluations, all during preparation.\n', K.Info.evaluations);
+```
+
+The seven simulations reproduce $|G(i\omega)|$ to four digits, with no
+evaluation of $G$ after the preparation (`info.evaluations` is zero). The
+whole script takes about 1.2 s, against 2.8 s for seven ordinary `clsim`
+calls; the gain grows with the number of inputs.
+
+Three rules make reuse safe:
+
+1. **`K` is a snapshot of one model, one grid and one hold.** It stores
+   numbers, not the function handle. Changing a parameter of `G`, the time
+   samples or the hold requires a new `ckernel`; `clsim(K,...)` rejects a
+   different grid or hold with an error rather than guessing.
+2. **With FOH, both $S$ and $R$ are stored**, so inputs that start at a
+   nonzero value, such as `1 + cos(3*t)`, work as well. ZOH needs $S$ only.
+3. **Each input gets its own accuracy check.** The kernels are prepared to
+   tighter tolerances (`AbsTol = 1e-8`, `RelTol = 1e-6`) than an ordinary
+   response, because an input amplifies the kernel errors by the size of its
+   jumps and slope changes. Every `clsim(K,u,t)` call recomputes the
+   propagated error for its input and checks the usual output tolerances.
+   A large or rapidly varying input can therefore be reported as
+   unresolved even though the preparation succeeded; the kernels are never
+   refined behind your back. Prepare a new `K` with tighter tolerances, or
+   relax the output tolerance if the requested accuracy was unnecessary.
+
+The [`ckernel` reference](../api/ckernel.md) lists the allowed options and
+the diagnostics.
+
 ## 10.6 Impulses, direct feedthrough and $t = 0$
 
 **Direct feedthrough.** If $G(s) = D + G_r(s)$ with a constant $D$, the
@@ -313,7 +383,10 @@ by entirely different means:
 
 (The beam error is that of the finite-element reference itself.) The
 regression tests add analytical first-order, delayed, unstable, marginal
-and fractional cases, and MATLAB's `lsim` for ZOH and FOH inputs.
+and fractional cases, and MATLAB's `lsim` for ZOH and FOH inputs. Kernel
+reuse is tested against ordinary `clsim` calls, against the delay-free
+`lsim` response shifted by a delay, and against `dde23`
+([validation page](../validation.md#zero-state-time-responses)).
 
 <!-- no-test -->
 ```matlab
@@ -322,7 +395,8 @@ results = run_time_response_study;   % about 1 minute; writes output/time_respon
 ```
 
 Short scripts: `first_step.m`, `arbitrary_input.m`,
-`delays_and_diffusion.m` and `unstable_response.m` in `examples/time_response/`.
+`delays_and_diffusion.m`, `unstable_response.m` and `reuse_kernels.m` in
+`examples/time_response/`.
 
 ## 10.12 Scope and limitations
 

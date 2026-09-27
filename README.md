@@ -162,6 +162,13 @@ responses start from rest. See [Tutorial 10](docs/tutorials/10_time_response.md)
 for forced responses, impulses, unstable systems and the pitch response
 of the aeroelastic section.
 
+To simulate many inputs on the same system (a sine sweep, a set of
+reference signals), prepare the kernels once with
+[`ckernel`](docs/api/ckernel.md) and pass the result to `clsim` in place
+of `G`: `K = ckernel(G,t,...); y = clsim(K,u,t)`. No inverse transform is
+repeated, and each input still gets its own accuracy check
+([Tutorial 10, Section 10.5.1](docs/tutorials/10_time_response.md#1051-several-inputs-one-preparation)).
+
 ## What ContourRoots does not do
 
 - Matrix-valued or MIMO problems (e.g. $\det(sI - A - Be^{-sT}) = 0$ as a

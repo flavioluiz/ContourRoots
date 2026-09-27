@@ -67,7 +67,18 @@ The third output `info` is a structure (it is not a state vector).
 | `stopReason` | why the refinement stopped |
 | `interpolation`, `kernelConvention`, `kernelErrorEstimate`, `stepKernelInfo` | `clsim` only: hold, integrated-kernel method, and the kernel checks |
 | `inputErrorEstimate` | `NaN`: what the input does between samples is not estimated |
+| `kernelReused`, `kernelPreparationEvaluations` | `clsim` only: whether a prepared `ckernel` object was used, and its original setup cost (zero for a fresh call); reuse has `evaluations = 0` |
 | `assumptions`, `warnings`, `endpointPolicy` | the assumptions made, and how $t = 0$ and jumps were treated |
+
+## Reusing prepared kernels
+
+[`ckernel`](ckernel.md) prepares a fixed grid and hold for several inputs.
+Its kernel tolerances default to `1e-8` and `1e-6`, independently of the
+normal output tolerances of `clsim`. On reuse, kernel refinement fields
+and histories refer to preparation; the propagated `errorEstimate`,
+`resolvedMask` and convergence status are recomputed for the current input.
+No transfer evaluations or inverse transforms are repeated. A stricter
+output request may fail; it never silently tightens the stored kernels.
 
 ## When a response is unresolved
 

@@ -1,5 +1,7 @@
-function [y,t,i]=response_run(kind,G,u,t,args,plotDefault)
-    [o,t]=response_options(kind,t,args,plotDefault); m=response_model(G,o);
+function [y,t,i]=response_run(kind,G,u,t,args,plotDefault,data)
+    if nargin<7, data=[]; end
+    [o,t]=response_options(kind,t,args,plotDefault);
+    if isempty(data), m=response_model(G,o); else, m=data.model; end
     if strcmp(kind,'impulse') && ~m.known && ~o.RegularImpulse
         error('ContourRoots:ResponseImpulse','For an opaque model assert RegularImpulse=true after excluding hidden Dirac terms; supply Feedthrough when present.');
     end
@@ -20,17 +22,17 @@ function [y,t,i]=response_run(kind,G,u,t,args,plotDefault)
             end
             ko=o; ko.AbsTol=o.AbsTol/(4*scale); ko.RelTol=o.RelTol/(4*scale);
             if strcmp(o.Interpolation,'zoh')
-                [S,i]=response_kernels(m,t,1,ko);
+                [S,i]=response_get_kernel(m,t,1,ko,data);
                 y=response_convolve(S,weights,t,convSigma,o);
                 err=error_conv(i.errorEstimate,abs(weights),t,o);
                 resolved=all(i.resolvedMask);
             else
-                [R,i]=response_kernels(m,t,2,ko);
+                [R,i]=response_get_kernel(m,t,2,ko,data);
                 y=response_convolve(R,weights,t,convSigma,o);
                 err=error_conv(i.errorEstimate,abs(weights),t,o);
                 resolved=all(i.resolvedMask);
                 if u(1)~=0
-                    [S,j]=response_kernels(m,t,1,ko); y=y+u(1)*S;
+                    [S,j]=response_get_kernel(m,t,1,ko,data); y=y+u(1)*S;
                     err=err+abs(u(1))*j.errorEstimate;
                     resolved=resolved&&all(j.resolvedMask); i.evaluations=i.evaluations+j.evaluations;
                     i.stepKernelInfo=j;
@@ -45,6 +47,14 @@ function [y,t,i]=response_run(kind,G,u,t,args,plotDefault)
             i.inputErrorEstimate=NaN;
             i.assumptions{end+1}='Input is the chosen interpolant of supplied samples; unsampled input error is not estimated.';
             i.kernelConvention='Integrated step/ramp basis; linear convolution, no dt factor.';
+            i.kernelReused=~isempty(data); i.kernelPreparationEvaluations=0;
+            if ~isempty(data)
+                i.kernelPreparationEvaluations=data.info.evaluations;
+                if i.converged
+                    i.stopReason='Stored kernel errors propagated through this input met output tolerances; no inversion performed.';
+                end
+                i.assumptions{end+1}='Fixed prepared kernels: no new inversion; kernel history describes preparation, output errors are rechecked for this input.';
+            end
     end
     i.singularityBound=m.bound; i.domainSource=m.domainSource;
     i.assumptions=[m.assumptions i.assumptions];

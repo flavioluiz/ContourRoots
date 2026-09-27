@@ -25,6 +25,7 @@ pade\_critical\_delays & critical delays predicted by Padé models\\
 {}[g,t,info] = cimpulse(G,t,...) & ordinary impulse response; Dirac terms in \code{info}\\
 {}[y,t,info] = cstep(G,t,...) & unit-step response\\
 {}[y,t,info] = clsim(G,u,t,...) & response to a sampled input (ZOH/FOH)\\
+K = ckernel(G,t,...) & reusable kernels for \code{clsim(K,u,t,...)}\\
 {}[f,t,info] = cinvlaplace(F,t,...) & inverse Laplace transform of $F(s)$\\
 setup\_contourroots, contourroots & path setup; overview and version\\
 \bottomrule

@@ -27,7 +27,7 @@ blocks into MATLAB in order.
 | 7 | [Distributed-parameter systems](tutorials/07_distributed_systems.md) | heat, string, duct and beam transfer functions |
 | 8 | [Beam coupled to an oscillator](tutorials/08_coupled_beam.md) | deriving N/D for a PDE–ODE system, parameter studies, FEM check |
 | 9 | [Flutter without rational approximations](tutorials/09_aeroelasticity.md) | stability of a wing section with exact Theodorsen aerodynamics: unstable-root counts, root locus in the airspeed, flutter and divergence; Jones, quasi-steady and p-k comparisons |
-| 10 | [Time responses](tutorials/10_time_response.md) | `cstep`, `cimpulse`, `clsim`, `cinvlaplace`: step, impulse and forced responses computed from $G(s)$ itself, including delays, diffusion and the aeroelastic section |
+| 10 | [Time responses](tutorials/10_time_response.md) | `cstep`, `cimpulse`, `clsim`, `cinvlaplace`: responses from $G(s)$ itself; delays, diffusion, aeroelasticity and reusable `ckernel` preparation |
 
 ## Reference
 

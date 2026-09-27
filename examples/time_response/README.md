@@ -7,6 +7,7 @@ Short scripts (run `setup_contourroots` first), explained in
 |---|---|
 | `first_step.m` | `cstep` on a loop with a delay, and how to justify `SingularityBound` |
 | `arbitrary_input.m` | `clsim` with a sampled input through a diffusion model |
+| `reuse_kernels.m` | prepare once with `ckernel`, simulate two inputs without new inversions |
 | `delays_and_diffusion.m` | step responses of a delay and of diffusion against exact formulas |
 | `unstable_response.m` | an unstable system: the inversion line right of the pole |
 

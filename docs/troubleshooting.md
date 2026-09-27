@@ -15,6 +15,22 @@ shows which. The usual causes and fixes:
   `MaxPoints`, or check selected times with `'Method','quadrature'`.
 `'Warn',false` only hides the message; unresolved samples stay unresolved.
 
+**`clsim(K,u,t)` is unresolved although `ckernel` succeeded**
+The kernel errors are amplified by the jumps and slope changes of each
+input, so a large or fast input can miss the output tolerance. The kernels
+are not refined automatically. Prepare a new `K` with tighter `AbsTol`/
+`RelTol`, or relax the output tolerance if the default was stricter than
+you need. See [`ckernel`](api/ckernel.md#two-tolerances-kernel-and-output).
+
+**`ckernel` fails with `ContourRoots:KernelUnresolved`**
+The kernels are prepared at tight tolerances; over a long horizon a corner
+at $t = 0$ or at a delay may need more frequencies than the budget. Shorten
+the horizon, increase `MaxPoints`, or relax the kernel tolerances.
+
+**`clsim(K,...)` rejects the grid, the hold or an option**
+`K` is tied to the exact time samples and hold used in `ckernel`, and to
+its model and inversion options. Prepare a new `K` for any of these changes.
+
 **A time response asks for `SingularityBound`**
 For a function handle, ContourRoots cannot know where the transfer function
 is analytic, and the inversion line must lie to the right of all its

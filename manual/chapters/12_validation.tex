@@ -31,7 +31,12 @@ layers.
 The time-response extension additionally checks analytical impulse/step
 responses, unstable and fractional models, direct transmission, external
 delays, ZOH/FOH input reconstruction, optional MATLAB \code{lsim} agreement,
-conjugacy, resource limits, and explicit unresolved inversion cases.
+conjugacy, resource limits, and explicit unresolved inversion cases. Kernel
+reuse (\code{ckernel}) is compared with ordinary \code{clsim} calls for all
+inversion methods and both holds, with a delayed \code{tf} against the
+shifted delay-free \code{lsim} response ($5\times10^{-8}$), and for
+superposition ($10^{-12}$); a counting evaluator confirms that reuse
+evaluates the model zero times.
 
 \section{Independent references in the studies}
 

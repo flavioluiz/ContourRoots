@@ -1,5 +1,5 @@
 % ContourRoots: poles, zeros and roots of nonrational scalar functions.
-% Version 0.4.0 26-Sep-2026
+% Version 0.5.0 26-Sep-2026
 %
 % Main functions
 %   croots               - Roots of a scalar analytic function in a rectangle.
@@ -12,6 +12,7 @@
 %   cimpulse             - Ordinary impulse response and singular-term metadata.
 %   cstep                - Unit-step response by inverse Laplace transform.
 %   clsim                - Response to a sampled or function-handle input.
+%   ckernel              - Prepare reusable step/ramp kernels for clsim.
 %   cinvlaplace          - Inverse Laplace transform (FFT, de Hoog or quadrature).
 %
 % Solver and compatibility names

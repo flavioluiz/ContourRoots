@@ -5,6 +5,8 @@ function [y,tOut,info] = clsim(G,u,t,varargin)
 %   Interpolation: 'foh' (default, piecewise linear) or 'zoh' (held samples).
 %   The supplied interpolant, not an unknown continuous signal, is simulated.
 %   The third output is diagnostics, NOT internal states. No outputs plots.
+%   CLSIM(K,U,T,...) reuses K=CKERNEL(G,T,...), with no new inversions.
+%   The same grid/hold is required; output error is rechecked for every input.
 %   See CSTEP for shared options and CINVLAPLACE for a known input transform.
     [y,tOut,info]=response_run('lsim',G,u,t,varargin,nargout==0);
 end
