@@ -20,7 +20,7 @@ parameters and tolerances, not general accuracy guarantees.
 
 Regression tests: `tests/regression/test_continuous_wing.m` (10 tests, ~20 s).
 
-The research prototype (in the author's `delay_systems` repository, with a
+The research prototype (in the author's research repository, with a
 Portuguese report) additionally validated the section loads on the NASA
 typical-section benchmark and the hybrid 6×6 port formulation of each strip.
 The section benchmark is already part of Tutorial 9. The port formulation
