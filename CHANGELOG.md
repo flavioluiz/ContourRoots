@@ -12,7 +12,7 @@ follows [semantic versioning](https://semver.org/).
   Per-output tolerances, direct terms, exact delays, singularity bounds,
   error accounting, diagnostics and bounded work are retained.
 - A reproducible `tools/benchmark_shared_grid.m` benchmark and
-  [algorithm/measurement report](docs/development/shared_grid_preparation.md).
+  [algorithm/measurement report](docs/benchmarks/shared_grid_preparation.md).
 - Shared-vs-independent and budget regressions, including genuine 0.8.0
   scalar/matrix saved snapshots. Numerical snapshot schema remains 1.
 

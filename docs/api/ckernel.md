@@ -8,7 +8,7 @@ For matrix models, opt into `SharedGrid=true` with FFT or de Hoog to prepare
 all channels and both kernel orders on one adaptive spectral grid. Default
 `false` keeps independent channel refinement. Shared setup uses the same
 numeric snapshot schema and the same `clsim` error accounting. See the
-[benchmark and limits](../development/shared_grid_preparation.md).
+[benchmark and limits](../benchmarks/shared_grid_preparation.md).
 
 ## Syntax
 

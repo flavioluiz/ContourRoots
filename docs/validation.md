@@ -160,5 +160,5 @@ when they are missing). Other releases have not been tested yet.
 `test_shared_grid` compares shared and independent FFT/de Hoog preparation,
 including per-output tolerances, distinct channel delays, direct terms,
 FOH/ZOH reuse, batched/structured callbacks, failure budgets, and loading
-actual 0.8.0 snapshots. See the [benchmark report](development/shared_grid_preparation.md)
+actual 0.8.0 snapshots. See the [benchmark report](benchmarks/shared_grid_preparation.md)
 for measured node/factorization counts and the opt-in default decision.

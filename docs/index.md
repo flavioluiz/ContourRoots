@@ -56,4 +56,4 @@ blocks into MATLAB in order.
   evaluated without Padé approximation or modal truncation. The computed
   roots are still floating-point numbers.
 
-Shared MIMO preparation: [algorithm, usage and benchmark](development/shared_grid_preparation.md).
+Shared MIMO preparation: [algorithm, usage and benchmark](benchmarks/shared_grid_preparation.md).

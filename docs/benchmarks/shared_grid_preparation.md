@@ -160,3 +160,11 @@ rectangular structured, opaque, batched, channel-cell, unstable, delayed,
 direct-term and optional LTI inputs, FOH/ZOH, serialization, exact budgets,
 domain checks and symmetry failures. The old scalar engines and their
 existing regression tests remain in the validation suite.
+
+## Validation run
+
+On MATLAB R2026a, the release run passed all **153 unit/regression tests**
+and all **3 documentation tests**, with no skips. After a final loop-variable
+scope cleanup, all seven shared-grid tests passed again and MATLAB's static
+check was clean. The example on this page was also executed separately.
+The full study/manual/package build is recorded when it finishes.

@@ -45,7 +45,7 @@ Shared scalar options retain their meanings. Matrix additions are:
   Quadrature with `SharedGrid=true` raises `ContourRoots:KernelOption`.
   Common grids can require more memory or refinement for cheap, delayed,
   or differently scaled channels; this is intentionally opt-in. See the
-  [measurements and algorithm](../development/shared_grid_preparation.md).
+  [measurements and algorithm](../benchmarks/shared_grid_preparation.md).
 - `AbsTol`: scalar or one value per output (in that output's units).
 - `Feedthrough`, `InitialValue`: full `ny`-by-`nu` matrices, consistent
   with any model metadata. `RegularImpulse=true` remains required for

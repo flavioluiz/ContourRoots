@@ -42,7 +42,7 @@ welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
 - Opt-in shared FFT/de Hoog preparation for MIMO kernel banks, with one
   block evaluation per requested spectral node and worst-channel refinement
   across step/ramp orders. Existing independent preparation remains the
-  default. See [measurements and limits](docs/development/shared_grid_preparation.md).
+  default. See [measurements and limits](docs/benchmarks/shared_grid_preparation.md).
 - Next performance work: parallel spectral-node evaluation, and a shared
   adaptive quadrature engine. Neither is part of 0.9.0.
 
