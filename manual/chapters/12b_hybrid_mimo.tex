@@ -95,6 +95,20 @@ uses the scalar inversion of Chapter~\ref{ch:response}. Evaluations of the
 matrix model are shared between channels within one call, and a kernel
 bank from \code{ckernel} stores the kernels of every channel.
 
+Version 0.9.0 adds \code{'SharedGrid',true} to matrix \code{ckernel}
+preparation with FFT or de Hoog. All channels and the step/ramp kernels
+share spectral nodes and refine until the worst channel meets its own
+output tolerance at two successive levels. Each structured node uses one
+factorization with all inputs as right-hand sides. Delays remain exact time
+shifts and direct terms retain their analytical treatment. The shared line
+uses the tightest output tolerance and the largest singularity bound.
+Independent channel preparation remains the default: a common grid can
+cost more for cheap channels and requires matrix sample storage. Shared
+quadrature and parallel evaluation are not implemented. The numeric
+snapshot schema and cancellation-aware \code{clsim} error propagation are
+unchanged; saved 0.8.0 banks still load.
+
+
 Figure~\ref{fig:hybridsup} shows the tip response of the wing at
 120~m/s to a force $1+0.2\sin10t$~kN and a torque $0.3\cos5t$~kN\,m. One
 bank is prepared (about 30~s), and three \code{clsim} calls give the

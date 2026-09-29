@@ -1,0 +1,85 @@
+{
+  "baselineCommit": "9b70d02",
+  "date": "2026-09-29",
+  "matlab": "26.1.0.3276743 (R2026a) Update 3",
+  "computer": "MACA64",
+  "threads": 1,
+  "timingCaveat": "One measured run per case; other MATLAB computations active. Dense case uses de Hoog and a 16-node warmup.",
+  "cases": {
+    "small": {
+      "maxOutputDifference": 4.477106629874328e-09,
+      "independent": {
+        "distinctNodes": 98308,
+        "medianSeconds": 10.859380916666666,
+        "cacheHitRate": 0.792232714238615,
+        "evaluations": 98308,
+        "factorizations": 98308,
+        "linearSolves": 98308,
+        "rhsColumns": 196616,
+        "cacheHits": 374856,
+        "method": "fft"
+      },
+      "shared": {
+        "distinctNodes": 73732,
+        "medianSeconds": 2.1025044166666667,
+        "cacheHitRate": 0.49651744011362703,
+        "evaluations": 73732,
+        "factorizations": 73732,
+        "linearSolves": 73732,
+        "rhsColumns": 147464,
+        "cacheHits": 72712,
+        "method": "fft"
+      }
+    },
+    "hybrid": {
+      "maxOutputDifference": 0.0,
+      "independent": {
+        "distinctNodes": 16386,
+        "medianSeconds": 12.213839375,
+        "cacheHitRate": 0.9394008875739644,
+        "evaluations": 16386,
+        "factorizations": 0,
+        "linearSolves": 0,
+        "rhsColumns": 0,
+        "cacheHits": 254014,
+        "method": "fft"
+      },
+      "shared": {
+        "distinctNodes": 16386,
+        "medianSeconds": 5.588583083333333,
+        "cacheHitRate": 0.5152071005917159,
+        "evaluations": 16386,
+        "factorizations": 0,
+        "linearSolves": 0,
+        "rhsColumns": 0,
+        "cacheHits": 17414,
+        "method": "fft"
+      }
+    },
+    "dense300": {
+      "maxOutputDifference": 4.259798763728284e-10,
+      "independent": {
+        "distinctNodes": 16896,
+        "medianSeconds": 302.20110125,
+        "cacheHitRate": 0.9297405189620759,
+        "evaluations": 16896,
+        "factorizations": 16896,
+        "linearSolves": 16896,
+        "rhsColumns": 33792,
+        "cacheHits": 223584,
+        "method": "dehoog"
+      },
+      "shared": {
+        "distinctNodes": 1056,
+        "medianSeconds": 29.652538458333332,
+        "cacheHitRate": 0.47305389221556887,
+        "evaluations": 1056,
+        "factorizations": 1056,
+        "linearSolves": 1056,
+        "rhsColumns": 2112,
+        "cacheHits": 948,
+        "method": "dehoog"
+      }
+    }
+  }
+}

@@ -24,7 +24,10 @@ The scalar inverse-Laplace engines are reused channel by channel. A
 bounded, operation-local cache shares matrix evaluations at common nodes,
 including across step/ramp preparation. Different channels may need
 different adaptive grids; sharing is opportunistic, not a forced common
-convergence decision. Structured nodes use one block solve for all inputs.
+convergence decision. For `ckernel`, version 0.9.0 also offers
+`SharedGrid=true`: FFT and de Hoog use a common grid, refined until every
+active channel and both step/ramp orders pass their own tolerances twice.
+Structured nodes use one block solve for all inputs.
 The cache is discarded after the operation and has a finite memory budget;
 evicted nodes may be evaluated again. No cache key is based on printed
 function-handle names.
@@ -33,6 +36,16 @@ function-handle names.
 
 Shared scalar options retain their meanings. Matrix additions are:
 
+- `SharedGrid`: `ckernel` only, default `false`. Set `true` for common FFT
+  or de Hoog preparation. At each node the complete undelayed transfer
+  matrix is evaluated once for every channel and both orders; a bounded
+  cache also reuses nodes between probes. The tightest output tolerance
+  selects the common line; each channel retains its own acceptance test.
+  Different delays use exact shifts of the evaluation times on that grid.
+  Quadrature with `SharedGrid=true` raises `ContourRoots:KernelOption`.
+  Common grids can require more memory or refinement for cheap, delayed,
+  or differently scaled channels; this is intentionally opt-in. See the
+  [measurements and algorithm](../development/shared_grid_preparation.md).
 - `AbsTol`: scalar or one value per output (in that output's units).
 - `Feedthrough`, `InitialValue`: full `ny`-by-`nu` matrices, consistent
   with any model metadata. `RegularImpulse=true` remains required for
@@ -74,7 +87,9 @@ tighter preparation even when every large channel response looks accurate.
 `evaluations`, `factorizations`, `linearSolves`, `rhsColumns`, `cacheHits`
 describe the operation. A scalar channel's evaluation count is a request
 count; the top-level count reports actual shared matrix-node evaluations.
-Factorization counters cover explicit structured models, not unknown linear
+`ckernel` also reports `info.sharedGrid`. Channel evaluation counts include
+requests shared across step and ramp; summing them is not a count of actual
+block solves. Factorization counters cover explicit structured models, not unknown linear
 algebra performed inside opaque transfer callbacks.
 
 ## Frozen matrix kernels
@@ -89,8 +104,8 @@ Reuse requires the identical grid and hold. Only output tolerances,
 convolution budgets and presentation may change. Every reuse recomputes
 output errors, with `evaluations=0`, `factorizations=0`, `kernelReused=true`.
 The separate scalar `ContourRootsKernel` class and its saved schema are
-unchanged. Banks are snapshots for this implementation's schema, not a
-promise of cross-version serialization compatibility.
+unchanged. Version 0.9.0 reads the schema-1 scalar and matrix snapshots
+created by 0.8.0; a checked-in old snapshot is exercised by regression tests.
 
 ## Example
 

@@ -3,6 +3,39 @@
 All notable changes to ContourRoots are documented here. The project
 follows [semantic versioning](https://semver.org/).
 
+## [0.9.0] — 2026-09-29
+
+### Added
+- Opt-in `ckernel(M,t,'SharedGrid',true)` for explicit MIMO models with
+  FFT or de Hoog: common spectral grids refined on the worst channel and
+  both step/ramp orders, one full block evaluation per requested node.
+  Per-output tolerances, direct terms, exact delays, singularity bounds,
+  error accounting, diagnostics and bounded work are retained.
+- A reproducible `tools/benchmark_shared_grid.m` benchmark and
+  [algorithm/measurement report](docs/development/shared_grid_preparation.md).
+- Shared-vs-independent and budget regressions, including genuine 0.8.0
+  scalar/matrix saved snapshots. Numerical snapshot schema remains 1.
+
+### Behavior and limits
+- Independent channel preparation remains the default: cheap channel-cell
+  models can be slower with shared grids (0.141 s → 0.970 s in the measured
+  2×2 rational/constant case). `SharedGrid=true` supports FFT/de Hoog only;
+  quadrature rejects it explicitly. Parallel evaluation remains deferred.
+- Scalar APIs and `clsim` reuse semantics are unchanged.
+
+| Case | Evaluations before → after | Factorizations before → after | Setup seconds before → after | Max output difference |
+|---|---:|---:|---:|---:|
+| Small 2×2, FFT | 98,308 → 73,732 | 98,308 → 73,732 | 10.859 → 2.103 | 4.48e-9 |
+| Hybrid wing, FFT | 16,386 → 16,386 | opaque | 12.214 → 5.589 | 0 |
+| Dense 300 states, 30×2, de Hoog | 16,896 → 1,056 | 16,896 → 1,056 | 302.201 → 29.653 | 4.26e-10 |
+
+R2026a, single computational thread, one measured run per case with other
+MATLAB work active; timings are indicative. Dense shared output differs
+from an exact modal FOH reference by 2.55e-11. The report includes distinct
+node counts, cache hit rates, parameters, warmup policy and limitations.
+
+Implemented by Codex; review by Claude Code pending.
+
 ## [0.8.0] — 2026-09-27
 
 ### Added

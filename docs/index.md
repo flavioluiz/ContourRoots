@@ -55,3 +55,5 @@ blocks into MATLAB in order.
 - "Exact" in this documentation means that the original function is
   evaluated without Padé approximation or modal truncation. The computed
   roots are still floating-point numbers.
+
+Shared MIMO preparation: [algorithm, usage and benchmark](development/shared_grid_preparation.md).

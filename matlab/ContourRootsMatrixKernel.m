@@ -1,6 +1,7 @@
 classdef (Sealed) ContourRootsMatrixKernel
 %CONTOURROOTSMATRIXKERNEL Immutable numeric MIMO kernel bank from CKERNEL.
 %   Includes every channel, even if its input is zero in the first run.
+%   SharedGrid=true opts into common fft/dehoog preparation (see CKERNEL).
 %   No model handles or shared evaluation cache are retained. Scalar
 %   ContourRootsKernel snapshots remain unchanged and load as before.
     properties (Access=private)

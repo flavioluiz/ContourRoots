@@ -57,6 +57,12 @@ session. Check the installation with:
 contourroots      % prints the version and the main functions
 ```
 
+Version 0.9.0 adds opt-in shared-grid MIMO kernel preparation:
+`ckernel(M,t,'SharedGrid',true,...)` evaluates the whole transfer matrix at
+common FFT/de Hoog nodes, using one factorization and all right-hand sides
+for `cdyn`. Per-output tolerances and per-channel delays/direct terms are
+preserved. See the [benchmark and usage notes](docs/development/shared_grid_preparation.md).
+
 ## Your first roots in 30 seconds
 
 The characteristic equation of a system with a delay,

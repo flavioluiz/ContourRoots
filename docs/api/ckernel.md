@@ -4,6 +4,11 @@ Prepare the numerical kernels of a system once, then simulate many inputs
 with `clsim` without inverting the Laplace transform again.
 
 **Matrix models.** Explicit matrix models prepare a `ContourRootsMatrixKernel` bank for all channels. See [MIMO responses](matrix_responses.md); the scalar snapshot class and behavior described below remain unchanged.
+For matrix models, opt into `SharedGrid=true` with FFT or de Hoog to prepare
+all channels and both kernel orders on one adaptive spectral grid. Default
+`false` keeps independent channel refinement. Shared setup uses the same
+numeric snapshot schema and the same `clsim` error accounting. See the
+[benchmark and limits](../development/shared_grid_preparation.md).
 
 ## Syntax
 
@@ -102,6 +107,7 @@ For `ckernel` (fixed once prepared):
 | `SingularityBound`, `Abscissa`, `AssumeStable` | as in [`cstep`](cstep.md#main-options) | where $G$ is analytic; required for a function handle |
 | `Feedthrough` | exact or 0 | known direct term $D$ |
 | `Method` | `'fft'` | inversion method: `'fft'`, `'dehoog'`, `'quadrature'` |
+| `SharedGrid` | `false` | matrix models only: common FFT/de Hoog grid across channels and step/ramp orders |
 | `MaxPoints`, `MaxRefinements`, `MaxMemoryMB` | `2^20`, 8, 256 | effort and storage budgets |
 | `Display` | `false` | print the preparation cost |
 
@@ -173,7 +179,8 @@ to about $10^{-4}$, the size of the remaining transient
 
 `K` can be saved to a MAT file and loaded later with the same toolbox
 version; the function handle does not need to exist anymore. The snapshot
-format may change between versions.
+format may change between versions. Version 0.9.0 retains schema 1 and
+loads scalar and matrix snapshots saved by 0.8.0.
 
 ## Errors
 

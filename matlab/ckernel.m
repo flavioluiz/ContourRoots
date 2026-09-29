@@ -20,8 +20,12 @@ function [K,info] = ckernel(G,t,varargin)
 %       assert(info.evaluations == 0 && info.kernelReused);
 %
 %   See also CLSIM, CSTEP, CINVLAPLACE.
-%   Explicit CMIMO/CDYN input prepares every channel in a separate immutable
-%   ContourRootsMatrixKernel bank. Shared matrix evaluations occur only here.
+%   Explicit CMIMO/CDYN input prepares all channels in an immutable bank.
+%   SharedGrid=true (matrix models only, fft/dehoog) refines a common grid
+%   against the worst channel and both kernel orders. Each matrix node uses
+%   one block evaluation for all inputs/outputs. Default false preserves
+%   independent channel refinement; quadrature uses that path only.
+%   SharedGrid changes setup, not CLSIM reuse or the saved numeric schema.
     if isa(G,'ContourRootsModel')
         K=ContourRootsMatrixKernel(G,t,varargin{:});
     else
