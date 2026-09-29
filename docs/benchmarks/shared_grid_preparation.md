@@ -167,4 +167,5 @@ On MATLAB R2026a, the release run passed all **153 unit/regression tests**
 and all **3 documentation tests**, with no skips. After a final loop-variable
 scope cleanup, all seven shared-grid tests passed again and MATLAB's static
 check was clean. The example on this page was also executed separately.
-The full study/manual/package build is recorded when it finishes.
+The full `buildtool release` additionally regenerates every study, the
+manual, and the local release archives.
