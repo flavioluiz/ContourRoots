@@ -34,7 +34,8 @@ MATLAB work active; timings are indicative. Dense shared output differs
 from an exact modal FOH reference by 2.55e-11. The report includes distinct
 node counts, cache hit rates, parameters, warmup policy and limitations.
 
-Implemented by Codex; review by Claude Code pending.
+Implemented by Codex; reviewed by Claude Code (independent `buildtool test`:
+153/153; client regression in infinite-dim-lab against 0.9.0: 23/23).
 
 ## [0.8.0] — 2026-09-27
 
